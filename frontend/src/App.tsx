@@ -1,11 +1,10 @@
 import React from 'react';
+import RootView from './views';
 
-import Layout from './components/Layout';
 
-
-function App() {
+const App: React.FC = () => {
   return (
-    <Layout>Content</Layout>
+    <RootView />
   );
 }
 

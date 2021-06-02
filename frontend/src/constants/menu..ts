@@ -2,15 +2,13 @@ import {
     ClockIcon,
     HomeIcon,
     QuestionMarkCircleIcon,
-    ScaleIcon,
   } from '@heroicons/react/outline'
 
 export const navigation = [
-    { name: 'Home', href: '#', icon: HomeIcon, current: true },
-    { name: 'Postgres', href: '#', icon: ClockIcon, current: false },
-    { name: 'MongoDB', href: '#', icon: ScaleIcon, current: false },
+    { name: 'Overview', href: '#', icon: HomeIcon, current: true },
+    { name: 'Databases', href: '#', icon: ClockIcon, current: false },
   ]
 
 export const secondaryNavigation = [
-    { name: 'Help', href: '#', icon: QuestionMarkCircleIcon },
+    { name: 'Settings', href: '#', icon: QuestionMarkCircleIcon },
 ]
