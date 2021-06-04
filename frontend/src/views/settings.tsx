@@ -7,7 +7,7 @@ interface SettingsViewProps {}
 
 const SettingsView: React.FC<SettingsViewProps> = () => {
   return (
-    <Layout>SettingsView</Layout>
+    <Layout selectedNavigation="Settings">SettingsView</Layout>
   );
 }
 

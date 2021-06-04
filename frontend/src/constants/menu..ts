@@ -1,14 +1,42 @@
-import {
-    ClockIcon,
-    HomeIcon,
-    QuestionMarkCircleIcon,
-  } from '@heroicons/react/outline'
+import React from 'react'
+import { HomeIcon, DatabaseIcon, CogIcon } from '@heroicons/react/outline'
+
+// TODO: create a map for all routes
+export type LinkProps = {
+  name: string;
+  to: string;
+}
+
+export type Navigation = LinkProps & {
+  section: "primary" | "secondary";
+  icon: (props: React.ComponentProps<'svg'>) => JSX.Element;
+}
+
+export const OverviewNavigation: Navigation = {
+  name: 'Overview',
+  to: '/overview',
+  section: 'primary',
+  icon: HomeIcon,
+}
+
+export const DatabasesNavigation: Navigation = {
+  name: 'Databases',
+  to: '/databases',
+  section: 'primary',
+  icon: DatabaseIcon,
+}
+
+export const SettingsNavigation: Navigation = {
+  name: 'Settings',
+  to: '/settings',
+  section: 'secondary',
+  icon: CogIcon,
+}
+
+// HINT: INSERT NEW NAVIGATION HERE
 
 export const navigation = [
-    { name: 'Overview', href: '#', icon: HomeIcon, current: true },
-    { name: 'Databases', href: '#', icon: ClockIcon, current: false },
-  ]
-
-export const secondaryNavigation = [
-    { name: 'Settings', href: '#', icon: QuestionMarkCircleIcon },
+  OverviewNavigation,
+  DatabasesNavigation,
+  SettingsNavigation,
 ]

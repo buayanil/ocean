@@ -1,9 +1,11 @@
 import { Fragment, useState } from 'react'
+import { Link } from 'react-router-dom';
+
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import { MenuAlt1Icon, XIcon} from '@heroicons/react/outline'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
-import { navigation, secondaryNavigation } from '../constants/menu.'
+import { navigation, SettingsNavigation } from '../constants/menu.'
 
 
 function classNames(...classes: string[]) {
@@ -12,11 +14,12 @@ function classNames(...classes: string[]) {
 
 
 export interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
+  selectedNavigation: string;
 }
 
 
-const Layout: React.FC<LayoutProps> = ({children}) =>{
+const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -78,32 +81,32 @@ const Layout: React.FC<LayoutProps> = ({children}) =>{
               </div>
               <nav className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto" aria-label="Sidebar">
                 <div className="px-2 space-y-1">
-                  {navigation.map((item) => (
-                    <a
+                  {navigation.filter(item => item.section === "primary").map((item) => (
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.to}
                       className={classNames(
-                        item.current ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
+                        item.name === selectedNavigation ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
                         'group flex items-center px-2 py-2 text-base font-medium rounded-md'
                       )}
-                      aria-current={item.current ? 'page' : undefined}
+                      aria-current={item.name === selectedNavigation ? 'page' : undefined}
                     >
                       <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200" aria-hidden="true" />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
                 <div className="mt-6 pt-6">
                   <div className="px-2 space-y-1">
-                    {secondaryNavigation.map((item) => (
-                      <a
+                    {navigation.filter(item => item.section === "secondary").map((item) => (
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.to}
                         className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
                       >
                         <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -130,32 +133,32 @@ const Layout: React.FC<LayoutProps> = ({children}) =>{
             </div>
             <nav className="mt-5 flex-1 flex flex-col divide-y divide-cyan-800 overflow-y-auto" aria-label="Sidebar">
               <div className="px-2 space-y-1">
-                {navigation.map((item) => (
-                  <a
+                {navigation.filter(item => item.section === "primary").map((item) => (
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.to}
                     className={classNames(
-                      item.current ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
+                      item.name === selectedNavigation ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
                       'group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md'
                     )}
-                    aria-current={item.current ? 'page' : undefined}
+                    aria-current={item.name === selectedNavigation ? 'page' : undefined}
                   >
                     <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200" aria-hidden="true" />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
               <div className="mt-6 pt-6">
                 <div className="px-2 space-y-1">
-                  {secondaryNavigation.map((item) => (
-                    <a
+                  {navigation.filter(item => item.section === "secondary").map((item) => (
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.to}
                       className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
                     >
                       <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -213,41 +216,28 @@ const Layout: React.FC<LayoutProps> = ({children}) =>{
                       >
                         <Menu.Item>
                           {({ active }) => (
-                            <a
-                              href="#"
-                              className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm text-gray-700'
-                              )}
-                            >
-                              Your Profile
-                            </a>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <a
-                              href="#"
+                            <Link
+                              to={SettingsNavigation.to}
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm text-gray-700'
                               )}
                             >
                               Settings
-                            </a>
+                            </Link>
                           )}
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <a
-                              href="#"
+                            <Link
+                              to="#"
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm text-gray-700'
                               )}
                             >
                               Logout
-                            </a>
+                            </Link>
                           )}
                         </Menu.Item>
                       </Menu.Items>
@@ -259,8 +249,10 @@ const Layout: React.FC<LayoutProps> = ({children}) =>{
           </div>
         </div>
         <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
-          <div className="mt-8">
-            {children}
+          <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+            <div className="mt-8">
+              {children}
+            </div>
           </div>
         </main>
       </div>
