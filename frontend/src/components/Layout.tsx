@@ -1,11 +1,11 @@
-import { Fragment, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom';
 
 import { Dialog, Menu, Transition } from '@headlessui/react'
-import { MenuAlt1Icon, XIcon} from '@heroicons/react/outline'
-import { ChevronDownIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon, MenuAlt1Icon, XIcon } from '@heroicons/react/solid'
 
 import { navigation, SettingsNavigation } from '../constants/menu.'
+import CreateDropdown from './CreateDropdown';
 
 
 function classNames(...classes: string[]) {
@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
+    <div className="h-screen flex overflow-hidden bg-white">
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -184,10 +184,11 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
             <span className="sr-only">Open sidebar</span>
             <MenuAlt1Icon className="h-6 w-6" aria-hidden="true" />
           </button>
-          <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+          <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8 border-b-2 border-gray-100">
             <div className="flex-1 flex">
             </div>
             <div className="ml-4 flex items-center md:ml-6">
+              <CreateDropdown />
               {/* Profile dropdown */}
               <Menu as="div" className="ml-3 relative">
                 {({ open }) => (
