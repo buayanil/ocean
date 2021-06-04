@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HTW-DB1",
+  "name": "Platform for managed database hosting.",
   "icons": [
     {
       "src": "favicon.ico",
