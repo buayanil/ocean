@@ -1,6 +1,7 @@
 FRONTEND_DIR=${PWD}/frontend
 cd ${FRONTEND_DIR}
 
+git stash
 git pull origin production
 git checkout production
 
