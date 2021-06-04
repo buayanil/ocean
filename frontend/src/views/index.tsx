@@ -1,12 +1,12 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 
-import LoadingView from './loading';
+import LoadingView from './LoadingView';
 
-const OverviewView = React.lazy(() => import('./overview'));
+const OverviewView = React.lazy(() => import('./OverviewView'));
 const DatabasesView = React.lazy(() => import('./databases/DatabasesView'));
 const NewDatabaseView = React.lazy(() => import('./databases/NewDatabaseView'));
-const SettingsView = React.lazy(() => import('./settings'));
+const SettingsView = React.lazy(() => import('./SettingsView'));
 
 
 export interface ViewProps {
