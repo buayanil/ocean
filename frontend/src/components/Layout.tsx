@@ -102,7 +102,11 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
                       <Link
                         key={item.name}
                         to={item.to}
-                        className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
+                        className={classNames(
+                          item.name === selectedNavigation ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
+                          'group flex items-center px-2 py-2 text-base font-medium rounded-md'
+                        )}
+                        aria-current={item.name === selectedNavigation ? 'page' : undefined}
                       >
                         <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
                         {item.name}
@@ -154,7 +158,11 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
                     <Link
                       key={item.name}
                       to={item.to}
-                      className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
+                      className={classNames(
+                        item.name === selectedNavigation ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600',
+                        'group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md'
+                      )}
+                      aria-current={item.name === selectedNavigation ? 'page' : undefined}
                     >
                       <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
                       {item.name}
