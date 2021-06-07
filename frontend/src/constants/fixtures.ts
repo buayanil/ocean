@@ -1,3 +1,4 @@
+import { EngineOption } from "../components/EngineSelector/EngineSelector";
 import { DatabaseProperties } from "../types/models";
 
 export const databases: ReadonlyArray<DatabaseProperties> = [
@@ -14,4 +15,18 @@ export const databases: ReadonlyArray<DatabaseProperties> = [
       created: 'July 15, 2020',
     },
 ]
-  
+
+export const engineOptions: ReadonlyArray<EngineOption> = [
+  {
+    id: 1,
+    label: 'PostgreSQL',
+    imageSrc: 'https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg',
+    alt: 'postgresql logo',
+  },
+  {
+    id: 2,
+    label: 'MongoDB',
+    imageSrc: 'https://1000logos.net/wp-content/uploads/2020/08/MongoDB-Emblem.jpg',
+    alt: 'mongodb logo',
+  },
+]
