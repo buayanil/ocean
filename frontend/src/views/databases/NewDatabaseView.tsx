@@ -15,7 +15,7 @@ const NewDatabaseView: React.FC<NewDatabaseViewProps> = () => {
       <div className="text-3xl text-gray-600 sm:text-4xl mb-5">Create a database</div>
       <div className="text-xl  text-gray-600 sm:text-2xl mb-3">Choose a database engine</div>
       <div className="text-sm font-light mb-3">A database runs a single database engine that powers one or more individual databases.</div>
-      <EngineSelector engineOptions={engineOptions} selectionOptionId={2} />
+      <EngineSelector engineOptions={engineOptions} />
       <div className="text-xl text-gray-600 sm:text-2xl mt-6 mb-3">Choose a unique database name</div>
       <div className="text-sm font-light">Names must be lowercase and start with a letter. They can be between 3 and 63 characters long and may contain dashes.</div>
       <div className="mt-3">

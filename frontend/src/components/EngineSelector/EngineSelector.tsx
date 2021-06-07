@@ -11,11 +11,10 @@ export interface EngineOption {
 
 export interface EngineSelectorProps {
     engineOptions: ReadonlyArray<EngineOption>;
-    selectionOptionId: number;
 }
 
-const EngineSelector: React.FC<EngineSelectorProps> = ({engineOptions, selectionOptionId}) => {
-    const [optionId, setOptionId] =  useState<number>(NaN)
+const EngineSelector: React.FC<EngineSelectorProps> = ({engineOptions}) => {
+    const [optionId, setOptionId] =  useState<number>(1)
 
     const getClassName = (value: number) => {
         if (optionId === value) {
