@@ -36,7 +36,7 @@ class LdapService @Inject()(config: Configuration) {
       val lastName = entry.get("sn").getString
       val mail = entry.get("mail").getString
       val employeeType = entry.get("employeetype").getString
-      Right(LdapProfile(firstName, lastName, mail, employeeType))
+      Right(LdapProfile(username, firstName, lastName, mail, employeeType))
     } catch {
       case e: LdapInvalidAttributeValueException => Left(e.toString)
     }
