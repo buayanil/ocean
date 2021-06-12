@@ -11,4 +11,5 @@ scalaVersion := "2.13.5"
 libraryDependencies ++= Seq(
   specs2 % Test,
   guice,
+  "org.apache.directory.api" % "api-all" % "2.0.2",
 )
