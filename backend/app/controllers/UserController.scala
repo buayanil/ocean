@@ -24,8 +24,10 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       formData => {
-        // TODO: userService.login(formData.username, formData.password)
-        Ok("")
+        userService.login(formData.username, formData.password) match {
+          case Left(value) => BadRequest(Json.toJson(value))
+          case Right(token) => Ok(token)
+        }
       }
     )
   }

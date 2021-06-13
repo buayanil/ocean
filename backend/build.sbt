@@ -16,4 +16,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
   "com.h2database" % "h2" % "1.4.200",
   "org.postgresql" % "postgresql" % "42.2.21",
+  "com.github.jwt-scala" %% "jwt-play-json" % "8.0.2",
+  "com.github.jwt-scala" %% "jwt-core" % "8.0.2",
 )
