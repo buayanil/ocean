@@ -1,27 +1,27 @@
 package services
 
-import models.LdapProfile
 import org.apache.directory.api.ldap.model.cursor.{CursorException, EntryCursor}
 import org.apache.directory.api.ldap.model.entry.Entry
 import org.apache.directory.api.ldap.model.exception.{LdapAuthenticationException, LdapException, LdapInvalidAttributeValueException}
 import org.apache.directory.api.ldap.model.message.SearchScope
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException
 import org.apache.directory.ldap.client.api.{LdapConnectionConfig, LdapNetworkConnection}
-import play.api.Configuration
-
 import java.io.IOException
 import javax.inject._
+import play.api.Configuration
 import scala.collection.mutable.ListBuffer
+
+import models.LdapUser
 
 
 class LdapService @Inject()(config: Configuration) {
 
-  def authenticate(username: String, password: String): Either[List[String], LdapProfile] = {
+  def authenticate(username: String, password: String): Either[List[String], LdapUser] = {
     val ldapConnectionConfig = getLdapConnectionConfig(username, password)
     ldapConnectionConfig match {
       case Right(config) => fetchLdapRole(config, username) match {
         case Right(entry) => getProfileFor(entry, username) match {
-          case Right(ldapProfile) => Right(ldapProfile)
+          case Right(ldapUser) => Right(ldapUser)
           case Left(error) => Left(List(error))
         }
         case Left(error) => Left(List(error))
@@ -30,13 +30,13 @@ class LdapService @Inject()(config: Configuration) {
     }
   }
 
-  def getProfileFor(entry: Entry, username: String): Either[String, LdapProfile] = {
+  def getProfileFor(entry: Entry, username: String): Either[String, LdapUser] = {
     try {
       val firstName = entry.get("givenName").getString
       val lastName = entry.get("sn").getString
       val mail = entry.get("mail").getString
       val employeeType = entry.get("employeetype").getString
-      Right(LdapProfile(username, firstName, lastName, mail, employeeType))
+      Right(LdapUser(username, firstName, lastName, mail, employeeType))
     } catch {
       case e: LdapInvalidAttributeValueException => Left(e.toString)
     }
@@ -50,9 +50,9 @@ class LdapService @Inject()(config: Configuration) {
       ldapConnection = new LdapNetworkConnection(ldapConnectionConfig)
       ldapConnection.bind()
     } catch {
-      case e: InvalidConnectionException  => return Left(e.toString)
-      case e: LdapAuthenticationException  => return Left(e.toString)
-      case e: LdapException  => return Left(e.toString)
+      case e: InvalidConnectionException => return Left(e.toString)
+      case e: LdapAuthenticationException => return Left(e.toString)
+      case e: LdapException => return Left(e.toString)
     }
 
     var entry: Entry = null
@@ -64,7 +64,7 @@ class LdapService @Inject()(config: Configuration) {
       entry = entryCursor.get();
     } catch {
       case e: CursorException => return Left(e.toString)
-      case e: LdapException  => return Left(e.toString)
+      case e: LdapException => return Left(e.toString)
     }
 
     try {
