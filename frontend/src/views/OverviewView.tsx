@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Layout from '../components/Layout';
+import AppLayout from '../layouts/AppLayout';
 import { OverviewNavigation } from '../constants/menu.';
 
 
@@ -8,7 +8,7 @@ interface OverviewViewProps {}
 
 const OverviewView: React.FC<OverviewViewProps> = () => {
   return (
-    <Layout selectedNavigation={OverviewNavigation.name}>OverviewView</Layout>
+    <AppLayout selectedNavigation={OverviewNavigation.name}>OverviewView</AppLayout>
   );
 }
 

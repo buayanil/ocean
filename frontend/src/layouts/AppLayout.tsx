@@ -5,7 +5,7 @@ import { Dialog, Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from '@heroicons/react/solid'
 
 import { navigation, SettingsNavigation } from '../constants/menu.'
-import CreateDropdown from './CreateDropdown';
+import CreateDropdown from '../components/CreateDropdown';
 
 
 function classNames(...classes: string[]) {
@@ -13,13 +13,13 @@ function classNames(...classes: string[]) {
 }
 
 
-export interface LayoutProps {
+export interface AppLayoutProps {
   children: React.ReactNode;
   selectedNavigation: string;
 }
 
 
-const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
+const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation}) =>{
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -269,4 +269,4 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedNavigation}) =>{
   )
 }
 
-export default Layout;
+export default AppLayout;

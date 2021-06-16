@@ -1,13 +1,13 @@
 import React from 'react';
 
-import Layout from '../components/Layout';
+import AppLayout from '../layouts/AppLayout';
 
 
 interface LoadingViewProps {}
 
 const LoadingView: React.FC<LoadingViewProps> = () => {
   return (
-    <Layout selectedNavigation="">LoadingView</Layout>
+    <AppLayout selectedNavigation="">LoadingView</AppLayout>
   );
 }
 

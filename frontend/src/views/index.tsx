@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 
+import SignInView from './SignInView';
 import LoadingView from './LoadingView';
 
 const OverviewView = React.lazy(() => import('./OverviewView'));
@@ -18,6 +19,7 @@ const RootView: React.FC = () => (
         <Suspense fallback={<LoadingView />}>
             <Switch>
                 <Redirect exact from="/" to={"/overview"} />
+                <Route exact path='/login' render={(props) => <SignInView {...props} />} />
                 <Route exact path='/overview' render={(props) => <OverviewView {...props} />} />
                 <Route exact path='/databases' render={(props) => <DatabasesView {...props} />} />
                 <Route path='/databases/new' render={(props) => <NewDatabaseView {...props} />} />

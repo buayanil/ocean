@@ -1,7 +1,7 @@
 import React from 'react';
 import EngineSelector from '../../components/EngineSelector/EngineSelector';
 
-import Layout from '../../components/Layout';
+import AppLayout from '../../layouts/AppLayout';
 import { DatabasesNavigation } from '../../constants/menu.';
 import { engineOptions } from '../../constants/fixtures';
 import { CheckCircleIcon } from '@heroicons/react/solid';
@@ -11,7 +11,7 @@ interface NewDatabaseViewProps {}
 
 const NewDatabaseView: React.FC<NewDatabaseViewProps> = () => {
   return (
-    <Layout selectedNavigation={DatabasesNavigation.name}>
+    <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="text-3xl text-gray-600 sm:text-4xl mb-5">Create a database</div>
       <div className="text-xl  text-gray-600 sm:text-2xl mb-3">Choose a database engine</div>
       <div className="text-sm font-light mb-3">A database runs a single database engine that powers one or more individual databases.</div>
@@ -34,14 +34,14 @@ const NewDatabaseView: React.FC<NewDatabaseViewProps> = () => {
             <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
           </div>
         </div>
-    </div>
-    <button
-        type="button"
-        className="mt-6 px-4 w-full py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Create a database
-    </button>
-    </Layout>
+      </div>
+      <button
+          type="button"
+          className="mt-6 px-4 w-full py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Create a database
+      </button>
+    </AppLayout>
   );
 }
 

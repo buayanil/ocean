@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Layout from '../components/Layout';
+import AppLayout from '../layouts/AppLayout';
 import { SettingsNavigation } from '../constants/menu.';
 
 interface SettingsViewProps {}
@@ -8,7 +8,7 @@ interface SettingsViewProps {}
 
 const SettingsView: React.FC<SettingsViewProps> = () => {
   return (
-    <Layout selectedNavigation={SettingsNavigation.name}>SettingsView</Layout>
+    <AppLayout selectedNavigation={SettingsNavigation.name}>SettingsView</AppLayout>
   );
 }
 
