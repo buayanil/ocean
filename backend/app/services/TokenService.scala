@@ -13,14 +13,14 @@ class TokenService @Inject()(configuration: Configuration) {
   val SECRET_KEY: String = configuration.getOptional[String]("jwt.secret_key").getOrElse("")
   val ALGO_TYPE: JwtHmacAlgorithm = JwtAlgorithm.HS256
 
-  def encode(issuer: String): String = {
+  def encode(issuer: String, expiresIn: Long = 172800): String = {
     implicit val clock: Clock = Clock.systemUTC
-    val claim = JwtClaim().issuedNow.expiresIn(172800).by(issuer)
+    val claim = JwtClaim().issuedNow.expiresIn(expiresIn).by(issuer)
     Jwt.encode(claim, SECRET_KEY, ALGO_TYPE)
   }
 
   def validate(token: String): Either[List[String], String] = {
-    if (Jwt.isValid(token)) {
+    if (Jwt.isValid(token, SECRET_KEY, Seq(ALGO_TYPE))) {
       Jwt.decode(token, SECRET_KEY, Seq(ALGO_TYPE)) match {
         case Success(jwtClaim) => jwtClaim.issuer match {
           case Some(issuer) => Right(issuer)
