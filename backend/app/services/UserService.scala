@@ -1,5 +1,7 @@
 package services
 
+import models.ErrorMessage
+
 import javax.inject.Inject
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -8,7 +10,7 @@ import repositories.UserRepository
 
 class UserService @Inject()(ldapService: LdapService, tokenService: TokenService ,userRepository: UserRepository) {
 
-  def login(username: String, password: String): Either[List[String], String] = {
+  def login(username: String, password: String): Either[List[ErrorMessage], String] = {
     ldapService.authenticate(username, password) match {
       case Left(errors) => Left(errors)
       case Right(ldapUser) => Await.result(userRepository.getByUsername(ldapUser.username), Duration.Inf) match {

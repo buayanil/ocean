@@ -7,6 +7,8 @@ import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import play.api.Configuration
 import scala.util.{Failure, Success}
 
+import models.ErrorMessage
+
 
 class TokenService @Inject()(configuration: Configuration) {
 
@@ -19,17 +21,17 @@ class TokenService @Inject()(configuration: Configuration) {
     Jwt.encode(claim, SECRET_KEY, ALGO_TYPE)
   }
 
-  def validate(token: String): Either[List[String], String] = {
+  def validate(token: String): Either[ErrorMessage, String] = {
     if (Jwt.isValid(token, SECRET_KEY, Seq(ALGO_TYPE))) {
       Jwt.decode(token, SECRET_KEY, Seq(ALGO_TYPE)) match {
         case Success(jwtClaim) => jwtClaim.issuer match {
           case Some(issuer) => Right(issuer)
-          case None => Left(List("Issuer Claim missing"))
+          case None => Left(ErrorMessage(ErrorMessage.CODE_JWT_ISSUER_MISSING, "Issuer in claim not found"))
         }
-        case Failure(e) => Left(List(e.toString))
+        case Failure(e) => Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, "Invalid signature", developerMessage = e.getMessage))
       }
     } else {
-      Left(List("Invalid signature for this token or wrong algorithm."))
+      Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, "Invalid signature"))
     }
   }
 

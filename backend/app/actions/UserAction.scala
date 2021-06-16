@@ -5,11 +5,11 @@ import play.api.Logging
 import play.api.mvc._
 import play.api.http.HeaderNames
 import play.api.mvc.Results.Unauthorized
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
-import models.User
+import models.{ErrorBody, ErrorMessage, User}
 import repositories.UserRepository
 import services.TokenService
 
@@ -23,15 +23,18 @@ class UserAction @Inject() (bodyParser: BodyParsers.Default, tokenService: Token
 
   override def parser: BodyParser[AnyContent] = bodyParser
 
+  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
+  implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
+
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
     logger.info("UserAction - " + request)
 
     extractBearerToken(request) match {
-      case None => Future.successful(Unauthorized("No token given"))
+      case None => Future.successful(Unauthorized(Json.toJson(ErrorBody(List(ErrorMessage(ErrorMessage.CODE_JWT_BEARER_MISSING, "Bearer token required"))))))
       case Some(token) => tokenService.validate(token) match {
-        case Left(errors) => Future.successful(Unauthorized(Json.toJson(errors)))
+        case Left(errors) => Future.successful(Unauthorized(Json.toJson(ErrorBody(List(errors)))))
         case Right(username) => Await.result(userRepository.getByUsername(username), Duration.Inf) match {
-          case None => Future.successful(Unauthorized("Invalid issuer"))
+          case None => Future.successful(Unauthorized(Json.toJson(ErrorBody(List(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_ISSUER, "Invalid issuer"))))))
           case Some(user) =>  block(UserRequest(user, request))
         }
       }

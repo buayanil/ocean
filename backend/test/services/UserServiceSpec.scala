@@ -4,7 +4,7 @@ import org.specs2.mutable._
 import org.specs2.mock.Mockito
 import scala.concurrent.Future
 
-import models.{LdapUser, User}
+import models.{ErrorMessage, LdapUser, User}
 import repositories.UserRepository
 
 
@@ -20,7 +20,7 @@ class UserServiceSpec extends Specification with Mockito {
       val ldapService = mock[LdapService]
       ldapService.authenticate(any[String], any[String]).returns(Right(ldapUser))
       val tokenService = mock[TokenService]
-      tokenService.encode(any[String]).returns("token")
+      tokenService.encode(any[String], any[Long]).returns("token")
       val userService = new UserService(ldapService, tokenService, userRepository)
 
       // Act
@@ -40,7 +40,7 @@ class UserServiceSpec extends Specification with Mockito {
       val ldapService = mock[LdapService]
       ldapService.authenticate(any[String], any[String]).returns(Right(ldapUser))
       val tokenService = mock[TokenService]
-      tokenService.encode(any[String]).returns("token")
+      tokenService.encode(any[String], any[Long]).returns("token")
       val userService = new UserService(ldapService, tokenService, userRepository)
 
       // Act
@@ -54,7 +54,7 @@ class UserServiceSpec extends Specification with Mockito {
       // Arrange
       val userRepository = mock[UserRepository]
       val ldapService = mock[LdapService]
-      ldapService.authenticate(any[String], any[String]).returns(Left(List("error")))
+      ldapService.authenticate(any[String], any[String]).returns(Left(List(ErrorMessage("", ""))))
       val tokenService = mock[TokenService]
       val userService = new UserService(ldapService, tokenService, userRepository)
 
@@ -62,7 +62,7 @@ class UserServiceSpec extends Specification with Mockito {
       val actual = userService.login("username", "password")
 
       // Assert
-      (actual must be).equalTo(Left(List("error")))
+      (actual must be).equalTo(Left(List(ErrorMessage("", ""))))
     }
   }
 }

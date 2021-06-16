@@ -11,12 +11,12 @@ import javax.inject._
 import play.api.Configuration
 import scala.collection.mutable.ListBuffer
 
-import models.LdapUser
+import models.{ErrorMessage, LdapUser}
 
 
 class LdapService @Inject()(config: Configuration) {
 
-  def authenticate(username: String, password: String): Either[List[String], LdapUser] = {
+  def authenticate(username: String, password: String): Either[List[ErrorMessage], LdapUser] = {
     val ldapConnectionConfig = getLdapConnectionConfig(username, password)
     ldapConnectionConfig match {
       case Right(config) => fetchLdapRole(config, username) match {
@@ -30,7 +30,7 @@ class LdapService @Inject()(config: Configuration) {
     }
   }
 
-  def getProfileFor(entry: Entry, username: String): Either[String, LdapUser] = {
+  def getProfileFor(entry: Entry, username: String): Either[ErrorMessage, LdapUser] = {
     try {
       val firstName = entry.get("givenName").getString
       val lastName = entry.get("sn").getString
@@ -38,11 +38,11 @@ class LdapService @Inject()(config: Configuration) {
       val employeeType = entry.get("employeetype").getString
       Right(LdapUser(username, firstName, lastName, mail, employeeType))
     } catch {
-      case e: LdapInvalidAttributeValueException => Left(e.toString)
+      case e: LdapInvalidAttributeValueException => Left(ErrorMessage(ErrorMessage.CODE_LDAP_ENTRY_MISSING, e.getMessage))
     }
   }
 
-  def fetchLdapRole(ldapConnectionConfig: LdapConnectionConfig, username: String): Either[String, Entry] = {
+  def fetchLdapRole(ldapConnectionConfig: LdapConnectionConfig, username: String): Either[ErrorMessage, Entry] = {
     val ldapUserRoot = config.getOptional[String]("ldap.userRoot")
 
     var ldapConnection: LdapNetworkConnection = null
@@ -50,9 +50,9 @@ class LdapService @Inject()(config: Configuration) {
       ldapConnection = new LdapNetworkConnection(ldapConnectionConfig)
       ldapConnection.bind()
     } catch {
-      case e: InvalidConnectionException => return Left(e.toString)
-      case e: LdapAuthenticationException => return Left(e.toString)
-      case e: LdapException => return Left(e.toString)
+      case e: InvalidConnectionException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_AUTHENTICATION_FAILED, e.getMessage))
+      case e: LdapAuthenticationException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_AUTHENTICATION_FAILED, e.getMessage))
+      case e: LdapException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_AUTHENTICATION_FAILED, e.getMessage))
     }
 
     var entry: Entry = null
@@ -63,46 +63,46 @@ class LdapService @Inject()(config: Configuration) {
       entryCursor.next()
       entry = entryCursor.get();
     } catch {
-      case e: CursorException => return Left(e.toString)
-      case e: LdapException => return Left(e.toString)
+      case e: CursorException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_CURSOR_FAILED, e.getMessage))
+      case e: LdapException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_CURSOR_FAILED, e.getMessage))
     }
 
     try {
       ldapConnection.close()
     } catch {
-      case e: LdapException => return Left(e.toString)
-      case e: IOException => return Left(e.toString)
+      case e: LdapException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_CLOSING_FAILED, e.getMessage))
+      case e: IOException => return Left(ErrorMessage(ErrorMessage.CODE_LDAP_CLOSING_FAILED, e.getMessage))
     }
 
     Right(entry)
   }
 
-  def getLdapConnectionConfig(username: String, password: String): Either[List[String], LdapConnectionConfig] = {
-    val errors = ListBuffer[String]()
+  def getLdapConnectionConfig(username: String, password: String): Either[List[ErrorMessage], LdapConnectionConfig] = {
+    val errors = ListBuffer[ErrorMessage]()
     val ldapConnectionConfig = new LdapConnectionConfig()
 
     val ldapHost = config.getOptional[String]("ldap.host")
     ldapHost match {
       case Some(value) => ldapConnectionConfig.setLdapHost(value)
-      case _ => errors += "Could not load ldap host."
+      case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG ,"Could not load ldap host.")
     }
 
     val ldapPort = config.getOptional[Int]("ldap.port")
     ldapPort match {
       case Some(value) if value > 0 => ldapConnectionConfig.setLdapPort(value)
-      case _ => errors += "Could not load ldap port."
+      case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG, "Could not load ldap port.")
     }
 
     val ldapStartTls = config.getOptional[Boolean]("ldap.startTls")
     ldapStartTls match {
       case Some(value: Boolean) => ldapConnectionConfig.setUseTls(value)
-      case _ => errors += "Could not load ldap useTls."
+      case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG ,"Could not load ldap useTls.")
     }
 
     val ldapUseSsl = config.getOptional[Boolean]("ldap.useSsl")
     ldapUseSsl match {
       case Some(value: Boolean) => ldapConnectionConfig.setUseSsl(value)
-      case _ => errors += "Could not load ldap useSsl."
+      case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG ,"Could not load ldap useSsl.")
     }
 
     val ldapUserRoot = config.getOptional[String]("ldap.userRoot")
@@ -113,9 +113,9 @@ class LdapService @Inject()(config: Configuration) {
           case Some(ldapName) => ldapConnectionConfig.setName(ldapName
             .replace("%USER%", username)
             .replace("%USER_ROOT%", userRoot))
-          case _ => errors += "Could not load ldap name."
+          case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG ,"Could not load ldap name.")
         }
-      case _ => errors += "Could not load ldap userRoot."
+      case _ => errors += ErrorMessage(ErrorMessage.CODE_LDAP_CONNECTION_CONFIG ,"Could not load ldap userRoot.")
     }
 
     ldapConnectionConfig.setCredentials(password)
