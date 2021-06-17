@@ -56,9 +56,9 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading }) => {
                 </label>
                 <div className="mt-1">
                   <Field id="username" name="username" placeholder=""
-                    className={getFieldClassNames(Boolean(errors.username) && Boolean(touched.username))} />
+                    className={getFieldClassNames(errors.username !== undefined && touched.username !== undefined)} />
                   {errors.username && touched.username && (
-                    <span className="mt-2 text-sm text-red-600" id="usernameHelp">Username is required</span>
+                    <span className="mt-2 text-sm text-red-600" id="usernameHelp">{errors.username}</span>
                   )}
                 </div>
               </div>
@@ -69,9 +69,9 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading }) => {
                 </label>
                 <div className="mt-1">
                   <Field id="password" name="password" type="password" placeholder="" 
-                    className={getFieldClassNames(Boolean(errors.username) && Boolean(touched.username))} />
+                    className={getFieldClassNames(errors.password !== undefined && touched.password !== undefined)} />
                   {errors.password && touched.password && (
-                    <span className="mt-2 text-sm text-red-600" id="passwordHelp">Password is required</span>
+                    <span className="mt-2 text-sm text-red-600" id="passwordHelp">{errors.password}</span>
                   )}
                 </div>
               </div>
