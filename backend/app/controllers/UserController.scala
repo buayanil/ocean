@@ -19,8 +19,8 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
     )
   }
 
-  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
   implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
+  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
 
   def login: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     CredentialsForm.form.bindFromRequest.fold(

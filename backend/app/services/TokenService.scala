@@ -26,12 +26,14 @@ class TokenService @Inject()(configuration: Configuration) {
       Jwt.decode(token, SECRET_KEY, Seq(ALGO_TYPE)) match {
         case Success(jwtClaim) => jwtClaim.issuer match {
           case Some(issuer) => Right(issuer)
-          case None => Left(ErrorMessage(ErrorMessage.CODE_JWT_ISSUER_MISSING, "Issuer in claim not found"))
+          case None =>
+            Left(ErrorMessage(ErrorMessage.CODE_JWT_ISSUER_MISSING, ErrorMessage.MESSAGE_JWT_ISSUER_MISSING))
         }
-        case Failure(e) => Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, "Invalid signature", developerMessage = e.getMessage))
+        case Failure(e) =>
+          Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE, developerMessage = e.getMessage))
       }
     } else {
-      Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, "Invalid signature"))
+      Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE))
     }
   }
 
