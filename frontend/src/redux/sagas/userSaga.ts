@@ -1,22 +1,46 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { put, takeLatest } from "redux-saga/effects";
+import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
+import * as yup from 'yup';
 
-import { CrendentialProperties, UserProperties } from "../../types/models";
-import { loginStart, loginSuccess } from "../slices/userSlice";
+import { login } from "../../api/userApi";
+import { CrendentialProperties } from "../../types/models";
+import { loginFailed, loginStart, loginSuccess } from "../slices/userSlice";
 
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms))
 
 export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
-    yield delay(1000)
-    const userMock: UserProperties = {
-        id: 1,
-        username: 'u',
-        firstName: 'f',
-        lastName: 'l',
-        mail: 'm',
-        employeeType: 'e',
-    }
-    yield put(loginSuccess(userMock))
+    try {
+        const response: SagaReturnType<typeof login> = yield call(login, payload);
+        if (response.status === 200) {
+            let tokenSchema = yup.string().required()
+            try {
+                const token = tokenSchema.validateSync(response.data);
+                yield put(loginSuccess(token))
+            } catch (parseError) {
+                yield put(loginFailed(parseError.toString()))
+            }
+        } 
+    } catch (networkError) {
+        let errorSchema = yup.object({
+            errors: yup.array().required().of(
+              yup.object({
+                code: yup.string().required(),
+                message: yup.string().required(),
+              }),
+            ),
+        });
+        try {
+            const data = errorSchema.validateSync(networkError.response.data);
+            if (data.errors && data.errors[0]) {
+                yield put(loginFailed(data.errors[0].message))
+            } else {
+                yield put(loginFailed(networkError.toString()))
+            }
+            
+        } catch (parseError) {
+            yield put(loginFailed(parseError.toString()))
+        }
+
+    }    
 }
   
 export default function* authSaga() {

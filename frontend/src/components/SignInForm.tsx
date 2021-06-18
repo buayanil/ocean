@@ -3,17 +3,17 @@ import { Formik, Form, Field, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { LockClosedIcon } from '@heroicons/react/solid';
 
+import Alert from './Alert';
+import { CrendentialProperties } from '../types/models';
 
-interface SignInValues {
-  username: string;
-  password: string;
-}
 
 export interface SignInFormProps {
   loading?: boolean;
+  errorMessage?: string;
+  onSubmit?: (credentials: CrendentialProperties) => void;
 }
 
-const SignInForm: React.FC<SignInFormProps> = ({ loading }) => {
+const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit }) => {
 
   const schema = yup.object().shape({
     username: yup.string().required('Username is required'),
@@ -35,17 +35,18 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading }) => {
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="mb-4">{errorMessage && <Alert errorMessage={errorMessage} /> }</div>
         <Formik
           initialValues={{
             username: '',
             password: '',
           }}
           validationSchema={schema}
-          onSubmit={( values: SignInValues, { setSubmitting }: FormikHelpers<SignInValues>) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 500);
+          onSubmit={( values: CrendentialProperties, { setSubmitting }: FormikHelpers<CrendentialProperties>) => {
+            if (onSubmit) {
+              onSubmit(values);
+            }
+            setSubmitting(false);
           }}
         >
           {({ errors, touched }) => (

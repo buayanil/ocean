@@ -5,6 +5,7 @@ import { CrendentialProperties, UserProperties } from '../../types/models'
 
 
 interface UserState {
+  token?: string;
   user?: UserProperties,
   loading: boolean,
   error?: string,
@@ -19,11 +20,13 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     loginStart: (state, action: PayloadAction<CrendentialProperties>) => {
-      state.error = undefined;
       state.loading = true;
+      state.error = undefined;
+      state.user = undefined;
+      state.token = undefined;
     },
-    loginSuccess: (state, action: PayloadAction<UserProperties>) => {
-      state.user = action.payload;
+    loginSuccess: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
       state.loading = false;
     },
     loginFailed: (state, action: PayloadAction<string>) => {
@@ -34,7 +37,5 @@ export const userSlice = createSlice({
 })
 
 export const { loginStart, loginSuccess, loginFailed } = userSlice.actions
-
-export const selectUser = (state: RootState) => state.user.user
 
 export default userSlice.reducer
