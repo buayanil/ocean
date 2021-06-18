@@ -4,8 +4,11 @@
 
 In the project directory, you can run:
 
-### `sbt run`
+### `sbt run -Dconfig.resource=application.dev.conf`
 Runs the app in the development mode.
+
+### `sbt run -Dplay.http.secret.key='SECRET KEY' -Djwt.secret_key='SECRET KEY'`
+Runs the app in the staging mode.
 
 ### `sbt test`
 Launches the test runner
