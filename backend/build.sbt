@@ -1,6 +1,8 @@
 name := "backend"
  
-version := "1.0" 
+version := "1.0"
+
+maintainer := "https://github.com/abteilung6"
       
 lazy val `backend` = (project in file(".")).enablePlugins(PlayScala)
 
