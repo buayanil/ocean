@@ -1,5 +1,4 @@
-FRONTEND_DIR=${PWD}/frontend
-cd ${FRONTEND_DIR}
+FRONTEND_DIR=${PWD}
 
 git checkout production
 git pull origin production
