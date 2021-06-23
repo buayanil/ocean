@@ -21,12 +21,5 @@ jobs:
         username: ${{ secrets.TESTSERVERUSER }}
         password: ${{ secrets.TESTSERVERPASS }}
         script: 
-          cd db1/backend && 
-          export APPLICATION_SECRET=${{ secrets.PLAY_APPLICATION_SECRET }} && 
-          export JWT_SECRET=${{ secrets.JWT_SECRET }}
-          export SLICK_DB_URL=${{ secrets.SLICK_DB_URL }}
-          export SLICK_DB_USER=${{ secrets.SLICK_DB_USER }}
-          export SLICK_DB_PASSWORD=${{ secrets.SLICK_DB_PASSWORD }}
-          export HOST_IP=${{ secrets.HOST_IP }}
-          sh deploy.sh
+          cd db1/backend && sh deploy.sh
 
