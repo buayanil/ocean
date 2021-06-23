@@ -1,9 +1,7 @@
-FRONTEND_DIR=${PWD}/frontend
-cd ${FRONTEND_DIR}
+FRONTEND_DIR=${PWD}
 
-git stash
-git pull origin production
 git checkout production
+git pull origin production
 
 npm install
 npm run build

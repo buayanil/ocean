@@ -1,0 +1,25 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Backend Production Deployment
+
+on:
+  push:
+    branches: [ production ]
+    paths:
+    - "backend/**"
+
+jobs:
+
+  deployment: 
+    runs-on: ubuntu-latest
+    steps:
+    - name: Executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.TESTSERVERHOST }}
+        username: ${{ secrets.TESTSERVERUSER }}
+        password: ${{ secrets.TESTSERVERPASS }}
+        script: 
+          cd db1/backend && sh deploy.sh
+
