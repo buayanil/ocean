@@ -21,5 +21,5 @@ jobs:
         username: ${{ secrets.TESTSERVERUSER }}
         password: ${{ secrets.TESTSERVERPASS }}
         script: 
-          cd db1/backend && sh deploy.sh
+          cd ocean/backend && sh deploy.sh
 
