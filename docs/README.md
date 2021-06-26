@@ -170,6 +170,14 @@ Add lines to enable RewriteEngine in `etc/apache2/sites-enabled/000-default.conf
 </Directory>
 ```
 
+Get permission for user
+
+```
+usermod -aG www-data local
+chown -R www-data:www-data /var/www/html
+chmod -R 770 /var/www/html
+```
+
 ### Create a systemd service
 
 Create a systemd service file `nano /etc/systemd/system/backend.service`
