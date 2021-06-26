@@ -44,5 +44,5 @@ jobs:
         host: ${{ secrets.TESTSERVERHOST }}
         username: ${{ secrets.TESTSERVERUSER }}
         password: ${{ secrets.TESTSERVERPASS }}
-        script: cd db1/frontend && sh deploy.sh
+        script: cd ocean/frontend && sh deploy.sh
 
