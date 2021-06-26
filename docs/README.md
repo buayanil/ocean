@@ -36,6 +36,9 @@ iptables -A OUTPUT -p tcp --dport 9000 -j ACCEPT
 # External PostgreSQL
 iptables -A OUTPUT -p tcp --dport 5432 -j ACCEPT
 
+# External LDAP
+iptables -A OUTPUT -p tcp --dport 636 -j ACCEPT
+
 # loopback device
 iptables -A INPUT -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT
 iptables -A OUTPUT -o lo -d 127.0.0.0/8 -s 127.0.0.0/8 -j ACCEPT
