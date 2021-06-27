@@ -42,7 +42,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   def create(username: String, firstname: String, lastName: String, mail: String, employeeType: String): Future[User] = db.run {
     (users.map(p => (p.username, p.firstName, p.lastName, p.mail, p.employeeType))
       returning users.map(_.id)
-      into ((nameAge, id) => User(id, nameAge._1, nameAge._2, nameAge._3, nameAge._4, nameAge._5))
+      into ((entry, id) => User(id, entry._1, entry._2, entry._3, entry._4, entry._5))
       ) += (username, firstname, lastName, mail, employeeType)
   }
 

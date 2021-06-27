@@ -5,12 +5,13 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 import play.api.libs.json._
 
+import actions.{UserAction, UserRequest}
 import forms.CredentialsForm
-import models.{ErrorBody, ErrorMessage}
+import models.{ErrorBody, ErrorMessage, User}
 import services.UserService
 
 
-class UserController @Inject()(cc: ControllerComponents, userService: UserService) extends AbstractController(cc) {
+class UserController @Inject()(cc: ControllerComponents, userService: UserService, userAction: UserAction) extends AbstractController(cc) {
 
   implicit object FormErrorWrites extends Writes[FormError] {
     override def writes(o: FormError): JsValue = Json.obj(
@@ -19,8 +20,13 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
     )
   }
 
+  implicit val userWrites: OWrites[User] = Json.writes[User]
   implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
   implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
+
+  def index: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    Ok(Json.toJson(request.user))
+  }
 
   def login: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     CredentialsForm.form.bindFromRequest.fold(
