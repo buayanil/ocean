@@ -20,9 +20,8 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
     )
   }
 
-  implicit val userWrites: OWrites[User] = Json.writes[User]
-  implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
-  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
+
+
 
   def index: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     Ok(Json.toJson(request.user))

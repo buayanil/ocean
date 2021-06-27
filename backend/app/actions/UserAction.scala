@@ -23,8 +23,7 @@ class UserAction @Inject() (bodyParser: BodyParsers.Default, tokenService: Token
 
   override def parser: BodyParser[AnyContent] = bodyParser
 
-  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
-  implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
+
 
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
     logger.info("UserAction - " + request)
