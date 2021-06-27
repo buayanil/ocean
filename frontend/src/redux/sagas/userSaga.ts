@@ -2,16 +2,15 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
 import * as yup from 'yup';
 
-import { login } from "../../api/userApi";
+import { getUser, login, tokenSchema, userSchema } from "../../api/userApi";
 import { CrendentialProperties } from "../../types/models";
-import { loginFailed, loginStart, loginSuccess } from "../slices/userSlice";
+import { getUserFailed, getUserStart, getUserSuccess, loginFailed, loginStart, loginSuccess } from "../slices/userSlice";
 
 
 export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
     try {
         const response: SagaReturnType<typeof login> = yield call(login, payload);
         if (response.status === 200) {
-            let tokenSchema = yup.string().required()
             try {
                 const token = tokenSchema.validateSync(response.data);
                 yield put(loginSuccess(token))
@@ -35,14 +34,30 @@ export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
             } else {
                 yield put(loginFailed(networkError.toString()))
             }
-            
         } catch (parseError) {
             yield put(loginFailed(parseError.toString()))
         }
 
     }    
 }
+
+export function* getUserAsync() {
+    try {
+        const response: SagaReturnType<typeof login> = yield call(getUser);
+        if (response.status === 200) {
+            try {
+                const user = userSchema.validateSync(response.data);
+                yield put(getUserSuccess(user))
+            } catch (parseError) {
+                yield put(getUserFailed(parseError.toString()))
+            }
+        } 
+    } catch (networkError) {
+        yield put(getUserFailed(networkError.toString()))
+    }
+}
   
 export default function* authSaga() {
     yield takeLatest(loginStart.type, loginAsync);
+    yield takeLatest(getUserStart.type, getUserAsync);
 }

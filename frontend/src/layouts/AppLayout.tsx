@@ -1,9 +1,11 @@
 import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from '@heroicons/react/solid'
 
+import { logout } from '../redux/slices/userSlice';
 import { navigation, SettingsNavigation } from '../constants/menu.'
 import CreateDropdown from '../components/CreateDropdown';
 
@@ -19,8 +21,14 @@ export interface AppLayoutProps {
 }
 
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation}) =>{
+const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) => {
+  const {user} = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const onLogout = () => {
+    dispatch(logout())
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-white">
@@ -201,7 +209,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation}) =>
                           alt=""
                         />
                         <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                          <span className="sr-only">Open user menu for </span>Emilia Birch
+                          <span className="sr-only">Open user menu for </span>{user && user.firstName}
                         </span>
                         <ChevronDownIcon
                           className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
@@ -238,15 +246,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation}) =>
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <Link
-                              to="#"
+                            <div
+                              onClick={onLogout}
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm text-gray-700'
                               )}
                             >
                               Logout
-                            </Link>
+                            </div>
                           )}
                         </Menu.Item>
                       </Menu.Items>
