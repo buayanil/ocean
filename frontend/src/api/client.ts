@@ -1,4 +1,5 @@
 import axios from "axios";
+import jwt from 'jsonwebtoken';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -19,4 +20,15 @@ export const setAuthorization = (token: string) => {
   } else {
     delete axiosInstance.defaults.headers.common.Authorization;
   }
+}
+
+export const validateToken = (token: string): boolean => {
+  const decoded = jwt.decode(token, {complete: true})
+  const dateNow = new Date();
+  if (decoded && decoded.payload.exp && decoded.payload.exp * 1000 > dateNow.getTime()) {
+    return true;
+  } else if (decoded && decoded.payload.exp === undefined) {
+    return true;
+  }
+  return false;
 }

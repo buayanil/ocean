@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { setAuthorization } from '../../api/client';
+import { setAuthorization, validateToken } from '../../api/client';
 import { CrendentialProperties, UserProperties } from '../../types/models'
 
 
@@ -11,9 +11,17 @@ interface UserState {
   error?: string,
 }
 
-const initialState: UserState = {
-  loading: false,
+const restoreInitialState = (): UserState => {
+  const token = localStorage.getItem('token');
+  if (token !== null && validateToken(token)) {
+    setAuthorization(token);
+    return {token: token, loading: false}
+  }
+  return {loading: false}
 }
+
+
+const initialState: UserState = restoreInitialState()
 
 export const userSlice = createSlice({
   name: 'userSlice',
@@ -28,6 +36,7 @@ export const userSlice = createSlice({
     loginSuccess: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       setAuthorization(action.payload);
+      localStorage.setItem('token', action.payload)
       state.loading = false;
     },
     loginFailed: (state, action: PayloadAction<string>) => {
@@ -49,6 +58,9 @@ export const userSlice = createSlice({
       state.loading = false;
     },
     logout: (state) => {
+      state.loading = true;
+      localStorage.removeItem('token');
+      setAuthorization('');
       state.token = undefined;
       state.user = undefined;
       state.error = undefined;
