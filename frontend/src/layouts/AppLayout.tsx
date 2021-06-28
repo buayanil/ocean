@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from '@heroicons/react/solid'
 
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { logout } from '../redux/slices/userSlice';
+import { UserProperties } from '../types/models';
 import { navigation, SettingsNavigation } from '../constants/menu.'
 import CreateDropdown from '../components/CreateDropdown';
 
@@ -22,12 +22,20 @@ export interface AppLayoutProps {
 
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) => {
-  const {user} = useAppSelector((state) => state.user);
+  const {loading, user} = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const onLogout = () => {
     dispatch(logout())
+  }
+
+  const getAbbreviationFor = (value: UserProperties | undefined): string => {
+    const fallbackValue = ':('
+    if (value && value.firstName.length > 0 && value.lastName.length > 0) {
+      return value.firstName[0] + value.lastName[0];
+    }
+    return fallbackValue;
   }
 
   return (
@@ -202,15 +210,26 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
                 {({ open }) => (
                   <>
                     <div>
-                      <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
-                        <img
-                          className="h-8 w-8 rounded-full"
-                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                          alt=""
-                        />
-                        <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                          <span className="sr-only">Open user menu for </span>{user && user.firstName}
-                        </span>
+                      <Menu.Button disabled={loading} className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
+                        {loading ? 
+                          <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" /> : 
+                          <svg className="rounded-full" height="36" width="36">
+                            <rect fill="#a0d36a" x="0" y="0" height="36" width="36"></rect>
+                            <text
+                              fill="#ffffff"
+                              fontSize="15"
+                              textAnchor="middle"
+                              x="17"
+                              y="23">{getAbbreviationFor(user)}</text>
+                          </svg>
+                        }
+                        {loading ? 
+                          <span className="animate-pulse hidden ml-3 lg:block">
+                            <div className="rounded-md w-24 h-8 bg-gray-200" />
+                          </span> :
+                          <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
+                            <span className="sr-only">Open user menu for </span>{user && user.firstName}
+                          </span>}
                         <ChevronDownIcon
                           className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
                           aria-hidden="true"
