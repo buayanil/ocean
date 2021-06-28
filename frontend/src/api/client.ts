@@ -1,5 +1,6 @@
 import axios from "axios";
 import jwt from 'jsonwebtoken';
+import * as yup from 'yup';
 
 const { REACT_APP_API_URL } = process.env;
 
@@ -32,3 +33,12 @@ export const validateToken = (token: string): boolean => {
   }
   return false;
 }
+
+export const errorSchema = yup.object({
+  errors: yup.array().required().of(
+    yup.object({
+      code: yup.string().required(),
+      message: yup.string().required(),
+    }),
+  ),
+});

@@ -1,10 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
-import * as yup from 'yup';
 
+import { errorSchema } from "../../api/client";
 import { getUser, login, tokenSchema, userSchema } from "../../api/userApi";
+import { getUserFailed, getUserStart, getUserSuccess, loginFailed, loginStart, loginSuccess, logout } from "../slices/userSlice";
 import { CrendentialProperties } from "../../types/models";
-import { getUserFailed, getUserStart, getUserSuccess, loginFailed, loginStart, loginSuccess } from "../slices/userSlice";
 
 
 export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
@@ -19,14 +19,6 @@ export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
             }
         } 
     } catch (networkError) {
-        let errorSchema = yup.object({
-            errors: yup.array().required().of(
-              yup.object({
-                code: yup.string().required(),
-                message: yup.string().required(),
-              }),
-            ),
-        });
         try {
             const data = errorSchema.validateSync(networkError.response.data);
             if (data.errors && data.errors[0]) {
@@ -53,6 +45,10 @@ export function* getUserAsync() {
             }
         } 
     } catch (networkError) {
+        if (networkError.response.status === 401) {
+            // HINT: token expired
+            yield put(logout())
+        }  
         yield put(getUserFailed(networkError.toString()))
     }
 }
