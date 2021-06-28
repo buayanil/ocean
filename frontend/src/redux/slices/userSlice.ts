@@ -17,6 +17,8 @@ const restoreInitialState = (): UserState => {
     setAuthorization(token);
     return {token: token, loading: false}
   }
+  localStorage.removeItem('token');
+  setAuthorization('');
   return {loading: false}
 }
 
