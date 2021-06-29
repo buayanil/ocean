@@ -1,31 +1,21 @@
-<!-- markdownlint-disable MD033 -->
-<p align="center">
-  <a href="https://opendiscourse.de/">
-    <img
-      alt="Doge"
-      src="https://liquipedia.net/commons/images/4/4a/TeamDoge_logo.png"
-      width="400"
-    />
-  </a>
-</p>
+# Ocean
 
-# Table of Content
+Ocean is platform for fully managed database service that makes it easy to setup, manage and administer databases.
 
-- [Project Info](#project-info)
-- [Repository Structure](#repository-structure)
+* Launch a database with just a few clicks and then access it via our simplified UI or an API.
+* We support **PostgreSQL** and **MongoDB**
+* Authenticate via an LDAP service
 
-## Project Info
+## Structure
 
-The platform provides simple access to different managed databases without any setup.
+This repository is structured in three different parts.
 
-## Repository Structure
+| Codebase              |      Description          |
+| :-------------------- | :-----------------------: |
+| [frontend](frontend)  |     React Frontend        |
+| [backend](backend)    |      Play Backend         |
+| [docs](docs)          |   Docsify Documentation   |
 
-This Repo is structured in three different parts.
+## Documentation
 
-- [backend](./database):
-  - Play backend
-- [frontend](./frontend):
-  - React fronend
-
-- Documentation of the frontend can be found in the [README in frontend](./frontend/README.md)
-- Documentation of the database can be found in the [README in backend](./backend/README.md)
+For full documentation, visit [htwhub.github.io/ocean](https://htwhub.github.io/ocean/).
