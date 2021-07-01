@@ -22,11 +22,14 @@ object ErrorMessage {
   val CODE_LDAP_CURSOR_FAILED = "ldap/cursor-failed"
   val CODE_LDAP_AUTHENTICATION_FAILED = "ldap/authentication-failed"
   val CODE_LDAP_CLOSING_FAILED = "ldap/closing-failed"
+  val CODE_INSTANCE_LIST_FAILED = "database/list-failed"
 
   val MESSAGE_LDAP_ENTRY_MISSING = "Your account could not loaded. Please contact the support."
   val MESSAGE_LDAP_AUTHENTICATION_FAILED = "An account with this profile was not found."
-  val MESSAGE_LDAP_CONNECTION_CONFIG = "The authentication service cannot load its internal configuration"
+  val MESSAGE_LDAP_CONNECTION_CONFIG = "The authentication service cannot load its internal configuration."
   val MESSAGE_JWT_ISSUER_MISSING = "Issuer in JWT required."
   val MESSAGE_JWT_INVALID_SIGNATURE = "JWT has a invalid signature."
+
+  val MESSAGE_INSTANCE_LIST_FAILED = "Could not retrieve the instance list."
 }
 
