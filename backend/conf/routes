@@ -9,4 +9,4 @@ GET         /user             controllers.UserController.index
 POST        /login            controllers.UserController.login
 
 # Databases
-GET         /databases        controllers.InstanceController.index
+GET         /databases        controllers.InstanceController.listAll

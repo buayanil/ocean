@@ -11,7 +11,7 @@ import services.InstanceService
 
 class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAction, instanceService: InstanceService) extends AbstractController(cc) {
 
-  def index: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+  def listAll: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.listAll(request.user.id) match {
       case Left(error) => BadRequest(Json.toJson(ErrorBody(List(error))))
       case Right(instances) => Ok(Json.toJson(instances))
