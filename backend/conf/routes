@@ -10,3 +10,5 @@ POST        /login            controllers.UserController.login
 
 # Databases
 GET         /databases        controllers.InstanceController.listAll
+POST         /databases        controllers.InstanceController.addInstance
+

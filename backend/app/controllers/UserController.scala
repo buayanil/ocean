@@ -7,7 +7,7 @@ import play.api.libs.json._
 
 import actions.{UserAction, UserRequest}
 import forms.CredentialsForm
-import models.{ErrorBody, ErrorMessage, User}
+import models.ErrorBody
 import services.UserService
 
 
@@ -19,9 +19,6 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
       "message" -> Json.toJson(o.message)
     )
   }
-
-
-
 
   def index: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     Ok(Json.toJson(request.user))

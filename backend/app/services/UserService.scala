@@ -1,11 +1,11 @@
 package services
 
-import models.ErrorMessage
-
 import javax.inject.Inject
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+
 import repositories.UserRepository
+import models.ErrorMessage
 
 
 class UserService @Inject()(ldapService: LdapService, tokenService: TokenService ,userRepository: UserRepository) {

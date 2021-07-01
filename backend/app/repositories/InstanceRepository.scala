@@ -50,10 +50,16 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
       foreignKey("users", userId, TableQuery[InstanceTable])(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
-  private val databases = TableQuery[InstanceTable]
+  private val instances = TableQuery[InstanceTable]
 
   def listAll(userId: Long): Future[Try[Seq[Instance]]] = {
-    val action = databases.filter(database => database.userId === userId).result.asTry
+    val action = instances.filter(database => database.userId === userId).result.asTry
+    dbConfig.db.run(action)
+  }
+
+  def addInstance(instance: Instance): Future[Try[Instance]] = {
+    val insertQuery = instances returning instances.map(_.id) into ((item, id) => item.copy(id = id))
+    val action = (insertQuery += instance).asTry
     dbConfig.db.run(action)
   }
 
