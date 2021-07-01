@@ -23,12 +23,20 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
   }
 
   def addInstance(createInstanceFormData: CreateInstanceFormData, userId: Long): Either[ErrorMessage, Instance] = {
-    val localTimestamp = Timestamp.from(Instant.now);
+    val localTimestamp = Timestamp.from(Instant.now)
     val localInstance = Instance(0, userId, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
     Await.result(instanceRepository.addInstance(localInstance), Duration.Inf) match {
       case Failure(exception) =>
         Left(getErrorMessageFor(exception))
       case Success(instance) => Right(instance)
+    }
+  }
+
+  def existsInstance(createInstanceFormData: CreateInstanceFormData): Either[ErrorMessage, Boolean] = {
+    Await.result(instanceRepository.exists(createInstanceFormData.name, createInstanceFormData.engine), Duration.Inf) match {
+      case Failure(exception) =>
+        Left(ErrorMessage(ErrorMessage.CODE_INSTANCE_EXISTS_FAILED, ErrorMessage.MESSAGE_INSTANCE_EXISTS_FAILED, developerMessage = exception.getMessage))
+      case Success(exists) => Right(exists)
     }
   }
 

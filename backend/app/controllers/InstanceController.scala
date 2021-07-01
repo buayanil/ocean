@@ -6,7 +6,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 
 import actions.{UserAction, UserRequest}
-import models.{CreateInstanceForm, ErrorBody}
+import models.{CreateInstanceForm, ErrorBody, ExistsInstanceResponse}
 import services.InstanceService
 
 
@@ -39,4 +39,19 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
       }
     )
   }
+
+  def existsInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    CreateInstanceForm.form.bindFromRequest.fold(
+      formWithErrors => {
+        UnprocessableEntity(Json.toJson(formWithErrors.errors))
+      },
+      createInstanceFormData => {
+        instanceService.existsInstance(createInstanceFormData) match {
+          case Left(error) => BadRequest(Json.toJson(ErrorBody(List(error))))
+          case Right(exists) => Ok(Json.toJson(ExistsInstanceResponse(exists)))
+        }
+      }
+    )
+  }
+
 }

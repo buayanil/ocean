@@ -63,5 +63,10 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     dbConfig.db.run(action)
   }
 
+  def exists(name: String, engine: String): Future[Try[Boolean]] = {
+    val action = instances.filter(instance => instance.name === name && instance.engine === engine).exists.result.asTry
+    dbConfig.db.run(action)
+  }
+
 }
 
