@@ -4,10 +4,9 @@ import javax.inject.Inject
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents, Request}
 import play.api.data.FormError
 import play.api.libs.json._
-
 import actions.{UserAction, UserRequest}
 import forms.CredentialsForm
-import models.ErrorBody
+import models.{ErrorResponse, LoginSuccessResponse}
 import services.UserService
 
 
@@ -31,8 +30,8 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
       },
       formData => {
         userService.login(formData.username, formData.password) match {
-          case Left(value) => BadRequest(Json.toJson(ErrorBody(value)))
-          case Right(token) => Ok(token)
+          case Left(value) => BadRequest(Json.toJson(ErrorResponse(value)))
+          case Right(token) => Ok(Json.toJson(LoginSuccessResponse(token)))
         }
       }
     )

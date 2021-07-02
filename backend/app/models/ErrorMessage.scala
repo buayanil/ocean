@@ -2,13 +2,8 @@ package models
 
 import play.api.libs.json.{Json, OWrites}
 
-case class ErrorBody(errors: List[ErrorMessage])
 
 case class ErrorMessage(code: String, message: String, developerMessage: String = "")
-
-object ErrorBody {
-  implicit val errorBodyWrites: OWrites[ErrorBody] = Json.writes[ErrorBody]
-}
 
 object ErrorMessage {
   implicit val errorMessageWrites: OWrites[ErrorMessage] = Json.writes[ErrorMessage]

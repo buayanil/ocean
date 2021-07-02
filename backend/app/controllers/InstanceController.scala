@@ -6,7 +6,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 
 import actions.{UserAction, UserRequest}
-import models.{CreateInstanceForm, ErrorBody, ExistsInstanceResponse}
+import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse}
 import services.InstanceService
 
 
@@ -21,7 +21,7 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
 
   def listAll(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.listAll(request.user.id) match {
-      case Left(error) => BadRequest(Json.toJson(ErrorBody(List(error))))
+      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
       case Right(instances) => Ok(Json.toJson(instances))
     }
   }
@@ -33,7 +33,7 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
       },
       createInstanceFormData => {
         instanceService.addInstance(createInstanceFormData, request.user.id) match {
-          case Left(error) => BadRequest(Json.toJson(ErrorBody(List(error))))
+          case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(instance) => Ok(Json.toJson(instance))
         }
       }
@@ -47,7 +47,7 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
       },
       createInstanceFormData => {
         instanceService.existsInstance(createInstanceFormData) match {
-          case Left(error) => BadRequest(Json.toJson(ErrorBody(List(error))))
+          case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(exists) => Ok(Json.toJson(ExistsInstanceResponse(exists)))
         }
       }
