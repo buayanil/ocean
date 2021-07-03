@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDistance } from 'date-fns';
 
 import MobileDatabaseListEntry from './MobileDatabaseListEntry';
 import DesktopDatabaseListEntry from './DesktopDatabaseListEntry';
@@ -56,6 +57,20 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases }) => {
     </>
     
   );
+}
+
+export const getDatabaseEngineTitle = (value: string): string => {
+  if (value === 'P') {
+      return 'PostgreSQL';
+  } else if (value === 'M') {
+      return 'MongoDB';
+  } else {
+      return 'Unknown';
+  }
+}
+
+export const getDatabaseCreatedAt = (value: string): string => {
+  return formatDistance(new Date(parseInt(value)), new Date(), { addSuffix: true })
 }
 
 export default DatabaseList;
