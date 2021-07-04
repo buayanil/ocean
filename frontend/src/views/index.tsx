@@ -9,49 +9,49 @@ import { getUserStart } from '../redux/slices/userSlice';
 
 const OverviewView = React.lazy(() => import('./OverviewView'));
 const DatabasesView = React.lazy(() => import('./databases/DatabasesView'));
-const NewDatabaseView = React.lazy(() => import('./databases/NewDatabaseView'));
+const CreateDatabaseView = React.lazy(() => import('./databases/CreateDatabaseView'));
 const SettingsView = React.lazy(() => import('./SettingsView'));
 
 
 const RootView: React.FC = () => {
-    const {token, user} = useAppSelector((state) => state.user);
-    const dispatch = useAppDispatch();
+  const { token, user } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        if (token && user === undefined) {
-            dispatch(getUserStart())
-        }
+  useEffect(() => {
+    if (token && user === undefined) {
+      dispatch(getUserStart())
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token])
+  }, [token])
 
-    return (
-        <Router>
-            <Suspense fallback={<LoadingView />}>
-                <Switch>
-                    <Redirect exact from="/" to={token ? '/overview': '/login'} />
-                    <Route exact path='/login' render={(props) => <SignInView {...props} />} />
-                    <ProtectedRoute exact path='/overview' render={(props: any) => <OverviewView {...props} />} />
-                    <ProtectedRoute exact path='/databases' render={(props: any) => <DatabasesView {...props} />} />
-                    <ProtectedRoute path='/databases/new' render={(props: any) => <NewDatabaseView {...props} />} />
-                    <ProtectedRoute path='/settings' render={(props: any) => <SettingsView {...props} />} />
-                    <Redirect to="/error" />
-                </Switch>
-            </Suspense>
-        </Router>
-    );
+  return (
+    <Router>
+      <Suspense fallback={<LoadingView />}>
+        <Switch>
+          <Redirect exact from="/" to={token ? '/overview' : '/login'} />
+          <Route exact path='/login' render={(props) => <SignInView {...props} />} />
+          <ProtectedRoute exact path='/overview' render={(props: any) => <OverviewView {...props} />} />
+          <ProtectedRoute exact path='/databases' render={(props: any) => <DatabasesView {...props} />} />
+          <ProtectedRoute path='/databases/new' render={(props: any) => <CreateDatabaseView {...props} />} />
+          <ProtectedRoute path='/settings' render={(props: any) => <SettingsView {...props} />} />
+          <Redirect to="/error" />
+        </Switch>
+      </Suspense>
+    </Router>
+  );
 }
 
 const ProtectedRoute = (props: any) => {
-    const token = useAppSelector((state) => state.user.token);
-    return token !== undefined ? (
-      <Route {...props} />
-    ) : (
-      <Redirect
-        to={{
-          pathname: "/login",
-        }}
-      />
-    );
+  const token = useAppSelector((state) => state.user.token);
+  return token !== undefined ? (
+    <Route {...props} />
+  ) : (
+    <Redirect
+      to={{
+        pathname: "/login",
+      }}
+    />
+  );
 };
 
 

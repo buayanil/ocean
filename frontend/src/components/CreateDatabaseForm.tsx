@@ -4,14 +4,17 @@ import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { CheckCircleIcon, RefreshIcon, BanIcon } from '@heroicons/react/outline';
 
 import { engineOptions } from '../constants/fixtures';
-import EngineSelector from './EngineSelector/EngineSelector';
 import { UpstreamDatabaseProperties } from '../types/models';
 import { existsDatabase, existsDatabaseSchema } from '../api/databaseApi';
+import EngineSelector from './EngineSelector/EngineSelector';
 
-export interface CreateDatabaseFormProps { }
+export interface CreateDatabaseFormProps {
+    processing: boolean,
+    onSubmit: (database: UpstreamDatabaseProperties) => void
+}
 
 
-const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
+const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
     const createDatabaseSchema = yup.object().shape({
         name: yup.string()
             .required('Name is required')
@@ -34,7 +37,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
                     return true;
                 }
             } catch (parseError) {
-                // TODO: user should now what happend
+                // TODO: user should know what happend
                 return false;
             }
         }
@@ -43,7 +46,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
 
     const renderNameInput = (touched: boolean, loading: boolean, valid: boolean): JSX.Element => {
         if (loading) {
-            <RefreshIcon className="h-5 w-5 text-blue-400" aria-hidden="true" />
+            <RefreshIcon className="animate-spin h-5 w-5 text-blue-400" aria-hidden="true" />
         } else if (touched && valid) {
             return <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
         } else if (!valid && touched) {
@@ -64,6 +67,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
                 }}
                 validationSchema={createDatabaseSchema}
                 onSubmit={(values: UpstreamDatabaseProperties, { setSubmitting }: FormikHelpers<UpstreamDatabaseProperties>) => {
+                    onSubmit(values)
                     setSubmitting(true);
                 }}
             >
@@ -81,6 +85,9 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
                                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                     Database Name
                                 </label>
+                                {errors.name && touched.name && (
+                                    <span className="mt-2 text-sm text-red-600" id="nameHelp">{errors.name}</span>
+                                )}
                                 <div className="mt-1 relative rounded-md shadow-sm">
                                     <Field
                                         id="name"
@@ -89,14 +96,14 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
                                         placeholder="db-postgresql-htw1-70738"
                                         className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md" />
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        {renderNameInput(touched.name !== undefined || touched.engine !== undefined, isValidating, isValid)}
+                                        {renderNameInput(values.name !== '', isValidating, isValid)}
                                     </div>
 
                                 </div>
                             </div>
                             <button
                                 type="submit"
-                                disabled={!touched.name || touched.engine || !isValid}
+                                disabled={values.name === '' || !isValid || processing}
                                 className="mt-6 px-4 w-full py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                             >
                                 Create a database
@@ -104,7 +111,6 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = () => {
                         </>
                     </Form>
                 )}
-
             </Formik>
         </>
     );

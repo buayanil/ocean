@@ -23,6 +23,13 @@ export const databasesSchema = yup
     })
   );
 
+export const createDatabaseSchema = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  engine: yup.string().required(),
+  createdAt: yup.string().required(),
+});
+
 export const existsDatabaseSchema = yup.object().shape({
   exists: yup.boolean().required(),
 });
