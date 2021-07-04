@@ -4,6 +4,7 @@ import { DatabaseIcon } from '@heroicons/react/outline';
 
 import { DatabaseProperties } from '../../types/models';
 import { DatabasesNavigation } from '../../constants/menu.';
+import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
 
 interface DesktopDatabaseListEntryProps {
     database: DatabaseProperties
@@ -28,11 +29,11 @@ const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ dat
                 <span
                     className={'bg-green-100 text-green-800 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize'}
                 >
-                    {database.engine}
+                    {getDatabaseEngineTitle(database.engine)}
                 </span>
             </td>
             <td className="hidden px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500 md:block">
-                <time dateTime={database.created}>{database.created}</time>
+                <time dateTime={database.createdAt}>{getDatabaseCreatedAt(database.createdAt)}</time>
             </td>
             <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500 ">
                 <Link to={DatabasesNavigation.to} className="text-blue-900 hover:text-blue-500">

@@ -7,7 +7,9 @@ export const login = (credentials: CrendentialProperties) => axiosInstance.post<
 
 export const getUser = () => axiosInstance.get<any>('/user')
 
-export const tokenSchema = yup.string().required()
+export const tokenSchema = yup.object().shape({
+    token: yup.string().required()
+})
 
 export const userSchema = yup.object().shape({
     id: yup.number().required(),

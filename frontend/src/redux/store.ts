@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import createSagaMiddleware from 'redux-saga';
 
 import rootSaga from './sagas/sagas';
+import databaseSlice from './slices/databaseSlice';
 import userSlice from './slices/userSlice'
 
 const sagaMiddleware = createSagaMiddleware();
@@ -9,6 +10,7 @@ const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
     reducer: {
         user: userSlice,
+        database: databaseSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware),
 })

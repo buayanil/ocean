@@ -12,7 +12,7 @@ export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
         const response: SagaReturnType<typeof login> = yield call(login, payload);
         if (response.status === 200) {
             try {
-                const token = tokenSchema.validateSync(response.data);
+                const {token} = tokenSchema.validateSync(response.data);
                 yield put(loginSuccess(token))
             } catch (parseError) {
                 yield put(loginFailed(parseError.toString()))

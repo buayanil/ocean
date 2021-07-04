@@ -2,8 +2,10 @@ export interface DatabaseProperties {
     id: number,
     name: string;
     engine: string;
-    created: string;
+    createdAt: string;
 }
+
+export type UpstreamDatabaseProperties = Pick<DatabaseProperties, "name" | "engine">; 
 
 export interface CrendentialProperties {
     username: string;
@@ -17,4 +19,9 @@ export interface UserProperties {
     lastName: string;
     mail: string;
     employeeType: string;
+}
+
+export enum StoreStatus {
+    PARTIALLY_LOADED = 'PARTIALLY_LOADED',
+    FULLY_LOADED = 'FULLY_LOADED'
 }

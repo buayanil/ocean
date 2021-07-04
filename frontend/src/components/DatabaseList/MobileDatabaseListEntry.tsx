@@ -4,6 +4,7 @@ import { DatabaseIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
 import { DatabaseProperties } from '../../types/models';
 import { DatabasesNavigation } from '../../constants/menu.';
+import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
 
 interface MobileDatabaseListEntryProps {
     database: DatabaseProperties
@@ -19,8 +20,8 @@ const MobileDatabaseListEntry: React.FC<MobileDatabaseListEntryProps> = ({ datab
                         <DatabaseIcon className="flex-shrink-0 h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span className="flex flex-col text-gray-500 text-sm truncate">
                             <span className="truncate">{database.name}</span>
-                            <time dateTime={database.created}>{database.created}</time>
-                            <span>{database.engine}</span>
+                            <time dateTime={database.createdAt}>{getDatabaseCreatedAt(database.createdAt)}</time>
+                            <span>{getDatabaseEngineTitle(database.engine)}</span>
                         </span>
                     </span>
                     <ChevronRightIcon className="flex-shrink-0 h-5 w-5 text-gray-400" aria-hidden="true" />

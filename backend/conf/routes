@@ -2,6 +2,13 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET         /             controllers.HomeController.index
-GET         /user         controllers.UserController.index
-POST        /login        controllers.UserController.login
+GET         /                          controllers.HomeController.index
+
+# Users
+GET         /user                      controllers.UserController.index
+POST        /login                     controllers.UserController.login
+
+# Databases
+GET         /databases                 controllers.InstanceController.listAll
+POST        /databases                 controllers.InstanceController.addInstance
+POST        /databases/_exists_        controllers.InstanceController.existsInstance

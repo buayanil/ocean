@@ -36,7 +36,7 @@ class UserServiceSpec extends Specification with Mockito {
       val ldapUser = LdapUser("username", "firstName", "lastName", "mail", "employeeType")
       val userRepository = mock[UserRepository]
       userRepository.getByUsername(any[String]).returns(Future.successful(None))
-      userRepository.create(any[String], any[String], any[String], any[String], any[String]).returns(Future.successful(user))
+      userRepository.addUser(any[User]).returns(Future.successful(user))
       val ldapService = mock[LdapService]
       ldapService.authenticate(any[String], any[String]).returns(Right(ldapUser))
       val tokenService = mock[TokenService]

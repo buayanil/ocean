@@ -1,11 +1,11 @@
 package repositories
 
-import models.User
-
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
+
+import models.User
 
 
 @Singleton
@@ -37,6 +37,13 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   def getByUsername(username: String): Future[Option[User]] = db.run {
     users.filter(user => user.username === username).result.headOption
+  }
+
+  // TODO: use asTry
+  def addUser(user: User): Future[User] = {
+    val insertQuery = users returning users.map(_.id) into ((item, id) => item.copy(id = id))
+    val action = (insertQuery += user)
+    dbConfig.db.run(action)
   }
 
   def create(username: String, firstname: String, lastName: String, mail: String, employeeType: String): Future[User] = db.run {
