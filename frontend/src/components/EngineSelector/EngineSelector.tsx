@@ -30,7 +30,7 @@ const EngineSelector: React.FC<EngineSelectorProps> = ({engineOptions}) => {
                 <div key={index} className={getClassName(engineOption.id)}
                     onClick={() => setOptionId(engineOption.id)}>
                     <div className="px-4 py-5 sm:p-6 ">
-                        <img className="w-32 h-16" src={engineOption.imageSrc} alt="postgresql logo" />
+                        <img className="w-36 h-16" src={engineOption.imageSrc} alt="postgresql logo" />
                     </div>
                     <div className="px-4 py-4 sm:px-6 text-center">
                         {engineOption.label}
