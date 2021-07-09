@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { CheckCircleIcon, RefreshIcon, BanIcon } from '@heroicons/react/outline';
 
-import { engineOptions } from '../constants/fixtures';
+import { engineOptions } from '../constants/engines';
 import { UpstreamDatabaseProperties } from '../types/models';
 import { existsDatabase, existsDatabaseSchema } from '../api/databaseApi';
 import EngineSelector from './EngineSelector/EngineSelector';

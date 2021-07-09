@@ -7,22 +7,23 @@ import { DatabasesNavigation } from '../../constants/menu.';
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
 
 interface DesktopDatabaseListEntryProps {
-    database: DatabaseProperties
+    database: DatabaseProperties;
+    onClick?: (id: number) => void;
 }
 
 
-const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ database }) => {
+const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ database, onClick }) => {
     return (
-        <tr className="bg-white">
+        <tr className="bg-white" onClick={() => onClick && onClick(database.id)}>
             <td className="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div className="flex">
-                <Link to={DatabasesNavigation.to} className="group inline-flex space-x-2 truncate text-sm">
-                    <DatabaseIcon
-                        className="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                        aria-hidden="true"
-                    />
-                    <p className="text-gray-500 truncate group-hover:text-gray-900">{database.name}</p>
-                </Link>
+                    <Link to={DatabasesNavigation.to} className="group inline-flex space-x-2 truncate text-sm">
+                        <DatabaseIcon
+                            className="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                            aria-hidden="true"
+                        />
+                        <p className="text-gray-500 truncate group-hover:text-gray-900">{database.name}</p>
+                    </Link>
                 </div>
             </td>
             <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500">
@@ -41,7 +42,7 @@ const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ dat
                 </Link>
             </td>
         </tr>
-  );
+    );
 }
 
 export default DesktopDatabaseListEntry;
