@@ -68,5 +68,10 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     dbConfig.db.run(action)
   }
 
+  def deleteInstance(id: Long, userId: Long): Future[Try[Int]] = {
+    val action = instances.filter(_.id === id).filter(_.userId === userId).delete.asTry
+    dbConfig.db.run(action)
+  }
+
 }
 

@@ -49,4 +49,12 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
     }
   }
 
+  def deleteInstance(instanceId: Long, userId: Long): Either[ErrorMessage, Int] = {
+    Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
+      case Failure(exception) =>
+        Left(ErrorMessage(ErrorMessage.CODE_INSTANCE_DELETE_FAILED, ErrorMessage.MESSAGE_INSTANCE_DELETE_FAILED, developerMessage = exception.getMessage))
+      case Success(rows) => Right(rows)
+    }
+  }
+
 }

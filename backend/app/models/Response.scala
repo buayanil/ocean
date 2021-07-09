@@ -21,3 +21,9 @@ case class LoginSuccessResponse(token: String) extends Response
 object LoginSuccessResponse {
   implicit val loginSuccessResponseWrites: OWrites[LoginSuccessResponse] = Json.writes[LoginSuccessResponse]
 }
+
+case class InstanceDeletedResponse(rows: Int) extends Response
+
+object InstanceDeletedResponse {
+  implicit val instanceDeletedResponseWrites: OWrites[InstanceDeletedResponse] = Json.writes[InstanceDeletedResponse]
+}
