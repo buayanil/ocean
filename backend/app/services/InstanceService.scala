@@ -22,6 +22,16 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
     }
   }
 
+  def getInstance(id: Long, userId: Long): Either[ErrorMessage, Instance] = {
+    Await.result(instanceRepository.get(id, userId), Duration.Inf) match {
+      case Failure(exception) =>
+        Left(ErrorMessage(ErrorMessage.CODE_INSTANCE_GET_FAILED, ErrorMessage.MESSAGE_INSTANCE_GET_FAILED, developerMessage = exception.getMessage))
+      case Success(instances) if instances.length == 1 => Right(instances.head)
+      case Success(instances) =>
+        Left(ErrorMessage(ErrorMessage.CODE_INSTANCE_GET_CONSTRAINT_ERROR, ErrorMessage.MESSAGE_INSTANCE_GET_CONSTRAINT_ERROR, developerMessage = s"Matches: ${instances.length}"))
+    }
+  }
+
   def addInstance(createInstanceFormData: CreateInstanceFormData, userId: Long): Either[ErrorMessage, Instance] = {
     val localTimestamp = Timestamp.from(Instant.now)
     val localInstance = Instance(0, userId, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
@@ -29,6 +39,15 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
       case Failure(exception) =>
         Left(getErrorMessageFor(exception))
       case Success(instance) => Right(instance)
+    }
+  }
+
+  private def getErrorMessageFor(exception: Throwable): ErrorMessage = {
+    exception match {
+      case exception: PSQLException if exception.getMessage.contains("duplicate key value") =>
+        ErrorMessage(ErrorMessage.CODE_INSTANCE_CREATE_DUPLICATED, ErrorMessage.MESSAGE_INSTANCE_CREATE_DUPLICATED, developerMessage = exception.getMessage)
+      case exception: Throwable =>
+        ErrorMessage(ErrorMessage.CODE_INSTANCE_CREATE_FAILED, ErrorMessage.MESSAGE_INSTANCE_CREATE_FAILED, developerMessage = exception.getMessage)
     }
   }
 
@@ -40,12 +59,11 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
     }
   }
 
-  private def getErrorMessageFor(exception: Throwable): ErrorMessage = {
-    exception match {
-      case exception: PSQLException if exception.getMessage.contains("duplicate key value") =>
-        ErrorMessage(ErrorMessage.CODE_INSTANCE_CREATE_DUPLICATED, ErrorMessage.MESSAGE_INSTANCE_CREATE_DUPLICATED, developerMessage = exception.getMessage)
-      case exception: Throwable =>
-        ErrorMessage(ErrorMessage.CODE_INSTANCE_CREATE_FAILED, ErrorMessage.MESSAGE_INSTANCE_CREATE_FAILED, developerMessage = exception.getMessage)
+  def deleteInstance(instanceId: Long, userId: Long): Either[ErrorMessage, Int] = {
+    Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
+      case Failure(exception) =>
+        Left(ErrorMessage(ErrorMessage.CODE_INSTANCE_DELETE_FAILED, ErrorMessage.MESSAGE_INSTANCE_DELETE_FAILED, developerMessage = exception.getMessage))
+      case Success(rows) => Right(rows)
     }
   }
 

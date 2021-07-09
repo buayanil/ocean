@@ -6,7 +6,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 
 import actions.{UserAction, UserRequest}
-import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse}
+import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
 import services.InstanceService
 
 
@@ -25,6 +25,14 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
       case Right(instances) => Ok(Json.toJson(instances))
     }
   }
+
+  def get(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    instanceService.getInstance(id, request.user.id) match {
+      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Right(instance) => Ok(Json.toJson(instance))
+    }
+  }
+
 
   def addInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateInstanceForm.form.bindFromRequest.fold(
@@ -52,6 +60,13 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
         }
       }
     )
+  }
+
+  def deleteInstance(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    instanceService.deleteInstance(id, request.user.id) match {
+      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Right(rows) => Ok(Json.toJson((InstanceDeletedResponse(rows))))
+    }
   }
 
 }

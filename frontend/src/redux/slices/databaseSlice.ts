@@ -43,6 +43,25 @@ export const databaseSlice = createSlice({
       state.loading = false;
       state.status = StoreStatus.PARTIALLY_LOADED;
     },
+    getDatabaseStart: (state, _action: PayloadAction<number>) => {
+      state.error = undefined;
+      state.loading = true;
+    },
+    getDatabaseSuccess: (
+      state,
+      { payload }: PayloadAction<DatabaseProperties>
+    ) => {
+      state.error = undefined;
+      state.databases = state.databases.filter(
+        (database) => database.id !== payload.id
+      );
+      state.databases.push(payload);
+      state.loading = false;
+    },
+    getDatabaseFailed: (state, { payload }: PayloadAction<string>) => {
+      state.error = payload;
+      state.loading = false;
+    },
     createDatabaseStart: (
       state,
       _action: PayloadAction<UpstreamDatabaseProperties>
@@ -62,6 +81,21 @@ export const databaseSlice = createSlice({
       state.error = payload;
       state.loading = false;
     },
+    deleteDatabaseStart: (state, _action: PayloadAction<number>) => {
+      state.error = undefined;
+      state.loading = true;
+    },
+    deleteDatabaseSuccess: (state, { payload }: PayloadAction<number>) => {
+      state.error = undefined;
+      state.databases = state.databases.filter(
+        (database) => database.id !== payload
+      );
+      state.loading = false;
+    },
+    deleteDatabaseFailed: (state, { payload }: PayloadAction<string>) => {
+      state.error = payload;
+      state.loading = false;
+    },
   },
 });
 
@@ -69,9 +103,15 @@ export const {
   getDatabasesStart,
   getDatabasesSuccess,
   getDatabasesFailed,
+  getDatabaseStart,
+  getDatabaseSuccess,
+  getDatabaseFailed,
   createDatabaseStart,
   createDatabaseSuccess,
   createDatabaseFailed,
+  deleteDatabaseStart,
+  deleteDatabaseSuccess,
+  deleteDatabaseFailed,
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

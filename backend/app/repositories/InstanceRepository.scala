@@ -57,6 +57,11 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     dbConfig.db.run(action)
   }
 
+  def get(id: Long, userId: Long): Future[Try[Seq[Instance]]] = {
+    val action = instances.filter(_.id === id).filter(_.userId === userId).result.asTry
+    dbConfig.db.run(action)
+  }
+
   def addInstance(instance: Instance): Future[Try[Instance]] = {
     val insertQuery = instances returning instances.map(_.id) into ((item, id) => item.copy(id = id))
     val action = (insertQuery += instance).asTry
@@ -65,6 +70,11 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
 
   def exists(name: String, engine: String): Future[Try[Boolean]] = {
     val action = instances.filter(instance => instance.name === name && instance.engine === engine).exists.result.asTry
+    dbConfig.db.run(action)
+  }
+
+  def deleteInstance(id: Long, userId: Long): Future[Try[Int]] = {
+    val action = instances.filter(_.id === id).filter(_.userId === userId).delete.asTry
     dbConfig.db.run(action)
   }
 
