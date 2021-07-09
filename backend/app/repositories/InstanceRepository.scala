@@ -57,6 +57,11 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     dbConfig.db.run(action)
   }
 
+  def get(id: Long, userId: Long): Future[Try[Seq[Instance]]] = {
+    val action = instances.filter(_.id === id).filter(_.userId === userId).result.asTry
+    dbConfig.db.run(action)
+  }
+
   def addInstance(instance: Instance): Future[Try[Instance]] = {
     val insertQuery = instances returning instances.map(_.id) into ((item, id) => item.copy(id = id))
     val action = (insertQuery += instance).asTry

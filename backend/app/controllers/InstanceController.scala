@@ -26,6 +26,14 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     }
   }
 
+  def get(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    instanceService.getInstance(id, request.user.id) match {
+      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Right(instance) => Ok(Json.toJson(instance))
+    }
+  }
+
+
   def addInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
