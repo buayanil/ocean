@@ -10,11 +10,11 @@ import UserLayout from '../layouts/UserLayout';
 import SignInForm from '../components/SignInForm';
 
 
-interface SignInViewProps {}
+interface SignInViewProps { }
 
 const SignInView: React.FC<SignInViewProps> = () => {
   const history = useHistory();
-  const {loading, error, token} = useAppSelector((state) => state.user);
+  const { loading, error, token } = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const SignInView: React.FC<SignInViewProps> = () => {
 
 
   const onSubmit = (credentials: CrendentialProperties) => {
-    dispatch(loginStart({username: credentials.username, password: credentials.password}))
+    dispatch(loginStart({ username: credentials.username, password: credentials.password }))
   }
 
   return (
@@ -37,8 +37,8 @@ const SignInView: React.FC<SignInViewProps> = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your HTW account</h2>
         </div>
         <SignInForm loading={loading} errorMessage={error} onSubmit={onSubmit} />
-    </div>
-  </UserLayout>
+      </div>
+    </UserLayout>
   );
 }
 

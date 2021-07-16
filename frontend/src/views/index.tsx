@@ -15,7 +15,7 @@ const SettingsView = React.lazy(() => import('./SettingsView'));
 
 
 const RootView: React.FC = () => {
-  const { token, user } = useAppSelector((state) => state.user);
+  const { token, user } = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const RootView: React.FC = () => {
 }
 
 const ProtectedRoute = (props: any) => {
-  const token = useAppSelector((state) => state.user.token);
+  const token = useAppSelector((state) => state.session.user.token);
   return token !== undefined ? (
     <Route {...props} />
   ) : (

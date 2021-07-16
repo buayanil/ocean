@@ -29,8 +29,8 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     let { id } = useParams<{ id: string }>();
     const history = useHistory();
     const dispatch = useAppDispatch();
-    const { loading, error, databases } = useAppSelector((state) => state.database);
-    const { user } = useAppSelector((state) => state.user);
+    const { loading, error, databases } = useAppSelector((state) => state.data.database);
+    const { user } = useAppSelector((state) => state.session.user);
     const [selectedId, setSelectedId] = useState<number>(1)
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [deleteProcess, setDeleteProcess] = useState<boolean>(false);

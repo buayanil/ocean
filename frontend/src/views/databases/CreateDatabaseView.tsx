@@ -14,7 +14,7 @@ interface CreateDatabaseViewProps { }
 
 const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   const history = useHistory();
-  const { loading } = useAppSelector((state) => state.database);
+  const { loading } = useAppSelector((state) => state.data.database);
   const dispatch = useAppDispatch();
   const [processing, setProcessing] = useState<boolean>(false)
 

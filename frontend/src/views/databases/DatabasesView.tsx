@@ -14,7 +14,7 @@ interface DatabasesViewProps { }
 const DatabasesView: React.FC<DatabasesViewProps> = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const { databases, status } = useAppSelector((state) => state.database);
+  const { databases, status } = useAppSelector((state) => state.data.database);
 
   useEffect(() => {
     if (status === StoreStatus.PARTIALLY_LOADED) {
