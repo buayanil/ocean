@@ -34,7 +34,7 @@ const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ dat
                 </span>
             </td>
             <td className="hidden px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500 md:block">
-                <time dateTime={database.createdAt}>{getDatabaseCreatedAt(database.createdAt)}</time>
+                <time dateTime={database.createdAt.toLocaleString()}>{getDatabaseCreatedAt(database.createdAt)}</time>
             </td>
             <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500 ">
                 <Link to={DatabasesNavigation.to} className="text-blue-900 hover:text-blue-500">

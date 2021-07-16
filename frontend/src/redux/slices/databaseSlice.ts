@@ -22,13 +22,13 @@ export const databaseSlice = createSlice({
   name: "databaseSlice",
   initialState,
   reducers: {
-    getDatabasesStart: (state) => {
+    getAllDatabasesStart: (state) => {
       state.loading = true;
       state.error = undefined;
       state.databases = [];
       state.status = StoreStatus.PARTIALLY_LOADED;
     },
-    getDatabasesSuccess: (
+    getAllDatabasesSuccess: (
       state,
       { payload }: PayloadAction<DatabaseProperties[]>
     ) => {
@@ -37,7 +37,7 @@ export const databaseSlice = createSlice({
       state.loading = false;
       state.status = StoreStatus.FULLY_LOADED;
     },
-    getDatabasesFailed: (state, { payload }: PayloadAction<string>) => {
+    getAllDatabasesFailed: (state, { payload }: PayloadAction<string>) => {
       state.error = payload;
       state.databases = [];
       state.loading = false;
@@ -100,9 +100,9 @@ export const databaseSlice = createSlice({
 });
 
 export const {
-  getDatabasesStart,
-  getDatabasesSuccess,
-  getDatabasesFailed,
+  getAllDatabasesStart,
+  getAllDatabasesSuccess,
+  getAllDatabasesFailed,
   getDatabaseStart,
   getDatabaseSuccess,
   getDatabaseFailed,

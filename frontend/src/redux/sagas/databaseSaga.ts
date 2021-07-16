@@ -11,31 +11,31 @@ import {
   deleteDatabaseStart,
   deleteDatabaseSuccess,
   getDatabaseFailed,
-  getDatabasesFailed,
-  getDatabasesStart,
-  getDatabasesSuccess,
+  getAllDatabasesFailed,
+  getAllDatabasesStart,
+  getAllDatabasesSuccess,
   getDatabaseStart,
   getDatabaseSuccess,
 } from "../slices/databaseSlice";
 import { UpstreamDatabaseProperties } from "../../types/models";
 
-export function* getDatabasesAsync() {
+export function* getAllDatabasesAsync() {
   try {
-    const response: SagaReturnType<typeof DatabaseClient.getDatabases> =
-      yield call(DatabaseClient.getDatabases);
+    const response: SagaReturnType<typeof DatabaseClient.getAllDatabases> =
+      yield call(DatabaseClient.getAllDatabases);
     if (response.status === 200) {
       try {
-        const databases = DatabaseValidation.databasesSchema.validateSync(
+        const databases = DatabaseValidation.getAllDatabasesSchema.validateSync(
           response.data
         );
         if (databases) {
-          yield put(getDatabasesSuccess(databases));
+          yield put(getAllDatabasesSuccess(databases));
         } else {
           // TODO: fix database schema
-          yield put(getDatabasesFailed("Error"));
+          yield put(getAllDatabasesFailed("Error"));
         }
       } catch (parseError) {
-        yield put(getDatabasesFailed(parseError.toString()));
+        yield put(getAllDatabasesFailed(parseError.toString()));
       }
     }
   } catch (networkError) {
@@ -43,7 +43,7 @@ export function* getDatabasesAsync() {
       // HINT: token expired
       yield put(logout());
     }
-    yield put(getDatabasesFailed(networkError.toString()));
+    yield put(getAllDatabasesFailed(networkError.toString()));
   }
 }
 
@@ -117,7 +117,7 @@ export function* deleteDatabaseAsync({ payload }: PayloadAction<number>) {
 }
 
 export default function* databaseSaga() {
-  yield takeLatest(getDatabasesStart.type, getDatabasesAsync);
+  yield takeLatest(getAllDatabasesStart.type, getAllDatabasesAsync);
   yield takeLatest(getDatabaseStart.type, getDatabaseAsync);
   yield takeLatest(createDatabaseStart.type, createDatabaseAsync);
   yield takeLatest(deleteDatabaseStart.type, deleteDatabaseAsync);

@@ -7,7 +7,7 @@ export class DatabaseClient {
   /**
    * Get all databases related to this user
    */
-  public static getDatabases = () => axiosInstance.get<any>("/databases");
+  public static getAllDatabases = () => axiosInstance.get<any>("/databases");
 
   /**
    * Get a single database by id
@@ -35,7 +35,7 @@ export class DatabaseClient {
 }
 
 export class DatabaseValidation {
-  public static databasesSchema = yup
+  public static getAllDatabasesSchema = yup
     .array()
     .required()
     .of(
@@ -43,7 +43,14 @@ export class DatabaseValidation {
         id: yup.number().required(),
         name: yup.string().required(),
         engine: yup.string().required(),
-        createdAt: yup.string().required(),
+        createdAt: yup
+          .date()
+          .required()
+          .transform(function (_castValue, originalValue) {
+            return Number.isNaN(originalValue)
+              ? new Date()
+              : new Date(originalValue);
+          }),
       })
     );
 
@@ -51,14 +58,28 @@ export class DatabaseValidation {
     id: yup.number().required(),
     name: yup.string().required(),
     engine: yup.string().required(),
-    createdAt: yup.string().required(),
+    createdAt: yup
+      .date()
+      .required()
+      .transform(function (_castValue, originalValue) {
+        return Number.isNaN(originalValue)
+          ? new Date()
+          : new Date(originalValue);
+      }),
   });
 
   public static createDatabaseSchema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required(),
     engine: yup.string().required(),
-    createdAt: yup.string().required(),
+    createdAt: yup
+      .date()
+      .required()
+      .transform(function (_castValue, originalValue) {
+        return Number.isNaN(originalValue)
+          ? new Date()
+          : new Date(originalValue);
+      }),
   });
 
   public static existsDatabaseSchema = yup.object().shape({

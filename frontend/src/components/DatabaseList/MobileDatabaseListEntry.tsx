@@ -19,7 +19,7 @@ const MobileDatabaseListEntry: React.FC<MobileDatabaseListEntryProps> = ({ datab
                         <DatabaseIcon className="flex-shrink-0 h-5 w-5 text-gray-400" aria-hidden="true" />
                         <span className="flex flex-col text-gray-500 text-sm truncate">
                             <span className="truncate">{database.name}</span>
-                            <time dateTime={database.createdAt}>{getDatabaseCreatedAt(database.createdAt)}</time>
+                            <time dateTime={database.createdAt.toLocaleString()}>{getDatabaseCreatedAt(database.createdAt)}</time>
                             <span>{getDatabaseEngineTitle(database.engine)}</span>
                         </span>
                     </span>

@@ -70,8 +70,8 @@ export const getDatabaseEngineTitle = (value: string): string => {
     }
 }
 
-export const getDatabaseCreatedAt = (value: string): string => {
-    return formatDistance(new Date(parseInt(value)), new Date(), { addSuffix: true })
+export const getDatabaseCreatedAt = (value: Date): string => {
+    return formatDistance(value, new Date(), { addSuffix: true })
 }
 
 export default DatabaseList;
