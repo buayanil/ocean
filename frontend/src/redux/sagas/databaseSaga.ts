@@ -2,16 +2,7 @@ import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 
 import { logout } from "../slices/userSlice";
-import {
-  createDatabase,
-  createDatabaseSchema,
-  databasesSchema,
-  deleteDatabase,
-  deleteDatabaseSchema,
-  getDatabase,
-  getDatabases,
-  getDatabaseSchema,
-} from "../../api/databaseApi";
+import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import {
   createDatabaseFailed,
   createDatabaseStart,
@@ -30,12 +21,13 @@ import { UpstreamDatabaseProperties } from "../../types/models";
 
 export function* getDatabasesAsync() {
   try {
-    const response: SagaReturnType<typeof getDatabases> = yield call(
-      getDatabases
-    );
+    const response: SagaReturnType<typeof DatabaseClient.getDatabases> =
+      yield call(DatabaseClient.getDatabases);
     if (response.status === 200) {
       try {
-        const databases = databasesSchema.validateSync(response.data);
+        const databases = DatabaseValidation.databasesSchema.validateSync(
+          response.data
+        );
         if (databases) {
           yield put(getDatabasesSuccess(databases));
         } else {
@@ -57,13 +49,13 @@ export function* getDatabasesAsync() {
 
 export function* getDatabaseAsync({ payload }: PayloadAction<number>) {
   try {
-    const response: SagaReturnType<typeof getDatabase> = yield call(
-      getDatabase,
-      payload
-    );
+    const response: SagaReturnType<typeof DatabaseClient.getDatabase> =
+      yield call(DatabaseClient.getDatabase, payload);
     if (response.status === 200) {
       try {
-        const database = getDatabaseSchema.validateSync(response.data);
+        const database = DatabaseValidation.getDatabaseSchema.validateSync(
+          response.data
+        );
         yield put(getDatabaseSuccess(database));
       } catch (parseError) {
         yield put(getDatabaseFailed(parseError.toString()));
@@ -82,13 +74,13 @@ export function* createDatabaseAsync({
   payload,
 }: PayloadAction<UpstreamDatabaseProperties>) {
   try {
-    const response: SagaReturnType<typeof createDatabase> = yield call(
-      createDatabase,
-      payload
-    );
+    const response: SagaReturnType<typeof DatabaseClient.createDatabase> =
+      yield call(DatabaseClient.createDatabase, payload);
     if (response.status === 200) {
       try {
-        const database = createDatabaseSchema.validateSync(response.data);
+        const database = DatabaseValidation.createDatabaseSchema.validateSync(
+          response.data
+        );
         yield put(createDatabaseSuccess(database));
       } catch (parseError) {
         yield put(createDatabaseFailed(parseError.toString()));
@@ -105,13 +97,11 @@ export function* createDatabaseAsync({
 
 export function* deleteDatabaseAsync({ payload }: PayloadAction<number>) {
   try {
-    const response: SagaReturnType<typeof deleteDatabase> = yield call(
-      deleteDatabase,
-      payload
-    );
+    const response: SagaReturnType<typeof DatabaseClient.deleteDatabase> =
+      yield call(DatabaseClient.deleteDatabase, payload);
     if (response.status === 200) {
       try {
-        deleteDatabaseSchema.validateSync(response.data);
+        DatabaseValidation.deleteDatabaseSchema.validateSync(response.data);
         yield put(deleteDatabaseSuccess(payload));
       } catch (parseError) {
         yield put(deleteDatabaseFailed(parseError.toString()));

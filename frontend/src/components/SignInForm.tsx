@@ -1,10 +1,10 @@
 import React from 'react';
 import { Formik, Form, Field, FormikHelpers } from 'formik';
-import * as yup from 'yup';
 import { LockClosedIcon } from '@heroicons/react/solid';
 
 import Alert from './Alert';
 import { CrendentialProperties } from '../types/models';
+import { UserValidation } from '../api/userClient';
 
 
 export interface SignInFormProps {
@@ -15,13 +15,6 @@ export interface SignInFormProps {
 
 const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit }) => {
 
-  const schema = yup.object().shape({
-    username: yup.string().required('Username is required'),
-    password: yup
-      .string()
-      .min(4, 'Password should be of minimum 4 characters length')
-      .required('Password is required'),
-  });
 
   const getFieldClassNames = (hasError: boolean): string => {
     const common = "appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm"
@@ -35,14 +28,14 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <div className="mb-4">{errorMessage && <Alert errorMessage={errorMessage} /> }</div>
+        <div className="mb-4">{errorMessage && <Alert errorMessage={errorMessage} />}</div>
         <Formik
           initialValues={{
             username: '',
             password: '',
           }}
-          validationSchema={schema}
-          onSubmit={( values: CrendentialProperties, { setSubmitting }: FormikHelpers<CrendentialProperties>) => {
+          validationSchema={UserValidation.loginSchema}
+          onSubmit={(values: CrendentialProperties, { setSubmitting }: FormikHelpers<CrendentialProperties>) => {
             if (onSubmit) {
               onSubmit(values);
             }
@@ -69,7 +62,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                   Password*
                 </label>
                 <div className="mt-1">
-                  <Field id="password" name="password" type="password" placeholder="" 
+                  <Field id="password" name="password" type="password" placeholder=""
                     className={getFieldClassNames(errors.password !== undefined && touched.password !== undefined)} />
                   {errors.password && touched.password && (
                     <span className="mt-2 text-sm text-red-600" id="passwordHelp">{errors.password}</span>
@@ -88,11 +81,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                   Sign in
                 </button>
               </div>
-          </Form>
-        )}
-      </Formik>
+            </Form>
+          )}
+        </Formik>
+      </div>
     </div>
-  </div>
   );
 }
 
