@@ -219,3 +219,41 @@ systemctl status backend
 journalctl -u backend
 ```
 
+### PostgreSQL Cluster
+
+Create the file repository configuration:
+
+```sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'```
+
+Import the repository signing key:
+
+```wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -```
+
+Update the package lists:
+
+```apt-get update```
+
+Install the latest version of PostgreSQL.
+
+```apt-get -y install postgresql-12```
+
+Start the database server using:
+
+```pg_ctlcluster 12 main start```
+
+After installing the PostgreSQL database server by default, it creates a user postgres with role postgres. It also creates a system account with the same name postgres. So to connect to postgres server, login to your system as user postgres and connect the database.
+
+```psql -c "alter user postgres with password 'STRONG_PASSWORD'"```
+
+## Development
+
+### Play framework
+
+Provide a PostgreSQL database for ORM
+
+```docker run --env POSTGRES_DB=db --env POSTGRES_USER=foo --env POSTGRES_PASSWORD=bar --publish 5432:5432 --rm --interactive --tty postgres```
+
+Provide a PostgreSQL Cluster. Run on a different outgoing port
+
+```docker run --env POSTGRES_DB=db --env POSTGRES_USER=foo --env POSTGRES_PASSWORD=bar --publish 5555:5432 --rm --interactive --tty postgres`
+

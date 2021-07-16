@@ -7,12 +7,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 import org.postgresql.util.PSQLException
-
-import models.{CreateInstanceFormData, ErrorMessage, Instance}
+import models.{CreateInstanceFormData, ErrorMessage, Instance, User}
 import repositories.InstanceRepository
 
 
-class InstanceService @Inject()(instanceRepository: InstanceRepository) {
+class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepository: InstanceRepository) {
 
   def listAll(userId: Long): Either[ErrorMessage, Seq[Instance]] = {
     Await.result(instanceRepository.listAll(userId), Duration.Inf) match {
@@ -32,17 +31,21 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
     }
   }
 
-  def addInstance(createInstanceFormData: CreateInstanceFormData, userId: Long): Either[ErrorMessage, Instance] = {
+  def addInstance(createInstanceFormData: CreateInstanceFormData, user: User): Either[ErrorMessage, Instance] = {
     val localTimestamp = Timestamp.from(Instant.now)
-    val localInstance = Instance(0, userId, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
+    val localInstance = Instance(0, user.id, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
     Await.result(instanceRepository.addInstance(localInstance), Duration.Inf) match {
       case Failure(exception) =>
-        Left(getErrorMessageFor(exception))
-      case Success(instance) => Right(instance)
+        Left(handleAddInstanceThrowable(exception))
+      case Success(instance) =>
+        pgClusterService.createDatabase(instance.name, user.username) match {
+          case Left(errorMessage) => Left(errorMessage)
+          case Right(_) => Right(instance)
+        }
     }
   }
 
-  private def getErrorMessageFor(exception: Throwable): ErrorMessage = {
+  private def handleAddInstanceThrowable(exception: Throwable): ErrorMessage = {
     exception match {
       case exception: PSQLException if exception.getMessage.contains("duplicate key value") =>
         ErrorMessage(ErrorMessage.CODE_INSTANCE_CREATE_DUPLICATED, ErrorMessage.MESSAGE_INSTANCE_CREATE_DUPLICATED, developerMessage = exception.getMessage)
