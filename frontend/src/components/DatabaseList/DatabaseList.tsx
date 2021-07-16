@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDistance } from 'date-fns';
+import { compareDesc, formatDistance } from 'date-fns';
 
 import MobileDatabaseListEntry from './MobileDatabaseListEntry';
 import DesktopDatabaseListEntry from './DesktopDatabaseListEntry';
@@ -13,12 +13,13 @@ export interface DatabaseListProps {
 
 
 const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
+    const sortedDatabases = databases.slice(0).sort((left, right) => compareDesc(left.createdAt, right.createdAt))
     return (
         <>
             {/*Mobile*/}
             <div className="shadow sm:hidden">
                 <ul className="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                    {databases.map((database, index) => (
+                    {sortedDatabases.map((database, index) => (
                         <MobileDatabaseListEntry key={index} database={database} onClick={onClick} />
                     ))}
                 </ul>
@@ -46,7 +47,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {databases.map((database, index) => (
+                                    {sortedDatabases.map((database, index) => (
                                         <DesktopDatabaseListEntry key={index} database={database} onClick={onClick} />
                                     ))}
                                 </tbody>
@@ -56,7 +57,6 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
                 </div>
             </div>
         </>
-
     );
 }
 
