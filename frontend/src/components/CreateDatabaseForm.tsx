@@ -5,7 +5,7 @@ import { CheckCircleIcon, RefreshIcon, BanIcon } from '@heroicons/react/outline'
 
 import { engineOptions } from '../constants/engines';
 import { UpstreamDatabaseProperties } from '../types/models';
-import { existsDatabase, existsDatabaseSchema } from '../api/databaseApi';
+import { DatabaseClient, DatabaseValidation } from '../api/databaseClient';
 import EngineSelector from './EngineSelector/EngineSelector';
 
 export interface CreateDatabaseFormProps {
@@ -30,9 +30,9 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
                 return false;
             }
             const payload: UpstreamDatabaseProperties = { name: name, engine: engine }
-            const response = await existsDatabase(payload)
+            const response = await DatabaseClient.existsDatabase(payload)
             try {
-                const { exists } = existsDatabaseSchema.validateSync(response.data);
+                const { exists } = DatabaseValidation.existsDatabaseSchema.validateSync(response.data);
                 if (!exists) {
                     return true;
                 }

@@ -22,7 +22,7 @@ export interface AppLayoutProps {
 
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) => {
-  const {loading, user} = useAppSelector((state) => state.user);
+  const { loading, user } = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -211,8 +211,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
                   <>
                     <div>
                       <Menu.Button disabled={loading} className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
-                        {loading ? 
-                          <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" /> : 
+                        {loading ?
+                          <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" /> :
                           <svg className="rounded-full" height="36" width="36">
                             <rect fill="#a0d36a" x="0" y="0" height="36" width="36"></rect>
                             <text
@@ -223,7 +223,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
                               y="23">{getAbbreviationFor(user)}</text>
                           </svg>
                         }
-                        {loading ? 
+                        {loading ?
                           <span className="animate-pulse hidden ml-3 lg:block">
                             <div className="rounded-md w-24 h-8 bg-gray-200" />
                           </span> :
