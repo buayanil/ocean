@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+
+  postgres_orm:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: internal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  pg_cluster:
+    image: postgres
+    restart: always
+    ports:
+      - 5555:5432
+    environment:
+      POSTGRES_DB: internal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  mysql_cluster:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: bar
+      MYSQL_DATABASE: internal
+      MYSQL_USER: foo
+      MYSQL_PASSWORD: bar
+
+  adminer:
+    depends_on:
+      - postgres_orm
+      - pg_cluster
+      - mysql_cluster
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
