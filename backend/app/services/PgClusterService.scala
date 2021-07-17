@@ -36,4 +36,28 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
     }
   }
 
+  def createRole(roleName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.createRole(roleName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) => Left(handleCreateRoleThrowable(throwable))
+    }
+  }
+
+  private def handleCreateRoleThrowable(throwable: Throwable): ErrorMessage = {
+    throwable match {
+      case exception: PSQLException if exception.getMessage.contains("already exists") =>
+        ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_CREATED_ROLE_EXIST,
+          ErrorMessage.MESSAGE_PG_CLUSTER_CREATED_ROLE_EXIST,
+          developerMessage = exception.getMessage
+        )
+      case exception =>
+        ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_CREATED_ROLE_UNKNOWN,
+          ErrorMessage.MESSAGE_PG_CLUSTER_CREATED_ROLE_UNKNOWN,
+          developerMessage = exception.getMessage
+        )
+    }
+  }
+
 }

@@ -17,4 +17,8 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     db.run(createDatabaseStatement.as[Int].asTry)
   }
 
+  def createRole(roleName: String): Future[Try[Vector[Int]]] = {
+    val createRoleStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500"""
+    db.run(createRoleStatement.as[Int].asTry)
+  }
 }
