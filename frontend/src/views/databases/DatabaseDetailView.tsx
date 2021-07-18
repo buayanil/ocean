@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { DatabaseIcon } from '@heroicons/react/outline';
 
+import { DatabaseProperties, HostProperties } from '../../types/models';
 import { DatabasesNavigation } from '../../constants/menu.';
 import { tabs } from '../../constants/tabs';
 import { deleteModalContent } from '../../constants/modals';
@@ -12,8 +13,8 @@ import TabList from '../../components/TabList';
 import ActionDropdown from '../../components/ActionDropdown';
 import DeleteModal from '../../components/DeleteModal';
 import OverviewCard from '../../components/OverviewCard';
-import { DatabaseProperties, HostProperties } from '../../types/models';
 import { getDatabaseEngineTitle } from '../../components/DatabaseList/DatabaseList';
+import Alert from '../../components/Alert';
 
 
 const {
@@ -42,13 +43,11 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
 
     useEffect(() => {
         if (!loading && deleteProcess) {
+            setDeleteProcess(false);
+            setOpenModal(false);
             const deleted = !databases.some(database => database.id === Number.parseInt(id));
             if (error === undefined && deleted) {
-                setDeleteProcess(false);
-                setOpenModal(false);
                 history.push('/databases')
-            } else {
-                // TODO: Delete failure interfaction
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,8 +64,6 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
             return <OverviewCard database={database} host={database ? getHostFor(database) : undefined} user={user} />
         } else if (selectedId === 2) {
             return <div>UserCard</div>
-        } else {
-            return <div>NotImplemented</div>
         }
     }
 
@@ -106,6 +103,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
                     <ActionDropdown onDelete={() => setOpenModal(true)} />
                 </div>
             </div>
+            <Alert errorMessage={error} />
             <TabList tabs={tabs} selectedId={selectedId} onSelect={(value) => setSelectedId(value)} />
             <div className="mt-4">
                 {renderTabContent()}
