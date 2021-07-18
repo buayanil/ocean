@@ -18,6 +18,7 @@ import {
   getDatabaseSuccess,
 } from "../slices/databaseSlice";
 import { UpstreamDatabaseProperties } from "../../types/models";
+import { errorSchema } from "../../api/client";
 
 export function* getAllDatabasesAsync() {
   try {
@@ -90,8 +91,18 @@ export function* createDatabaseAsync({
     if (networkError.response.status === 401) {
       // HINT: token expired
       yield put(logout());
+    } else {
+      try {
+        const data = errorSchema.validateSync(networkError.response.data);
+        if (data.errors && data.errors[0]) {
+          yield put(createDatabaseFailed(data.errors[0].message));
+        } else {
+          yield put(createDatabaseFailed(networkError.toString()));
+        }
+      } catch (parseError) {
+        yield put(createDatabaseFailed(parseError.toString()));
+      }
     }
-    yield put(createDatabaseFailed(networkError.toString()));
   }
 }
 

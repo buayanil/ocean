@@ -14,7 +14,7 @@ interface CreateDatabaseViewProps { }
 
 const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   const history = useHistory();
-  const { loading } = useAppSelector((state) => state.data.database);
+  const { loading, error } = useAppSelector((state) => state.data.database);
   const dispatch = useAppDispatch();
   const [processing, setProcessing] = useState<boolean>(false)
 
@@ -26,14 +26,16 @@ const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   useEffect(() => {
     if (!loading && processing) {
       setProcessing(false);
-      history.push(DatabasesNavigation.to)
+      if (error === undefined) {
+        history.push(DatabasesNavigation.to)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading])
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
-      <CreateDatabaseForm processing={processing} onSubmit={onSubmit} />
+      <CreateDatabaseForm processing={processing} errorMessage={error} onSubmit={onSubmit} />
     </AppLayout>
   );
 }

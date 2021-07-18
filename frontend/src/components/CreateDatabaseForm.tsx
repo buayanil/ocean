@@ -6,15 +6,17 @@ import { CheckCircleIcon, RefreshIcon, BanIcon } from '@heroicons/react/outline'
 import { engineOptions } from '../constants/engines';
 import { UpstreamDatabaseProperties } from '../types/models';
 import { DatabaseClient, DatabaseValidation } from '../api/databaseClient';
+import Alert from './Alert';
 import EngineSelector from './EngineSelector/EngineSelector';
 
 export interface CreateDatabaseFormProps {
     processing: boolean,
+    errorMessage?: string;
     onSubmit: (database: UpstreamDatabaseProperties) => void
 }
 
 
-const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
+const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, errorMessage, onSubmit }) => {
     const createDatabaseSchema = yup.object().shape({
         name: yup.string()
             .required('Name is required')
@@ -101,6 +103,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
 
                                 </div>
                             </div>
+                            <Alert errorMessage={errorMessage} />
                             <button
                                 type="submit"
                                 disabled={values.name === '' || !isValid || processing}
