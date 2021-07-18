@@ -21,4 +21,9 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     val createRoleStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500"""
     db.run(createRoleStatement.as[Int].asTry)
   }
+
+  def deleteDatabase(databaseName: String) = {
+    val deleteDatabaseStatement = sql"""DROP DATABASE IF EXISTS #${databaseName}"""
+    db.run(deleteDatabaseStatement.as[Int].asTry)
+  }
 }

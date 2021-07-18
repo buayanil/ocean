@@ -60,4 +60,18 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
     }
   }
 
+  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.deleteDatabase(databaseName), Duration.Inf) match {
+      case Success(_) =>
+        print _
+        Right(true)
+      case Failure(throwable) => Left(
+        ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_DELETED_ROLE_FAILED,
+          ErrorMessage.MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+      )
+    }
+  }
 }

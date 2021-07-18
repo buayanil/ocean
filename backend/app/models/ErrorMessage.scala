@@ -24,10 +24,13 @@ object ErrorMessage {
   val CODE_INSTANCE_CREATE_DUPLICATED = "database/create-duplicated"
   val CODE_INSTANCE_EXISTS_FAILED = "database/exists-failed"
   val CODE_INSTANCE_DELETE_FAILED = "database/delete-failed"
-  val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-failed-exists"
-  val CODE_PG_CLUSTER_CREATED_DATABASE_UNKNOWN = "pg_cluster/create-failed-unknown"
+  val CODE_INSTANCE_DELETE_NOT_FOUND = "database/delete-not-found"
+  val CODE_INSTANCE_DELETE_CONSTRAINT_ERROR = "database/delete-constraint-error"
+  val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
+  val CODE_PG_CLUSTER_CREATED_DATABASE_UNKNOWN = "pg_cluster/create-database-failed-unknown"
   val CODE_PG_CLUSTER_CREATED_ROLE_EXIST = "pg_cluster/create-role-exists"
-  val CODE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "pg_cluster/create-failed-unknown"
+  val CODE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "pg_cluster/create-role-failed-unknown"
+  val CODE_PG_CLUSTER_DELETED_ROLE_FAILED = "pg_cluster/delete-role-failed"
 
   val MESSAGE_LDAP_ENTRY_MISSING = "Your account could not loaded. Please contact the support."
   val MESSAGE_LDAP_AUTHENTICATION_FAILED = "An account with this profile was not found."
@@ -41,10 +44,12 @@ object ErrorMessage {
   val MESSAGE_INSTANCE_CREATE_DUPLICATED = "Database name is already reserved."
   val MESSAGE_INSTANCE_EXISTS_FAILED = "Could not check for this database."
   val MESSAGE_INSTANCE_DELETE_FAILED = "Could not delete this database."
+  val MESSAGE_INSTANCE_DELETE_NOT_FOUND = "Could not delete this database. Database Does not exists."
+  val MESSAGE_INSTANCE_DELETE_CONSTRAINT_ERROR = "Could not delete this database."
   val MESSAGE_PG_CLUSTER_CREATED_DATABASE_EXIST = "Could not create the database. Database already exists."
   val MESSAGE_PG_CLUSTER_CREATED_DATABASE_UNKNOWN = "Could not create the database. Unknown error."
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_EXIST = "Could not create the role. Role already exists."
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "Could not create the role. Unknown error."
-
+  val MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED = "Could not delete the role."
 }
 
