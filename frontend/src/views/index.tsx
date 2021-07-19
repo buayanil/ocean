@@ -12,6 +12,7 @@ const DatabasesView = React.lazy(() => import('./databases/DatabasesView'));
 const CreateDatabaseView = React.lazy(() => import('./databases/CreateDatabaseView'));
 const DatabaseDetailView = React.lazy(() => import('./databases/DatabaseDetailView'));
 const SettingsView = React.lazy(() => import('./SettingsView'));
+const PageNotFoundView = React.lazy(() => import('./PageNotFoundView'));
 
 
 const RootView: React.FC = () => {
@@ -36,6 +37,7 @@ const RootView: React.FC = () => {
           <ProtectedRoute path='/databases/new' render={(props: any) => <CreateDatabaseView {...props} />} />
           <ProtectedRoute exact path='/databases/:id' render={(props: any) => <DatabaseDetailView {...props} />} />
           <ProtectedRoute path='/settings' render={(props: any) => <SettingsView {...props} />} />
+          <Route path='/error' render={(props: any) => <PageNotFoundView {...props} />} />
           <Redirect to="/error" />
         </Switch>
       </Suspense>
