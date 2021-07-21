@@ -22,7 +22,9 @@ object CreateInstanceForm {
 
   val form: Form[CreateInstanceFormData] = Form(
     mapping(
-      "name" -> nonEmptyText,
+      "name" ->
+        nonEmptyText
+          .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$")),
       "engine" ->
         nonEmptyText.verifying("Invalid engine type.", engine => Instance.ENGINE_ALLOWED.contains(engine)),
     )(CreateInstanceFormData.apply)(CreateInstanceFormData.unapply)

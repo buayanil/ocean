@@ -1,7 +1,7 @@
 import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { logout } from "../slices/userSlice";
+import { logout } from "../slices/session/sessionSlice";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import {
   createDatabaseFailed,
@@ -16,8 +16,9 @@ import {
   getAllDatabasesSuccess,
   getDatabaseStart,
   getDatabaseSuccess,
-} from "../slices/databaseSlice";
+} from "../slices/data/databaseSlice";
 import { UpstreamDatabaseProperties } from "../../types/models";
+import { errorSchema } from "../../api/client";
 
 export function* getAllDatabasesAsync() {
   try {
@@ -90,8 +91,18 @@ export function* createDatabaseAsync({
     if (networkError.response.status === 401) {
       // HINT: token expired
       yield put(logout());
+    } else {
+      try {
+        const data = errorSchema.validateSync(networkError.response.data);
+        if (data.errors && data.errors[0]) {
+          yield put(createDatabaseFailed(data.errors[0].message));
+        } else {
+          yield put(createDatabaseFailed(networkError.toString()));
+        }
+      } catch (parseError) {
+        yield put(createDatabaseFailed(parseError.toString()));
+      }
     }
-    yield put(createDatabaseFailed(networkError.toString()));
   }
 }
 
@@ -111,8 +122,18 @@ export function* deleteDatabaseAsync({ payload }: PayloadAction<number>) {
     if (networkError.response.status === 401) {
       // HINT: token expired
       yield put(logout());
+    } else {
+      try {
+        const data = errorSchema.validateSync(networkError.response.data);
+        if (data.errors && data.errors[0]) {
+          yield put(deleteDatabaseFailed(data.errors[0].message));
+        } else {
+          yield put(deleteDatabaseFailed(networkError.toString()));
+        }
+      } catch (parseError) {
+        yield put(deleteDatabaseFailed(parseError.toString()));
+      }
     }
-    yield put(deleteDatabaseFailed(networkError.toString()));
   }
 }
 

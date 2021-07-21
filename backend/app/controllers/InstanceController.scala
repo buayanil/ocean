@@ -40,7 +40,7 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       createInstanceFormData => {
-        instanceService.addInstance(createInstanceFormData, request.user.id) match {
+        instanceService.addInstance(createInstanceFormData, request.user) match {
           case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(instance) => Ok(Json.toJson(instance))
         }

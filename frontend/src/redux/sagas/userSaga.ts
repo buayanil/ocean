@@ -4,17 +4,19 @@ import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
 import { errorSchema } from "../../api/client";
 import { UserClient, UserValidation } from "../../api/userClient";
 import {
-  getUserFailed,
-  getUserStart,
-  getUserSuccess,
   loginFailed,
   loginStart,
   loginSuccess,
   logout,
-} from "../slices/userSlice";
-import { CrendentialProperties } from "../../types/models";
+} from "../slices/session/sessionSlice";
+import {
+  getUserSuccess,
+  getUserFailed,
+  getUserStart,
+} from "../slices/data/userSlice";
+import { CredentialProperties } from "../../types/models";
 
-export function* loginAsync({ payload }: PayloadAction<CrendentialProperties>) {
+export function* loginAsync({ payload }: PayloadAction<CredentialProperties>) {
   try {
     const response: SagaReturnType<typeof UserClient.login> = yield call(
       UserClient.login,

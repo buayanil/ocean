@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import {
   DatabaseProperties,
   StoreStatus,
   UpstreamDatabaseProperties,
-} from "../../types/models";
+} from "../../../types/models";
 
 interface DatabaseState {
   databases: DatabaseProperties[];
