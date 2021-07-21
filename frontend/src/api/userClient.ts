@@ -1,13 +1,13 @@
 import * as yup from "yup";
 
 import { axiosInstance } from "./client";
-import { CrendentialProperties } from "../types/models";
+import { CredentialProperties } from "../types/models";
 
 export class UserClient {
   /**
    * Login with credentials
    */
-  public static login = (credentials: CrendentialProperties) =>
+  public static login = (credentials: CredentialProperties) =>
     axiosInstance.post<any>("/login", credentials);
 
   /**

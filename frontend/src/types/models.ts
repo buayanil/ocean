@@ -10,7 +10,7 @@ export type UpstreamDatabaseProperties = Pick<
   "name" | "engine"
 >;
 
-export interface CrendentialProperties {
+export interface CredentialProperties {
   username: string;
   password: string;
 }

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { getAllDatabasesStart } from "../../redux/slices/databaseSlice";
+import { getAllDatabasesStart } from "../../redux/slices/data/databaseSlice";
 import { StoreStatus } from "../../types/models";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { emptyDatabaseState } from "../../constants/empty";

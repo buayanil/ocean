@@ -1,7 +1,7 @@
 import { call, put, SagaReturnType, takeLatest } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { logout } from "../slices/userSlice";
+import { logout } from "../slices/session/sessionSlice";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import {
   createDatabaseFailed,
@@ -16,7 +16,7 @@ import {
   getAllDatabasesSuccess,
   getDatabaseStart,
   getDatabaseSuccess,
-} from "../slices/databaseSlice";
+} from "../slices/data/databaseSlice";
 import { UpstreamDatabaseProperties } from "../../types/models";
 import { errorSchema } from "../../api/client";
 
