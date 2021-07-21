@@ -193,12 +193,18 @@ After=network.target
 Type=simple
 User=local
 WorkingDirectory=/home/local/db1/backend
-Environment="APPLICATION_SECRET="
+Environment="APPLICATION_SECRET=""
 Environment="JWT_SECRET="
 Environment="SLICK_DB_URL="
 Environment="SLICK_DB_USER="
 Environment="SLICK_DB_PASSWORD="
 Environment="HOST_IP="
+Environment="PG_CLUSTER_HOSTNAME="
+Environment="PG_CLUSTER_PORT="
+Environment="PG_CLUSTER_DATABASE="
+Environment="PG_CLUSTER_USER="
+Environment="PG_CLUSTER_PASSWORD="
+
 ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend
 
 [Install]
@@ -245,15 +251,38 @@ After installing the PostgreSQL database server by default, it creates a user po
 
 ```psql -c "alter user postgres with password 'STRONG_PASSWORD'"```
 
+ Change the Listen Address in `/etc/postgresql/12/main/postgresql.conf`
+
+```listen_addresses = '*'```
+
+Also increase the maximum connections. Each PostgreSQL connection consumes RAM for managing the connection or the client using it. The more connections you have, the more RAM you will be using that could instead be used to run the database.
+
+```max_connections = 400```
+
+Integrate LDAP authentication in file ``
+
+```
+host    all             all             all                     ldap ldapscheme="ldaps" ldapserver="login-dc-01.login.htw-berlin.de" ldapprefix="cn=" ldapsuffix=", ou=idmusers,dc=login,dc=htw-berlin,dc=de" ldapport=636
+```
+
+Provide a initial database
+
+```create database internal with owner=postgres connection limit = -1;```
+
 ## Development
+
+### Docker Images
+
+This project provides a docker image with PostgreSQL, MySQL, MongoDB and Adminer in the directory `backend/docker`.
 
 ### Play framework
 
-Provide a PostgreSQL database for ORM
+Runs the app in the development mode.
 
-```docker run --env POSTGRES_DB=db --env POSTGRES_USER=foo --env POSTGRES_PASSWORD=bar --publish 5432:5432 --rm --interactive --tty postgres```
+```sbt run -Dconfig.resource=application.dev.conf```
 
-Provide a PostgreSQL Cluster. Run on a different outgoing port
+Runs the tests
+```sbt test```
 
-```docker run --env POSTGRES_DB=db --env POSTGRES_USER=foo --env POSTGRES_PASSWORD=bar --publish 5555:5432 --rm --interactive --tty postgres`
-
+Builds the app for production
+```sbt dist```
