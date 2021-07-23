@@ -2,12 +2,14 @@ package services
 
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
+
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
-
 import models.ErrorMessage
 import repositories.PgClusterRepository
+
+import java.sql.SQLTransientConnectionException
 
 
 class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
@@ -25,6 +27,12 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
         ErrorMessage(
           ErrorMessage.CODE_PG_CLUSTER_CREATED_DATABASE_EXIST,
           ErrorMessage.MESSAGE_PG_CLUSTER_CREATED_DATABASE_EXIST,
+          developerMessage = exception.getMessage
+        )
+      case exception: SQLTransientConnectionException if exception.getMessage.contains("not available") =>
+        ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_CREATED_DATABASE_NOT_AVAILABLE,
+          ErrorMessage.MESSAGE_PG_CLUSTER_CREATED_DATABASE_NOT_AVAILABLE,
           developerMessage = exception.getMessage
         )
       case exception =>
