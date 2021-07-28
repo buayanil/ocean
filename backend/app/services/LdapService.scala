@@ -1,14 +1,14 @@
 package services
 
+import java.io.IOException
+import javax.inject._
 import org.apache.directory.api.ldap.model.cursor.{CursorException, EntryCursor}
 import org.apache.directory.api.ldap.model.entry.Entry
 import org.apache.directory.api.ldap.model.exception.{LdapAuthenticationException, LdapException, LdapInvalidAttributeValueException}
 import org.apache.directory.api.ldap.model.message.SearchScope
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException
 import org.apache.directory.ldap.client.api.{LdapConnectionConfig, LdapNetworkConnection}
-import java.io.IOException
-import javax.inject._
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import scala.collection.mutable.ListBuffer
 
 import models.{ErrorMessage, LdapUser}
@@ -16,17 +16,25 @@ import models.{ErrorMessage, LdapUser}
 
 class LdapService @Inject()(config: Configuration) {
 
+  val logger: Logger = Logger(this.getClass)
+
   def authenticate(username: String, password: String): Either[List[ErrorMessage], LdapUser] = {
     val ldapConnectionConfig = getLdapConnectionConfig(username, password)
     ldapConnectionConfig match {
       case Right(config) => fetchLdapRole(config, username) match {
         case Right(entry) => getProfileFor(entry, username) match {
           case Right(ldapUser) => Right(ldapUser)
-          case Left(error) => Left(List(error))
+          case Left(error) =>
+            logger.error(error.toString)
+            Left(List(error))
         }
-        case Left(error) => Left(List(error))
+        case Left(error) =>
+          logger.warn(error.toString)
+          Left(List(error))
       }
-      case Left(errors) => Left(errors)
+      case Left(errors) =>
+        logger.error(errors.toString)
+        Left(errors)
     }
   }
 

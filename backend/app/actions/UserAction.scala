@@ -5,7 +5,7 @@ import play.api.Logging
 import play.api.mvc._
 import play.api.http.HeaderNames
 import play.api.mvc.Results.Unauthorized
-import play.api.libs.json.{Json}
+import play.api.libs.json.Json
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
@@ -19,14 +19,18 @@ case class UserRequest[A](user: User, request: Request[A]) extends WrappedReques
 
 class UserAction @Inject() (bodyParser: BodyParsers.Default, tokenService: TokenService, userRepository: UserRepository)(implicit ec: ExecutionContext) extends ActionBuilder[UserRequest, AnyContent] with Logging {
 
+
   private val headerTokenRegex = """Bearer (.+?)""".r
 
   override def parser: BodyParser[AnyContent] = bodyParser
 
 
-
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
-    logger.info("UserAction - " + request)
+    def getLoggerMessageFor(request: Request[A]): String = {
+      s"RemoteAddress: ${request.remoteAddress} Method: ${request.method} URI: ${request.uri} Body ${request.body}"
+    }
+
+    logger.info(getLoggerMessageFor(request))
 
     extractBearerToken(request) match {
       case None => Future.successful(Unauthorized(Json.toJson(ErrorResponse(List(ErrorMessage(ErrorMessage.CODE_JWT_BEARER_MISSING, "Bearer token required"))))))

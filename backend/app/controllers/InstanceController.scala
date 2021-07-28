@@ -1,9 +1,10 @@
 package controllers
 
-import play.api.libs.json.{JsValue, Json, Writes}
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.data.FormError
+import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.Logger
 
 import actions.{UserAction, UserRequest}
 import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
@@ -11,6 +12,8 @@ import services.InstanceService
 
 
 class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAction, instanceService: InstanceService) extends AbstractController(cc) {
+
+  val logger: Logger = Logger(this.getClass)
 
   implicit object FormErrorWrites extends Writes[FormError] {
     override def writes(o: FormError): JsValue = Json.obj(
@@ -21,14 +24,18 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
 
   def listAll(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.listAll(request.user.id) match {
-      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Left(error) =>
+        logger.error(error.toString)
+        BadRequest(Json.toJson(ErrorResponse(List(error))))
       case Right(instances) => Ok(Json.toJson(instances))
     }
   }
 
   def get(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.getInstance(id, request.user.id) match {
-      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Left(error) =>
+        logger.error(error.toString)
+        BadRequest(Json.toJson(ErrorResponse(List(error))))
       case Right(instance) => Ok(Json.toJson(instance))
     }
   }
@@ -37,11 +44,14 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
   def addInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
+        logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       createInstanceFormData => {
         instanceService.addInstance(createInstanceFormData, request.user) match {
-          case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+          case Left(error) =>
+            logger.error(error.toString)
+            BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(instance) => Ok(Json.toJson(instance))
         }
       }
@@ -51,11 +61,14 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
   def existsInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
+        logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       createInstanceFormData => {
         instanceService.existsInstance(createInstanceFormData) match {
-          case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+          case Left(error) =>
+            logger.error(error.toString)
+            BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(exists) => Ok(Json.toJson(ExistsInstanceResponse(exists)))
         }
       }
@@ -64,7 +77,9 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
 
   def deleteInstance(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.deleteInstance(id, request.user.id) match {
-      case Left(error) => BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Left(error) =>
+        logger.error(error.toString)
+        BadRequest(Json.toJson(ErrorResponse(List(error))))
       case Right(rows) => Ok(Json.toJson((InstanceDeletedResponse(rows))))
     }
   }

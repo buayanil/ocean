@@ -4,7 +4,7 @@ import javax.inject.Inject
 import java.time.Clock
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import scala.util.{Failure, Success}
 
 import models.ErrorMessage
@@ -12,6 +12,7 @@ import models.ErrorMessage
 
 class TokenService @Inject()(configuration: Configuration) {
 
+  val logger: Logger = Logger(this.getClass)
   val SECRET_KEY: String = configuration.getOptional[String]("jwt.secret_key").getOrElse("")
   val ALGO_TYPE: JwtHmacAlgorithm = JwtAlgorithm.HS256
 
@@ -27,13 +28,19 @@ class TokenService @Inject()(configuration: Configuration) {
         case Success(jwtClaim) => jwtClaim.issuer match {
           case Some(issuer) => Right(issuer)
           case None =>
-            Left(ErrorMessage(ErrorMessage.CODE_JWT_ISSUER_MISSING, ErrorMessage.MESSAGE_JWT_ISSUER_MISSING))
+            val errorMessage = ErrorMessage(ErrorMessage.CODE_JWT_ISSUER_MISSING, ErrorMessage.MESSAGE_JWT_ISSUER_MISSING)
+            logger.warn(errorMessage.toString)
+            Left(errorMessage)
         }
         case Failure(e) =>
-          Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE, developerMessage = e.getMessage))
+          val errorMessage = ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE, developerMessage = e.getMessage)
+          logger.warn(errorMessage.toString)
+          Left(errorMessage)
       }
     } else {
-      Left(ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE))
+      val errorMessage = ErrorMessage(ErrorMessage.CODE_JWT_INVALID_SIGNATURE, ErrorMessage.MESSAGE_JWT_INVALID_SIGNATURE)
+      logger.warn(errorMessage.toString)
+      Left(errorMessage)
     }
   }
 
