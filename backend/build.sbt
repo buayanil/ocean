@@ -20,4 +20,6 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.2.21",
   "com.github.jwt-scala" %% "jwt-play-json" % "8.0.2",
   "com.github.jwt-scala" %% "jwt-core" % "8.0.2",
+  "net.logstash.logback" % "logstash-logback-encoder" % "6.6",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.2",
 )
