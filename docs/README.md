@@ -7,60 +7,28 @@
 Configure iptables configuration
 
 ```
-iptables -F
 
-iptables -P INPUT ACCEPT
-iptables -P FORWARD DROP
+#!/bin/sh
+# Alle Regeln aller Chains in Tabelle Filter loeschen
+#
+iptables -F
+iptables -t nat -F
+#
+# Standart Policy fuer alle Chains DROP
+#
+iptables -P INPUT DROP
+iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 
+#
+# Allow only 141.45.x.x
+#
+iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -s 141.45.0.0/16 -j ACCEPT
 
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-# SSH
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
-
-# HTTPS
-iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
-
-# HTTP
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
-
-# HTTP
-iptables -A INPUT -p tcp --dport 9000 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 9000 -j ACCEPT
-
-# External PostgreSQL
-iptables -A OUTPUT -p tcp --dport 5432 -j ACCEPT
-
-# External LDAP
-iptables -A OUTPUT -p tcp --dport 636 -j ACCEPT
-
-# loopback device
-iptables -A INPUT -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT
-iptables -A OUTPUT -o lo -d 127.0.0.0/8 -s 127.0.0.0/8 -j ACCEPT
-
-# internal subnet
-iptables -A INPUT ! -s 141.45.0.0/16 -j DROP
-iptables -A OUTPUT ! -d 141.45.0.0/16 -j DROP
-
-# Ping
-iptables -A INPUT -p icmp -j ACCEPT
-iptables -A OUTPUT -p icmp -j ACCEPT
-
-# DNS
-iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-
-# NTP 
-iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 123 -j ACCEPT
-
-iptables -A INPUT -j DROP
-iptables -A OUTPUT -j DROP
-
+iptables-save > /etc/firewall.conf
+#
 echo -n "#"      > /etc/network/if-up.d/iptables
 echo -n !       >> /etc/network/if-up.d/iptables
 echo /bin/sh    >> /etc/network/if-up.d/iptables
@@ -205,7 +173,7 @@ Environment="PG_CLUSTER_DATABASE="
 Environment="PG_CLUSTER_USER="
 Environment="PG_CLUSTER_PASSWORD="
 
-ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend
+ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend -Dlogger.resource=logback.production.xml
 
 [Install]
 WantedBy=multi-user.target
@@ -273,13 +241,17 @@ Provide a initial database
 
 ### Docker Images
 
-This project provides a docker image with PostgreSQL, MySQL, MongoDB and Adminer in the directory `backend/docker`.
+This project provides a docker image with PostgreSQL, MySQL, MongoDB and Adminer in the file `backend/docker-compose.yml`.
 
 ### Play framework
 
 Runs the app in the development mode.
 
 ```sbt run -Dconfig.resource=application.dev.conf```
+
+Runs with production configuraiton.
+
+```sbt run -Dconfig.resource=application.production.conf -Dlogger.resource=logback.production.xml```
 
 Runs the tests
 ```sbt test```
