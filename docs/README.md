@@ -237,6 +237,10 @@ Provide a initial database
 
 ```create database internal with owner=postgres connection limit = -1;```
 
+Revoke public schema access
+
+```REVOKE CREATE ON SCHEMA public FROM PUBLIC;```
+
 ## Development
 
 ### Docker Images
