@@ -14,7 +14,8 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
 
   def createDatabase(databaseName: String, ownerName: String): Future[Try[Vector[Int]]] = {
     val createDatabaseStatement = sql"""CREATE DATABASE #${databaseName} WITH OWNER #${ownerName}"""
-    db.run(createDatabaseStatement.as[Int].asTry)
+    val revokePublicAccessStatement = sql"""REVOKE ALL ON DATABASE #${databaseName} FROM PUBLIC"""
+    db.run(createDatabaseStatement.as[Int].asTry andThen revokePublicAccessStatement.as[Int].asTry)
   }
 
   def createRole(roleName: String): Future[Try[Vector[Int]]] = {
@@ -22,7 +23,7 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     db.run(createRoleStatement.as[Int].asTry)
   }
 
-  def deleteDatabase(databaseName: String) = {
+  def deleteDatabase(databaseName: String): Future[Try[Vector[Int]]] = {
     val deleteDatabaseStatement = sql"""DROP DATABASE IF EXISTS #${databaseName}"""
     db.run(deleteDatabaseStatement.as[Int].asTry)
   }
