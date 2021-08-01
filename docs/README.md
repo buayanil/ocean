@@ -241,6 +241,27 @@ Revoke public schema access
 
 ```REVOKE CREATE ON SCHEMA public FROM PUBLIC;```
 
+### phpPgAdmin
+
+Install phpPgAdmin
+
+```apt -y install phppgadmin```
+
+Modify `/etc/phppgadmin/config.inc.php:
+
+```
+$conf['extra_login_security'] = false;
+$conf['owned_only'] = true;
+```
+
+Set remote postgres cluster hostname in `/etc/phppgadmin/config.inc.php`
+
+```$conf['servers'][0]['host'] = 'CHANGE_ME';```
+
+Reload Apache web server:
+
+```service apache2 reload```
+
 ## Development
 
 ### Docker Images
