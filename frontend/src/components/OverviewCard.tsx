@@ -8,9 +8,10 @@ export interface OverviewCardProps {
   database?: DatabaseProperties;
   host?: HostProperties;
   user?: UserProperties;
+  pgAdminUrl?: string;
 }
 
-const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user }) => {
+const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdminUrl }) => {
 
   const getConnectionString = (): string | undefined => {
     if (database && host && host && user) {
@@ -58,7 +59,25 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user }) => 
             {database && host && user ?
               <dd className="mt-2 text-sm text-gray-900">
                 {/*TODO: clipboard*/}
-                <span className="px-2 py-1 rounded bg-gray-200">{getConnectionString()}</span>
+                <div className="flex flex-col space-y-2">
+                  <div>
+                    <span className="px-2 py-1 rounded bg-gray-200">{getConnectionString()}</span>
+                  </div>
+                  <div>
+                    <button
+                      className="mr-2 border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={() => navigator.clipboard.writeText(getConnectionString() || "Some went wrong :(")}
+                    >
+                      Strg-C
+                    </button>
+                    <a
+                      href={pgAdminUrl || "#"}
+                      target="_blank" rel="noopener noreferrer"
+                      className="border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      phpPgAdmin
+                    </a>
+                  </div>
+                </div>
               </dd> :
               <dd className="animate-pulse mt-1 h-6 w-64 bg-gray-200" />
             }
