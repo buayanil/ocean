@@ -173,7 +173,7 @@ Environment="PG_CLUSTER_DATABASE="
 Environment="PG_CLUSTER_USER="
 Environment="PG_CLUSTER_PASSWORD="
 
-ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend -Dlogger.resource=logback.production.xml
+ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend -Dlogger.resource=logback.production.xml -Dhttps.port=9443 -Dhttp.port=disabled -Dplay.server.https.keyStore.path='/home/local/cert/keystore.p12' -Dplay.server.https.keyStore.password='change_me' -Dplay.server.https.keyStore.type='pkcs12'
 
 [Install]
 WantedBy=multi-user.target
