@@ -15,7 +15,11 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
   def createDatabase(databaseName: String, ownerName: String): Future[Try[Vector[Int]]] = {
     val createDatabaseStatement = sql"""CREATE DATABASE #${databaseName} WITH OWNER #${ownerName}"""
     val revokePublicAccessStatement = sql"""REVOKE ALL ON DATABASE #${databaseName} FROM PUBLIC"""
-    db.run(createDatabaseStatement.as[Int].asTry andThen revokePublicAccessStatement.as[Int].asTry)
+    val revokeDeleteFromOwner = sql"""REVOKE CONNECT ON DATABASE #${databaseName} FROM #${ownerName}"""
+    db.run(createDatabaseStatement.as[Int].asTry andThen
+      revokePublicAccessStatement.as[Int].asTry andThen
+      revokeDeleteFromOwner.as[Int].asTry
+    )
   }
 
   def createRole(roleName: String): Future[Try[Vector[Int]]] = {
