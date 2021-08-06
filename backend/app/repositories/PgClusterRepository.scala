@@ -22,13 +22,18 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     )
   }
 
+  def deleteDatabase(databaseName: String): Future[Try[Vector[Int]]] = {
+    val deleteDatabaseStatement = sql"""DROP DATABASE IF EXISTS #${databaseName}"""
+    db.run(deleteDatabaseStatement.as[Int].asTry)
+  }
+
   def createRole(roleName: String): Future[Try[Vector[Int]]] = {
     val createRoleStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500"""
     db.run(createRoleStatement.as[Int].asTry)
   }
 
-  def deleteDatabase(databaseName: String): Future[Try[Vector[Int]]] = {
-    val deleteDatabaseStatement = sql"""DROP DATABASE IF EXISTS #${databaseName}"""
-    db.run(deleteDatabaseStatement.as[Int].asTry)
+  def existsRole(roleName: String): Future[Try[Vector[Int]]] = {
+    val existsDatabaseStatement = sql"""SELECT 1 FROM pg_roles WHERE rolname='#${roleName}'"""
+    db.run(existsDatabaseStatement.as[Int].asTry)
   }
 }
