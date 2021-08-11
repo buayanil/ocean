@@ -61,13 +61,16 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
         val errorMessage = handleAddInstanceThrowable(exception)
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Success(instance) =>
+      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
         pgClusterService.createDatabase(instance.name, user.username) match {
           case Left(errorMessage) =>
             logger.error(errorMessage.toString)
             Left(errorMessage)
           case Right(_) => Right(instance)
         }
+      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
+        // TODO: mongodb not implemented yet
+        Right(instance)
     }
   }
 
@@ -112,15 +115,7 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
         )
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Success(instances) if instances.length > 1 =>
-        val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_INSTANCE_DELETE_CONSTRAINT_ERROR,
-          ErrorMessage.MESSAGE_INSTANCE_DELETE_CONSTRAINT_ERROR,
-          developerMessage = s"Matches: ${instances.length}"
-        )
-        logger.error(errorMessage.toString)
-        Left(errorMessage)
-      case Success(instances) if instances.length == 1 =>
+      case Success(instances) =>
         Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
           case Failure(exception) =>
             val errorMessage = ErrorMessage(

@@ -49,6 +49,19 @@ object ErrorMessage {
   val MESSAGE_INSTANCE_DELETE_NOT_FOUND = "Could not delete this database. Database Does not exists."
   val MESSAGE_INSTANCE_DELETE_CONSTRAINT_ERROR = "Could not delete this database."
 
+  // Role
+  val CODE_ROLE_LIST_FAILED = "role/list-failed"
+  val CODE_ROLE_CREATE_FAILED = "role/create-failed"
+  val CODE_ROLE_CREATE_WRONG_PERMISSION = "role/create-wrong-permission"
+  val CODE_ROLE_CREATE_CONSTRAINT_ERROR = "role/create-constraint-error"
+  val CODE_ROLE_LIST_WRONG_PERMISSION = "role/list-wrong-permission"
+
+  val MESSAGE_ROLE_FAILED = "Could not get the role list."
+  val MESSAGE_ROLE_CREATE_FAILED = "Could not create a role."
+  val MESSAGE_ROLE_CREATE_WRONG_PERMISSION = "Only the owner can create a role."
+  val MESSAGE_ROLE_CREATE_CONSTRAINT_ERROR = "Role already exists."
+  val MESSAGE_ROLE_LIST_WRONG_PERMISSION = "Only the owner can view the roles."
+
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
   val CODE_PG_CLUSTER_CREATED_DATABASE_NOT_AVAILABLE = "pg_cluster/create-database-not-available"

@@ -44,12 +44,12 @@ class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClu
               ErrorMessage.MESSAGE_STARTUP_LDAP_ROLE_NOT_EXISTS,
             )
             logger.warn(warnMessage.toString)
-            Await.result(pgClusterRepository.createRole(ldapRole), Duration.Inf) match {
-              case Failure(createRoleThrowable) =>
+            Await.result(pgClusterRepository.createGroup(ldapRole), Duration.Inf) match {
+              case Failure(createGroupThrowable) =>
                 val errorMessage = ErrorMessage(
                   ErrorMessage.CODE_STARTUP_LDAP_ROLE_CREATE_FAILED,
                   ErrorMessage.MESSAGE_STARTUP_LDAP_ROLE_CREATE_FAILED,
-                  developerMessage = createRoleThrowable.getMessage
+                  developerMessage = createGroupThrowable.getMessage
                 )
                 logger.error(errorMessage.toString)
               case Success(value) =>
@@ -84,12 +84,12 @@ class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClu
               ErrorMessage.MESSAGE_STARTUP_GENERIC_ROLE_NOT_EXISTS,
             )
             logger.warn(warnMessage.toString)
-            Await.result(pgClusterRepository.createRole(genericRole), Duration.Inf) match {
-              case Failure(createRoleThrowable) =>
+            Await.result(pgClusterRepository.createGroup(genericRole), Duration.Inf) match {
+              case Failure(createGroupThrowable) =>
                 val errorMessage = ErrorMessage(
                   ErrorMessage.CODE_STARTUP_GENERIC_ROLE_CREATE_FAILED,
                   ErrorMessage.MESSAGE_STARTUP_GENERIC_ROLE_CREATE_FAILED,
-                  developerMessage = createRoleThrowable.getMessage
+                  developerMessage = createGroupThrowable.getMessage
                 )
                 logger.error(errorMessage.toString)
               case Success(value) =>

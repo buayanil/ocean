@@ -12,13 +12,19 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
 
   val db = Database.forConfig("pg_cluster")
 
-  def createDatabase(databaseName: String, ownerName: String): Future[Try[Vector[Int]]] = {
-    val createDatabaseStatement = sql"""CREATE DATABASE #${databaseName} WITH OWNER #${ownerName}"""
+  /**
+   * Creates a database, revokes public access and grants a role access
+   * @param databaseName name of database
+   * @param ownerName name of owner
+   */
+  def createDatabase(databaseName: String, roleName: String): Future[Try[Vector[Int]]] = {
+    val createDatabaseStatement = sql"""CREATE DATABASE #${databaseName}"""
     val revokePublicAccessStatement = sql"""REVOKE ALL ON DATABASE #${databaseName} FROM PUBLIC"""
-    val revokeDeleteFromOwner = sql"""REVOKE CONNECT ON DATABASE #${databaseName} FROM #${ownerName}"""
-    db.run(createDatabaseStatement.as[Int].asTry andThen
+    val grantDatabaseAccessStatement = sql"""GRANT ALL PRIVILEGES ON DATABASE #${databaseName} to #${roleName}"""
+    db.run(
+      createDatabaseStatement.as[Int].asTry andThen
       revokePublicAccessStatement.as[Int].asTry andThen
-      revokeDeleteFromOwner.as[Int].asTry
+      grantDatabaseAccessStatement.as[Int].asTry
     )
   }
 
@@ -27,13 +33,27 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     db.run(deleteDatabaseStatement.as[Int].asTry)
   }
 
-  def createRole(roleName: String): Future[Try[Vector[Int]]] = {
-    val createRoleStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500"""
+  /**
+   * Creates a role with login permission and group membership.
+   * @param roleName name of role
+   * @param groupName name of group
+   */
+  def createRole(roleName: String, groupName: String): Future[Try[Vector[Int]]] = {
+    val createRoleStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500 IN ROLE #${groupName}"""
     db.run(createRoleStatement.as[Int].asTry)
   }
 
   def existsRole(roleName: String): Future[Try[Vector[Int]]] = {
     val existsDatabaseStatement = sql"""SELECT 1 FROM pg_roles WHERE rolname='#${roleName}'"""
     db.run(existsDatabaseStatement.as[Int].asTry)
+  }
+
+  /**
+   * Creates a group as a role without login permissions.
+   * @param groupName name of group
+   */
+  def createGroup(groupName: String): Future[Try[Vector[Int]]] = {
+    val createRoleStatement = sql"""CREATE ROLE #${groupName} WITH NOSUPERUSER"""
+    db.run(createRoleStatement.as[Int].asTry)
   }
 }

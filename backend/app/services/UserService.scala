@@ -23,7 +23,7 @@ class UserService @Inject()(ldapService: LdapService, tokenService: TokenService
         case None => Await.result(
           userRepository.addUser(getUserFor(ldapUser)), Duration.Inf) match {
           case user =>
-            pgClusterService.createRole(user.username) match {
+            pgClusterService.createRole(user.username, pgClusterService.LDAP_GROUP_NAME) match {
               case Left(errorMessage: ErrorMessage) =>
                 logger.error(errorMessage.toString)
                 Left(List(errorMessage))

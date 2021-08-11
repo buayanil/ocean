@@ -3,7 +3,7 @@ package services
 import javax.inject.Inject
 import java.sql.SQLTransientConnectionException
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
@@ -13,9 +13,12 @@ import repositories.PgClusterRepository
 
 
 
-class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
+class PgClusterService @Inject()(configuration: Configuration, pgClusterRepository: PgClusterRepository) {
 
   val logger: Logger = Logger(this.getClass)
+
+  val LDAP_GROUP_NAME: String = configuration.get[String]("ldap_role")
+  val GENERIC_GROUP_NAME: String = configuration.get[String]("generic_role")
 
   def createDatabase(databaseName: String, ownerName: String): Either[ErrorMessage, Boolean] = {
     Await.result(pgClusterRepository.createDatabase(databaseName, ownerName), Duration.Inf) match {
@@ -50,8 +53,8 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
     }
   }
 
-  def createRole(roleName: String): Either[ErrorMessage, Boolean] = {
-    Await.result(pgClusterRepository.createRole(roleName), Duration.Inf) match {
+  def createRole(roleName: String, groupName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.createRole(roleName, groupName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
         val errorMessage = handleCreateRoleThrowable(throwable)
