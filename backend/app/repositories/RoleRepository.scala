@@ -28,8 +28,10 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 
     def name = column[String]("name")
 
+    def password = column[String]("password")
+
     def * =
-      (id, instanceId, name) <> ((Role.apply _).tupled, Role.unapply)
+      (id, instanceId, name, password) <> ((Role.apply _).tupled, Role.unapply)
 
     def idx = index("idx_instanceId_name", (instanceId, name), unique = true)
 
@@ -49,6 +51,11 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     val createRoleQuery = roles returning roles.map(_.id) into ((item, id) => item.copy(id = id))
     val action = (createRoleQuery += role).asTry
     dbConfig.db.run(action)
+  }
+
+  def existsRole(roleName: String, instanceId: Long): Future[Try[Boolean]] = {
+    val existRoleStatement = roles.filter(role => role.name === roleName && role.instanceId === instanceId).exists.result.asTry
+    dbConfig.db.run(existRoleStatement)
   }
 }
 

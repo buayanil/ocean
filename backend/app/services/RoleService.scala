@@ -1,13 +1,13 @@
 package services
 
-import forms.CreateRoleFormData
-
+import java.security.SecureRandom
 import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
+import forms.{CreateRoleFormData, RoleExistsFormData}
 import models.{ErrorMessage, Role, User}
 import org.postgresql.util.PSQLException
 import repositories.RoleRepository
@@ -55,7 +55,8 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         logger.error(errorMessage.toString)
         Left(errorMessage)
       case Right(_) =>
-        val localRole = Role(0, createInstanceFormData.instanceId, createInstanceFormData.name)
+        val rolePassword = generateRolePassword()
+        val localRole = Role(0, createInstanceFormData.instanceId, createInstanceFormData.name, rolePassword)
         Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
           case Failure(createRoleThrowable) =>
             val errorMessage = handleAddRoleThrowable(createRoleThrowable)
@@ -82,6 +83,40 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
           ErrorMessage.MESSAGE_ROLE_CREATE_FAILED,
           developerMessage = exception.getMessage
         )
+    }
+  }
+
+  def generateRolePassword(length: Int = 8): String = {
+    val algorithm = new SecureRandom
+    val passwordChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray
+    val password = new StringBuilder
+    for (_ <- 0 to length)
+      password.append(passwordChars(algorithm.nextInt(passwordChars.length)))
+    password.toString
+  }
+
+  def existsRole(roleExistsFormData: RoleExistsFormData, user: User): Either[ErrorMessage, Boolean] = {
+    instanceService.getInstance(roleExistsFormData.instanceId, user.id) match {
+      case Left(getInstanceThrowable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_EXISTS_WRONG_PERMISSION,
+          ErrorMessage.MESSAGE_ROLE_EXISTS_WRONG_PERMISSION,
+          developerMessage = getInstanceThrowable.developerMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Right(_) => Await.result(roleRepository.existsRole(roleExistsFormData.roleName, roleExistsFormData.instanceId), Duration.Inf) match {
+        case Failure(existRoleThrowable) =>
+          val errorMessage = ErrorMessage(
+            ErrorMessage.CODE_ROLE_EXISTS_FAILED,
+            ErrorMessage.MESSAGE_ROLE_EXISTS_FAILED,
+            developerMessage = existRoleThrowable.getMessage
+          )
+          logger.error(errorMessage.toString)
+          Left(errorMessage)
+        case Success(exists) =>
+          Right(exists)
+      }
     }
   }
 }

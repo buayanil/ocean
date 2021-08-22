@@ -34,7 +34,7 @@ class RoleServiceSpec extends Specification with Mockito {
       // Arrange
       val user = User(1, "", "", "", "", "")
       val instance = Instance(1, 1, "", "", Timestamp.from(Instant.now))
-      val role = Role(1, 1, "")
+      val role = Role(1, 1, "", "")
       val roleRepository = mock[RoleRepository]
       roleRepository.listDatabaseRoles(any[Long]).returns(Future.successful(Success(List(role))))
       val instanceService = mock[InstanceService]
@@ -70,7 +70,7 @@ class RoleServiceSpec extends Specification with Mockito {
       // Arrange
       val user = User(1, "", "", "", "", "")
       val instance = Instance(1, 1, "", "", Timestamp.from(Instant.now))
-      val role = Role(1, 1, "")
+      val role = Role(1, 1, "", "")
       val createRoleFormData = CreateRoleFormData(1, "")
       val roleRepository = mock[RoleRepository]
       roleRepository.addRole(any[Role]).returns(Future.successful(Success(role)))

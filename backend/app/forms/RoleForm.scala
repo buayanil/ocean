@@ -15,3 +15,15 @@ object CreateRoleForm {
     )(CreateRoleFormData.apply)(CreateRoleFormData.unapply)
   )
 }
+
+case class RoleExistsFormData(instanceId: Long, roleName: String)
+
+object RoleExistsForm {
+  val form: Form[RoleExistsFormData] = Form(
+    mapping(
+      "instanceId" -> longNumber,
+      "roleName" -> nonEmptyText,
+
+    )(RoleExistsFormData.apply)(RoleExistsFormData.unapply)
+  )
+}

@@ -7,8 +7,8 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.Logger
 
 import actions.{UserAction, UserRequest}
-import forms.CreateRoleForm
-import models.ErrorResponse
+import forms.{CreateRoleForm, RoleExistsForm}
+import models.{ErrorResponse, ExistsRoleResponse}
 import services.RoleService
 
 
@@ -44,6 +44,24 @@ class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction,
             logger.error(error.toString)
             BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(instance) => Ok(Json.toJson(instance))
+        }
+      }
+    )
+  }
+
+  def existsRole(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    RoleExistsForm.form.bindFromRequest.fold(
+      formWithErrors => {
+        logger.warn(formWithErrors.errors.toString)
+        UnprocessableEntity(Json.toJson(formWithErrors.errors))
+      },
+      roleExistsFormData => {
+        roleService.existsRole(roleExistsFormData, request.user) match {
+          case Left(error) =>
+            logger.error(error.toString)
+            BadRequest(Json.toJson(ErrorResponse(List(error))))
+          case Right(exists) =>
+            Ok(Json.toJson(ExistsRoleResponse(exists)))
         }
       }
     )

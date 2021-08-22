@@ -55,12 +55,16 @@ object ErrorMessage {
   val CODE_ROLE_CREATE_WRONG_PERMISSION = "role/create-wrong-permission"
   val CODE_ROLE_CREATE_CONSTRAINT_ERROR = "role/create-constraint-error"
   val CODE_ROLE_LIST_WRONG_PERMISSION = "role/list-wrong-permission"
+  val CODE_ROLE_EXISTS_WRONG_PERMISSION = "role/exist-wrong-permission"
+  val CODE_ROLE_EXISTS_FAILED = "role/exist-failed"
 
   val MESSAGE_ROLE_FAILED = "Could not get the role list."
   val MESSAGE_ROLE_CREATE_FAILED = "Could not create a role."
   val MESSAGE_ROLE_CREATE_WRONG_PERMISSION = "Only the owner can create a role."
   val MESSAGE_ROLE_CREATE_CONSTRAINT_ERROR = "Role already exists."
   val MESSAGE_ROLE_LIST_WRONG_PERMISSION = "Only the owner can view the roles."
+  val MESSAGE_ROLE_EXISTS_WRONG_PERMISSION = "Only the owner can check the roles."
+  val MESSAGE_ROLE_EXISTS_FAILED = "Could not check for the database role."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
