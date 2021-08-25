@@ -3,6 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
 
 import { DatabaseProperties, HostProperties } from "../../types/models";
+import { UpstreamCreateRoleProperties } from "../../types/role";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
@@ -12,12 +13,16 @@ import {
   deleteDatabaseStart,
   getDatabaseStart,
 } from "../../redux/slices/data/databaseSlice";
+import { createRoleForDatabaseStart, getRolesForDatabaseStart } from "../../redux/slices/data/roleSlice";
 import TabList from "../../components/TabList";
 import ActionDropdown from "../../components/ActionDropdown";
 import DeleteModal from "../../components/DeleteModal";
 import OverviewCard from "../../components/OverviewCard";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
 import Alert from "../../components/Alert";
+import RoleList from "../../components/RoleList/RoleList";
+import Headline from "../../components/Headline";
+import CreateRoleModal from "../../components/modals/CreateRoleModal";
 
 const {
   REACT_APP_POSTGRESQL_HOSTNAME,
@@ -27,26 +32,46 @@ const {
   REACT_APP_PHPPGADMIN_URL,
 } = process.env;
 
+
 interface DatabaseDetailViewProps { }
 
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
   const history = useHistory();
+  // Redux
   const dispatch = useAppDispatch();
   const { loading, error, databases } = useAppSelector(
     (state) => state.data.database
   );
+  const { roles, isLoadingCreateRole } = useAppSelector(
+    (state) => state.data.role
+  );
   const { user } = useAppSelector((state) => state.data.user);
+  // Tab Selection
   const [selectedId, setSelectedId] = useState<number>(1);
+  // Delete Modal
   const [openModal, setOpenModal] = useState<boolean>(false);
+  // Create Role Modal
+  const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
+  // Delete database process
   const [deleteProcess, setDeleteProcess] = useState<boolean>(false);
+  // Create role for database process
+  const [createRoleProcess, setCreateRoleProcess] = useState<boolean>(false);
+  // Current database id
+  const databaseId = Number.parseInt(id);
+  // Current database
+  const database = databases.find(
+    (database) => database.id === databaseId
+  );
 
   useEffect(() => {
-    dispatch(getDatabaseStart(Number.parseInt(id)));
+    dispatch(getDatabaseStart(databaseId));
+    dispatch(getRolesForDatabaseStart(databaseId))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   useEffect(() => {
+    // HINT: Database deleted
     if (!loading && deleteProcess) {
       setDeleteProcess(false);
       setOpenModal(false);
@@ -60,9 +85,23 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  const onSubmit = () => {
+  useEffect(() => {
+    // HINT: Role created
+    if (!isLoadingCreateRole && createRoleProcess) {
+      setCreateRoleProcess(false);
+      setOpenCreateRoleModal(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingCreateRole])
+
+  const onDeleteDatabase = () => {
     setDeleteProcess(true);
     dispatch(deleteDatabaseStart(Number.parseInt(id)));
+  };
+
+  const onCreateRole = (value: UpstreamCreateRoleProperties) => {
+    setCreateRoleProcess(true);
+    dispatch(createRoleForDatabaseStart(value));
   };
 
   const renderTabContent = (): React.ReactNode => {
@@ -79,7 +118,29 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         />
       );
     } else if (selectedId === 2) {
-      return <div>UserCard</div>;
+      return (
+        <div className="mt-6">
+          <div className="flex items-center justify-between flex-wrap sm:flex-nowrap pb-8">
+            <div>
+              <Headline title="Users" size="medium" />
+              <p className="mt-1 text-sm text-gray-500">
+                Only for this database
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <button
+                type="button"
+                className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={isLoadingCreateRole}
+                onClick={() => setOpenCreateRoleModal(true)}
+              >
+                Add new user
+              </button>
+            </div>
+          </div>
+          <RoleList roles={roles} />
+        </div>
+      );
     }
   };
 
@@ -99,10 +160,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     }
   };
 
-  // TODO: selector for a single database
-  const database = databases.find(
-    (database) => database.id === Number.parseInt(id)
-  );
+
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
@@ -141,8 +199,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       <DeleteModal
         open={openModal}
         modalContent={deleteModalContent}
-        onSubmit={onSubmit}
+        onSubmit={onDeleteDatabase}
         onClose={() => setOpenModal(false)}
+      />
+      <CreateRoleModal
+        database={database}
+        open={openCreateRoleModal}
+        onSubmit={(value) => onCreateRole(value)}
+        onClose={() => setOpenCreateRoleModal(false)}
       />
     </AppLayout>
   );
