@@ -43,9 +43,9 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     }
   }
 
-  def addRole(createInstanceFormData: CreateRoleFormData, user: User): Either[ErrorMessage, Role] = {
+  def addRole(createRoleFormData: CreateRoleFormData, user: User): Either[ErrorMessage, Role] = {
     // HINT: Check if user is the owner of the database
-    instanceService.getInstance(createInstanceFormData.instanceId, user.id) match {
+    instanceService.getInstance(createRoleFormData.instanceId, user.id) match {
       case Left(getInstanceThrowable) =>
         val errorMessage = ErrorMessage(
           ErrorMessage.CODE_ROLE_CREATE_WRONG_PERMISSION,
@@ -56,7 +56,7 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         Left(errorMessage)
       case Right(_) =>
         val rolePassword = generateRolePassword()
-        val localRole = Role(0, createInstanceFormData.instanceId, createInstanceFormData.name, rolePassword)
+        val localRole = Role(0, createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
         Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
           case Failure(createRoleThrowable) =>
             val errorMessage = handleAddRoleThrowable(createRoleThrowable)

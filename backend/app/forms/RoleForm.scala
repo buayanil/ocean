@@ -4,13 +4,13 @@ import play.api.data.Form
 import play.api.data.Forms.{longNumber, mapping, nonEmptyText}
 
 
-case class CreateRoleFormData(instanceId: Long, name: String)
+case class CreateRoleFormData(instanceId: Long, roleName: String)
 
 object CreateRoleForm {
   val form: Form[CreateRoleFormData] = Form(
     mapping(
       "instanceId" -> longNumber,
-      "name" -> nonEmptyText,
+      "roleName" -> nonEmptyText,
 
     )(CreateRoleFormData.apply)(CreateRoleFormData.unapply)
   )
