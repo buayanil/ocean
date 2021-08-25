@@ -54,17 +54,27 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         )
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Right(_) =>
-        val rolePassword = generateRolePassword()
-        val localRole = Role(0, createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
-        Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
-          case Failure(createRoleThrowable) =>
-            val errorMessage = handleAddRoleThrowable(createRoleThrowable)
+      case Right(instance) =>
+        createRoleFormData.roleName.startsWith(instance.name) match {
+          case false =>
+            val errorMessage = ErrorMessage(
+              ErrorMessage.CODE_ROLE_CREATE_INVALID_NAME,
+              ErrorMessage.MESSAGE_ROLE_CREATE_INVALID_NAME,
+            )
             logger.error(errorMessage.toString)
             Left(errorMessage)
-          case Success(role) =>
-            // TODO: actual add the role to the cluster
-            Right(role)
+          case true =>
+            val rolePassword = generateRolePassword()
+            val localRole = Role(0, createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
+            Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
+              case Failure(createRoleThrowable) =>
+                val errorMessage = handleAddRoleThrowable(createRoleThrowable)
+                logger.error(errorMessage.toString)
+                Left(errorMessage)
+              case Success(role) =>
+                // TODO: actual add the role to the cluster
+                Right(role)
+            }
         }
     }
   }
