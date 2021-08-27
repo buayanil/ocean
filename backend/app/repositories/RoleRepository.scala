@@ -6,12 +6,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import slick.jdbc.JdbcProfile
 
-import models.Role
+import models.{Instance, Role}
 
 
 
 @Singleton
-class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanceRepository: InstanceRepository)(implicit ec: ExecutionContext) {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -56,6 +56,16 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   def existsRole(roleName: String, instanceId: Long): Future[Try[Boolean]] = {
     val existRoleStatement = roles.filter(role => role.name === roleName && role.instanceId === instanceId).exists.result.asTry
     dbConfig.db.run(existRoleStatement)
+  }
+
+  def getRoleWithInstance(roleId: Long): Future[Try[Seq[(Role, Instance)]]] = {
+    val getRoleWithInstanceStatement = roles.filter(_.id === roleId).join(instanceRepository.instances).on((a, b) => a.instanceId ===b.id).result.asTry
+    dbConfig.db.run(getRoleWithInstanceStatement)
+  }
+
+  def deleteRole(roleId: Long): Future[Try[Int]] = {
+    val deleteRoleStatement = roles.filter(_.id === roleId).delete.asTry
+    dbConfig.db.run(deleteRoleStatement)
   }
 }
 

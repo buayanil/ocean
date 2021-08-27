@@ -18,5 +18,6 @@ GET           /databases/:id/roles        controllers.RoleController.listInstanc
 # Database roles
 POST          /roles                      controllers.RoleController.addRole()
 POST          /roles/_exists_             controllers.RoleController.existsRole()
+DELETE        /roles/:id                  controllers.RoleController.deleteRole(id: Long)
 
 DELETE        /databases/:id              controllers.InstanceController.deleteInstance(id: Long)

@@ -51,6 +51,7 @@ object ErrorMessage {
 
   // Role
   val CODE_ROLE_LIST_FAILED = "role/list-failed"
+  val CODE_ROLE_GET_FAILED = "role/get-failed"
   val CODE_ROLE_CREATE_FAILED = "role/create-failed"
   val CODE_ROLE_CREATE_WRONG_PERMISSION = "role/create-wrong-permission"
   val CODE_ROLE_CREATE_CONSTRAINT_ERROR = "role/create-constraint-error"
@@ -58,8 +59,11 @@ object ErrorMessage {
   val CODE_ROLE_LIST_WRONG_PERMISSION = "role/list-wrong-permission"
   val CODE_ROLE_EXISTS_WRONG_PERMISSION = "role/exist-wrong-permission"
   val CODE_ROLE_EXISTS_FAILED = "role/exist-failed"
+  val CODE_ROLE_DELETE_FAILED = "role/delete-failed"
+  val CODE_ROLE_DELETE_WRONG_PERMISSION = "role/delete-wrong-permission"
 
   val MESSAGE_ROLE_FAILED = "Could not get the role list."
+  val MESSAGE_ROLE_GET_FAILED = "Could not get the database role."
   val MESSAGE_ROLE_CREATE_FAILED = "Could not create a role."
   val MESSAGE_ROLE_CREATE_WRONG_PERMISSION = "Only the owner can create a role."
   val MESSAGE_ROLE_CREATE_CONSTRAINT_ERROR = "Role already exists."
@@ -67,6 +71,8 @@ object ErrorMessage {
   val MESSAGE_ROLE_LIST_WRONG_PERMISSION = "Only the owner can view the roles."
   val MESSAGE_ROLE_EXISTS_WRONG_PERMISSION = "Only the owner can check the roles."
   val MESSAGE_ROLE_EXISTS_FAILED = "Could not check for the database role."
+  val MESSAGE_ROLE_DELETE_FAILED = "Could not delete the database role."
+  val MESSAGE_ROLE_DELETE_WRONG_PERMISSION = "Only the owner can delete a role."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"

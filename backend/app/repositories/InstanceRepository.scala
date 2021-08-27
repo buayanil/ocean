@@ -14,13 +14,13 @@ import models.Instance
 @Singleton
 class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
 
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
 
 
-  private class InstanceTable(tag: Tag) extends Table[Instance](tag, "instances") {
+  class InstanceTable(tag: Tag) extends Table[Instance](tag, "instances") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
@@ -50,7 +50,7 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
       foreignKey("users", userId, TableQuery[InstanceTable])(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
-  private val instances = TableQuery[InstanceTable]
+  val instances = TableQuery[InstanceTable]
 
   def listAll(userId: Long): Future[Try[Seq[Instance]]] = {
     val action = instances.filter(database => database.userId === userId).result.asTry

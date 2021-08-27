@@ -2,6 +2,7 @@ package services
 
 import java.security.SecureRandom
 import javax.inject.Inject
+import org.postgresql.util.PSQLException
 import play.api.Logger
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -9,7 +10,6 @@ import scala.util.{Failure, Success}
 
 import forms.{CreateRoleFormData, RoleExistsFormData}
 import models.{ErrorMessage, Role, User}
-import org.postgresql.util.PSQLException
 import repositories.RoleRepository
 
 
@@ -129,4 +129,37 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
       }
     }
   }
+
+  def deleteRole(roleId: Long, user: User): Either[ErrorMessage, Int] = {
+    Await.result(roleRepository.getRoleWithInstance(roleId), Duration.Inf) match {
+      case Failure(getInstanceThrowable) =>
+        val getRoleErrorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_GET_FAILED,
+          ErrorMessage.MESSAGE_ROLE_GET_FAILED,
+          developerMessage = getInstanceThrowable.getMessage
+        )
+        logger.warn(getRoleErrorMessage.toString)
+        Left(getRoleErrorMessage)
+      case Success(rolesWithInstance) if rolesWithInstance.exists(_._2.userId == user.id) =>
+        Await.result(roleRepository.deleteRole(roleId), Duration.Inf) match {
+          case Success(rows) => Right(rows)
+          case Failure(deleteRoleThrowable) =>
+            val getRoleErrorMessage = ErrorMessage(
+              ErrorMessage.CODE_ROLE_DELETE_FAILED,
+              ErrorMessage.MESSAGE_ROLE_DELETE_FAILED,
+              developerMessage = deleteRoleThrowable.getMessage
+            )
+            logger.warn(getRoleErrorMessage.toString)
+            Left(getRoleErrorMessage)
+        }
+      case _ =>
+        val getRoleErrorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_DELETE_WRONG_PERMISSION,
+          ErrorMessage.MESSAGE_ROLE_DELETE_WRONG_PERMISSION,
+        )
+        logger.warn(getRoleErrorMessage.toString)
+        Left(getRoleErrorMessage)
+    }
+  }
+
 }

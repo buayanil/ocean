@@ -8,7 +8,7 @@ import play.api.Logger
 
 import actions.{UserAction, UserRequest}
 import forms.{CreateRoleForm, RoleExistsForm}
-import models.{ErrorResponse, ExistsRoleResponse}
+import models.{ErrorResponse, ExistsRoleResponse, RoleDeletedResponse}
 import services.RoleService
 
 
@@ -65,5 +65,14 @@ class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction,
         }
       }
     )
+  }
+
+  def deleteRole(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    roleService.deleteRole(id, request.user) match {
+      case Left(error) =>
+        logger.error(error.toString)
+        BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Right(rows) => Ok(Json.toJson((RoleDeletedResponse(rows))))
+    }
   }
 }
