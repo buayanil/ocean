@@ -12,6 +12,9 @@ import {
   createRoleForDatabaseSuccess,
   createRoleForDatabaseFailed,
   createRoleForDatabaseStart,
+  deleteRoleForDatabaseSuccess,
+  deleteRoleForDatabaseFailed,
+  deleteRoleForDatabaseStart,
 } from "../slices/data/roleSlice";
 
 export function* getRolesForDatabaseAsync({ payload }: PayloadAction<number>) {
@@ -78,7 +81,41 @@ export function* createRoleForDatabaseAsync({
   }
 }
 
+export function* deleteRoleForDatabaseAsync({
+  payload,
+}: PayloadAction<number>) {
+  try {
+    const response: SagaReturnType<typeof RoleClient.deleteRoleForDatabase> =
+      yield call(RoleClient.deleteRoleForDatabase, payload);
+    if (response.status === 200) {
+      try {
+        RoleValidation.deleteDatabaseSchema.validateSync(response.data);
+        yield put(deleteRoleForDatabaseSuccess(payload));
+      } catch (parseError) {
+        yield put(deleteRoleForDatabaseFailed(parseError.toString()));
+      }
+    }
+  } catch (networkError) {
+    if (networkError.response.status === 401) {
+      // HINT: token expired
+      yield put(logout());
+    } else {
+      try {
+        const data = errorSchema.validateSync(networkError.response.data);
+        if (data.errors && data.errors[0]) {
+          yield put(deleteRoleForDatabaseFailed(data.errors[0].message));
+        } else {
+          yield put(deleteRoleForDatabaseFailed(networkError.toString()));
+        }
+      } catch (parseError) {
+        yield put(deleteRoleForDatabaseFailed(parseError.toString()));
+      }
+    }
+  }
+}
+
 export default function* rolesSaga() {
   yield takeLatest(getRolesForDatabaseStart.type, getRolesForDatabaseAsync);
   yield takeLatest(createRoleForDatabaseStart.type, createRoleForDatabaseAsync);
+  yield takeLatest(deleteRoleForDatabaseStart.type, deleteRoleForDatabaseAsync);
 }

@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
 
 import { DatabaseProperties, HostProperties } from "../../types/models";
-import { UpstreamCreateRoleProperties } from "../../types/role";
+import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
@@ -13,7 +13,7 @@ import {
   deleteDatabaseStart,
   getDatabaseStart,
 } from "../../redux/slices/data/databaseSlice";
-import { createRoleForDatabaseStart, getRolesForDatabaseStart } from "../../redux/slices/data/roleSlice";
+import { createRoleForDatabaseStart, deleteRoleForDatabaseStart, getRolesForDatabaseStart } from "../../redux/slices/data/roleSlice";
 import TabList from "../../components/TabList";
 import ActionDropdown from "../../components/ActionDropdown";
 import DeleteModal from "../../components/DeleteModal";
@@ -43,7 +43,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { loading, error, databases } = useAppSelector(
     (state) => state.data.database
   );
-  const { roles, isLoadingCreateRole } = useAppSelector(
+  const { roles, isLoadingCreateRole, isLoadingDeleteRole } = useAppSelector(
     (state) => state.data.role
   );
   const { user } = useAppSelector((state) => state.data.user);
@@ -54,7 +54,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Create Role Modal
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
   // Delete database process
-  const [deleteProcess, setDeleteProcess] = useState<boolean>(false);
+  const [deleteDatabaseProcess, setDeleteDatabaseProcess] = useState<boolean>(false);
   // Create role for database process
   const [createRoleProcess, setCreateRoleProcess] = useState<boolean>(false);
   // Current database id
@@ -72,8 +72,8 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
 
   useEffect(() => {
     // HINT: Database deleted
-    if (!loading && deleteProcess) {
-      setDeleteProcess(false);
+    if (!loading && deleteDatabaseProcess) {
+      setDeleteDatabaseProcess(false);
       setOpenModal(false);
       const deleted = !databases.some(
         (database) => database.id === Number.parseInt(id)
@@ -94,8 +94,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingCreateRole])
 
+
   const onDeleteDatabase = () => {
-    setDeleteProcess(true);
+    setDeleteDatabaseProcess(true);
     dispatch(deleteDatabaseStart(Number.parseInt(id)));
   };
 
@@ -103,6 +104,10 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     setCreateRoleProcess(true);
     dispatch(createRoleForDatabaseStart(value));
   };
+
+  const onDeleteRole = (value: RoleProperties) => {
+    dispatch(deleteRoleForDatabaseStart(value.id))
+  }
 
   const renderTabContent = (): React.ReactNode => {
     const database = databases.find(
@@ -138,7 +143,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
               </button>
             </div>
           </div>
-          <RoleList roles={roles} />
+          <RoleList roles={roles} onDelete={onDeleteRole} />
         </div>
       );
     }

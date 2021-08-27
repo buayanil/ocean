@@ -9,6 +9,7 @@ interface RoleState {
   roles: RoleProperties[];
   isLoadingRoles: boolean;
   isLoadingCreateRole: boolean;
+  isLoadingDeleteRole: boolean;
   error?: string;
 }
 
@@ -16,6 +17,7 @@ const initialState: RoleState = {
   roles: [],
   isLoadingRoles: false,
   isLoadingCreateRole: false,
+  isLoadingDeleteRole: false,
 };
 
 export const databaseSlice = createSlice({
@@ -62,6 +64,25 @@ export const databaseSlice = createSlice({
       state.error = payload;
       state.isLoadingCreateRole = false;
     },
+    deleteRoleForDatabaseStart: (state, _action: PayloadAction<number>) => {
+      state.error = undefined;
+      state.isLoadingDeleteRole = true;
+    },
+    deleteRoleForDatabaseSuccess: (
+      state,
+      { payload }: PayloadAction<number>
+    ) => {
+      state.error = undefined;
+      state.roles = state.roles.filter((role) => role.id !== payload);
+      state.isLoadingDeleteRole = false;
+    },
+    deleteRoleForDatabaseFailed: (
+      state,
+      { payload }: PayloadAction<string>
+    ) => {
+      state.error = payload;
+      state.isLoadingDeleteRole = false;
+    },
   },
 });
 
@@ -72,6 +93,9 @@ export const {
   createRoleForDatabaseStart,
   createRoleForDatabaseSuccess,
   createRoleForDatabaseFailed,
+  deleteRoleForDatabaseStart,
+  deleteRoleForDatabaseSuccess,
+  deleteRoleForDatabaseFailed,
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

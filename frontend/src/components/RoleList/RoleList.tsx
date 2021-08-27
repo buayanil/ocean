@@ -6,10 +6,11 @@ import RoleListEntry from './RoleListEntry';
 
 export interface RoleListProps {
     roles: RoleProperties[];
+    onDelete: (value: RoleProperties) => void;
 }
 
 
-const RoleList: React.FC<RoleListProps> = ({ roles }) => {
+const RoleList: React.FC<RoleListProps> = ({ roles, onDelete }) => {
     return (
         <div className="flex flex-col">
             <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -37,7 +38,7 @@ const RoleList: React.FC<RoleListProps> = ({ roles }) => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {roles.map((role, index) => (
-                                    <RoleListEntry key={index} role={role} onDelete={() => console.log("delete")} />
+                                    <RoleListEntry key={index} role={role} onDelete={() => onDelete(role)} />
                                 ))}
                             </tbody>
                         </table>

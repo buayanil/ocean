@@ -21,6 +21,12 @@ export class RoleClient {
    */
   public static existsRoleForDatabase = (role: UpstreamCreateRoleProperties) =>
     axiosInstance.post<any>("/roles/_exists_", role);
+
+  /**
+   * Deletes a database by id
+   */
+  public static deleteRoleForDatabase = (id: number) =>
+    axiosInstance.delete<any>(`/roles/${id.toString()}`);
 }
 
 export class RoleValidation {
@@ -45,5 +51,9 @@ export class RoleValidation {
 
   public static existsRoleForDatabaseSchema = yup.object().shape({
     exists: yup.boolean().required(),
+  });
+
+  public static deleteDatabaseSchema = yup.object().shape({
+    rows: yup.number().required(),
   });
 }
