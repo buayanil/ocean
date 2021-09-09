@@ -67,5 +67,10 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
     val deleteRoleStatement = roles.filter(_.id === roleId).delete.asTry
     dbConfig.db.run(deleteRoleStatement)
   }
+
+  def deleteDatabaseRoles(instanceId: Long): Future[Try[Int]] = {
+    val deleteDatabaseRolesStatement = roles.filter(_.instanceId === instanceId).delete.asTry
+    dbConfig.db.run(deleteDatabaseRolesStatement)
+  }
 }
 

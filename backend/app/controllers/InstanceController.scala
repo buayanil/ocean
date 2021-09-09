@@ -5,13 +5,12 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.Logger
-
 import actions.{UserAction, UserRequest}
 import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
-import services.InstanceService
+import services.{DatabaseManagerService, InstanceService}
 
 
-class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAction, instanceService: InstanceService) extends AbstractController(cc) {
+class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAction, instanceService: InstanceService, databaseManagerService: DatabaseManagerService) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -76,10 +75,10 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
   }
 
   def deleteInstance(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-    instanceService.deleteInstance(id, request.user.id) match {
-      case Left(error) =>
-        logger.error(error.toString)
-        BadRequest(Json.toJson(ErrorResponse(List(error))))
+    databaseManagerService.deleteDatabase(id, request.user.id) match {
+      case Left(errors) =>
+        logger.error(errors.toString)
+        BadRequest(Json.toJson(ErrorResponse(errors)))
       case Right(rows) => Ok(Json.toJson((InstanceDeletedResponse(rows))))
     }
   }

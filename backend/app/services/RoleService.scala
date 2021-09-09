@@ -162,4 +162,17 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     }
   }
 
+  def deleteDatabaseRoles(instanceId: Long): Either[ErrorMessage, Int] = {
+    Await.result(roleRepository.deleteDatabaseRoles(instanceId), Duration.Inf) match {
+      case Success(rows) => Right(rows)
+      case Failure(deleteRolesThrowable) =>
+        val deleteRolesErrorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLES_DATABASE_DELETE_FAILED,
+          ErrorMessage.MESSAGE_ROLE_DATABASE_DELETE_FAILED,
+          developerMessage = deleteRolesThrowable.getMessage
+        )
+        logger.warn(deleteRolesErrorMessage.toString)
+        Left(deleteRolesErrorMessage)
+    }
+  }
 }
