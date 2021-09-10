@@ -43,7 +43,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { loading, error, databases } = useAppSelector(
     (state) => state.data.database
   );
-  const { roles, isLoadingCreateRole, isLoadingDeleteRole } = useAppSelector(
+  const { roles, isLoadingCreateRole } = useAppSelector(
     (state) => state.data.role
   );
   const { user } = useAppSelector((state) => state.data.user);
