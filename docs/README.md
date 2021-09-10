@@ -324,6 +324,18 @@ Reload Apache web server:
 
 ```service apache2 reload```
 
+### Adminer
+
+```
+apt -y install php php-common
+apt -y install php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd  php-mbstring php-curl php-xml php-pear php-bcmath
+apt -y install libapache2-mod-php
+a2enmod php7.*
+apt-get install php-pgsql
+systemctl restart apache2
+```
+
+
 ## Development
 
 ### Docker Images
