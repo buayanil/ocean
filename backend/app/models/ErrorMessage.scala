@@ -62,6 +62,7 @@ object ErrorMessage {
   val CODE_ROLE_DELETE_FAILED = "role/delete-failed"
   val CODE_ROLES_DATABASE_DELETE_FAILED = "role/delete-failed"
   val CODE_ROLE_DELETE_WRONG_PERMISSION = "role/delete-wrong-permission"
+  val CODE_ROLE_GRANT_FAILED = "role/database-grant-failed"
 
   val MESSAGE_ROLE_FAILED = "Could not get the role list."
   val MESSAGE_ROLE_GET_FAILED = "Could not get the database role."
@@ -75,11 +76,13 @@ object ErrorMessage {
   val MESSAGE_ROLE_DELETE_FAILED = "Could not delete the database role."
   val MESSAGE_ROLE_DATABASE_DELETE_FAILED = "Could not delete all database roles."
   val MESSAGE_ROLE_DELETE_WRONG_PERMISSION = "Only the owner can delete a role."
+  val MESSAGE_ROLE_GRANT_FAILED = "Role could not get access to database."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
   val CODE_PG_CLUSTER_CREATED_DATABASE_NOT_AVAILABLE = "pg_cluster/create-database-not-available"
   val CODE_PG_CLUSTER_CREATED_DATABASE_UNKNOWN = "pg_cluster/create-database-failed-unknown"
+  val CODE_PG_CLUSTER_DELETE_DATABASE_FAILED = "pg_cluster/delete-database-failed"
   val CODE_PG_CLUSTER_CREATED_ROLE_EXIST = "pg_cluster/create-role-exists"
   val CODE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "pg_cluster/create-role-failed-unknown"
   val CODE_PG_CLUSTER_DELETED_ROLE_FAILED = "pg_cluster/delete-role-failed"
@@ -87,9 +90,10 @@ object ErrorMessage {
   val MESSAGE_PG_CLUSTER_CREATED_DATABASE_EXIST = "Could not create the database. Database already exists."
   val MESSAGE_PG_CLUSTER_CREATED_DATABASE_NOT_AVAILABLE = "Could not create the database. Cluster is not available."
   val MESSAGE_PG_CLUSTER_CREATED_DATABASE_UNKNOWN = "Could not create the database. Unknown error."
+  val MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED = "Could not delete the database."
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_EXIST = "Could not create the role. Role already exists."
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "Could not create the role. Unknown error."
-  val MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED = "Could not delete the role."
+  val MESSAGE_PG_CLUSTER_DELETE_ROLE_FAILED = "Could not delete the role."
 
   // Startup
   val CODE_STARTUP_LDAP_ROLE_CONFIG_MISSING = "startup/ldap-role-config-missing"

@@ -58,6 +58,11 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
     dbConfig.db.run(existRoleStatement)
   }
 
+  def getRole(roleId: Long): Future[Try[Seq[Role]]] = {
+    val action = roles.filter(role => role.id === roleId).result.asTry
+    dbConfig.db.run(action)
+  }
+
   def getRoleWithInstance(roleId: Long): Future[Try[Seq[(Role, Instance)]]] = {
     val getRoleWithInstanceStatement = roles.filter(_.id === roleId).join(instanceRepository.instances).on((a, b) => a.instanceId ===b.id).result.asTry
     dbConfig.db.run(getRoleWithInstanceStatement)

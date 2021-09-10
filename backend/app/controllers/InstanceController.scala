@@ -75,12 +75,11 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
   }
 
   def deleteInstance(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-    databaseManagerService.deleteDatabase(id, request.user.id) match {
+    databaseManagerService.deleteDatabase(id, request.user) match {
       case Left(errors) =>
         logger.error(errors.toString)
         BadRequest(Json.toJson(ErrorResponse(errors)))
       case Right(rows) => Ok(Json.toJson((InstanceDeletedResponse(rows))))
     }
   }
-
 }

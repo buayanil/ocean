@@ -43,39 +43,13 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     }
   }
 
-  def addRole(createRoleFormData: CreateRoleFormData, user: User): Either[ErrorMessage, Role] = {
-    // HINT: Check if user is the owner of the database
-    instanceService.getInstance(createRoleFormData.instanceId, user.id) match {
-      case Left(getInstanceThrowable) =>
-        val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_ROLE_CREATE_WRONG_PERMISSION,
-          ErrorMessage.MESSAGE_ROLE_CREATE_WRONG_PERMISSION,
-          developerMessage = getInstanceThrowable.developerMessage
-        )
+  def addRole(localRole: Role): Either[ErrorMessage, Role] = {
+    Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
+      case Failure(createRoleThrowable) =>
+        val errorMessage = handleAddRoleThrowable(createRoleThrowable)
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Right(instance) =>
-        createRoleFormData.roleName.startsWith(instance.name) match {
-          case false =>
-            val errorMessage = ErrorMessage(
-              ErrorMessage.CODE_ROLE_CREATE_INVALID_NAME,
-              ErrorMessage.MESSAGE_ROLE_CREATE_INVALID_NAME,
-            )
-            logger.error(errorMessage.toString)
-            Left(errorMessage)
-          case true =>
-            val rolePassword = generateRolePassword()
-            val localRole = Role(0, createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
-            Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
-              case Failure(createRoleThrowable) =>
-                val errorMessage = handleAddRoleThrowable(createRoleThrowable)
-                logger.error(errorMessage.toString)
-                Left(errorMessage)
-              case Success(role) =>
-                // TODO: actual add the role to the cluster
-                Right(role)
-            }
-        }
+      case Success(role) => Right(role)
     }
   }
 
@@ -105,6 +79,27 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     password.toString
   }
 
+  def getRole(roleId: Long): Either[ErrorMessage, Role]  = {
+    Await.result(roleRepository.getRole(roleId), Duration.Inf) match {
+      case Failure(getRoleThrowable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_GET_FAILED,
+          ErrorMessage.MESSAGE_ROLE_GET_FAILED,
+          developerMessage = getRoleThrowable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(roles) if roles.nonEmpty => Right(roles.head)
+      case _ =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_GET_FAILED,
+          ErrorMessage.MESSAGE_ROLE_GET_FAILED,
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
   def existsRole(roleExistsFormData: RoleExistsFormData, user: User): Either[ErrorMessage, Boolean] = {
     instanceService.getInstance(roleExistsFormData.instanceId, user.id) match {
       case Left(getInstanceThrowable) =>
@@ -130,36 +125,18 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     }
   }
 
-  def deleteRole(roleId: Long, user: User): Either[ErrorMessage, Int] = {
-    Await.result(roleRepository.getRoleWithInstance(roleId), Duration.Inf) match {
-      case Failure(getInstanceThrowable) =>
-        val getRoleErrorMessage = ErrorMessage(
-          ErrorMessage.CODE_ROLE_GET_FAILED,
-          ErrorMessage.MESSAGE_ROLE_GET_FAILED,
-          developerMessage = getInstanceThrowable.getMessage
-        )
-        logger.warn(getRoleErrorMessage.toString)
-        Left(getRoleErrorMessage)
-      case Success(rolesWithInstance) if rolesWithInstance.exists(_._2.userId == user.id) =>
-        Await.result(roleRepository.deleteRole(roleId), Duration.Inf) match {
-          case Success(rows) => Right(rows)
-          case Failure(deleteRoleThrowable) =>
-            val getRoleErrorMessage = ErrorMessage(
-              ErrorMessage.CODE_ROLE_DELETE_FAILED,
-              ErrorMessage.MESSAGE_ROLE_DELETE_FAILED,
-              developerMessage = deleteRoleThrowable.getMessage
-            )
-            logger.warn(getRoleErrorMessage.toString)
-            Left(getRoleErrorMessage)
-        }
-      case _ =>
-        val getRoleErrorMessage = ErrorMessage(
-          ErrorMessage.CODE_ROLE_DELETE_WRONG_PERMISSION,
-          ErrorMessage.MESSAGE_ROLE_DELETE_WRONG_PERMISSION,
-        )
-        logger.warn(getRoleErrorMessage.toString)
-        Left(getRoleErrorMessage)
-    }
+  def deleteRole(roleId: Long): Either[ErrorMessage, Int] = {
+      Await.result(roleRepository.deleteRole(roleId), Duration.Inf) match {
+        case Success(rows) => Right(rows)
+        case Failure(deleteRoleThrowable) =>
+          val getRoleErrorMessage = ErrorMessage(
+            ErrorMessage.CODE_ROLE_DELETE_FAILED,
+            ErrorMessage.MESSAGE_ROLE_DELETE_FAILED,
+            developerMessage = deleteRoleThrowable.getMessage
+          )
+          logger.warn(getRoleErrorMessage.toString)
+          Left(getRoleErrorMessage)
+      }
   }
 
   def deleteDatabaseRoles(instanceId: Long): Either[ErrorMessage, Int] = {

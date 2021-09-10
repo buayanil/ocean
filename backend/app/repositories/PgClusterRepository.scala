@@ -43,9 +43,15 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     db.run(createRoleStatement.as[Int].asTry)
   }
 
-  def existsRole(roleName: String): Future[Try[Vector[Int]]] = {
-    val existsDatabaseStatement = sql"""SELECT 1 FROM pg_roles WHERE rolname='#${roleName}'"""
-    db.run(existsDatabaseStatement.as[Int].asTry)
+  /**
+   * Creates a role with password, login permission and group membership
+   * @param roleName name of role
+   * @param groupName name of group
+   * @param password password
+   */
+  def createSecuredRole(roleName: String, groupName: String, password: String): Future[Try[Vector[Int]]] = {
+    val createRoleWithPasswordStatement = sql"""CREATE ROLE #${roleName} WITH NOSUPERUSER LOGIN CONNECTION LIMIT 500 IN ROLE #${groupName} PASSWORD '#${password}'"""
+    db.run(createRoleWithPasswordStatement.as[Int].asTry)
   }
 
   /**
@@ -55,5 +61,33 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
   def createGroup(groupName: String): Future[Try[Vector[Int]]] = {
     val createRoleStatement = sql"""CREATE ROLE #${groupName} WITH NOSUPERUSER"""
     db.run(createRoleStatement.as[Int].asTry)
+  }
+
+  def existsRole(roleName: String): Future[Try[Vector[Int]]] = {
+    val existsDatabaseStatement = sql"""SELECT 1 FROM pg_roles WHERE rolname='#${roleName}'"""
+    db.run(existsDatabaseStatement.as[Int].asTry)
+  }
+
+  /**
+   * Deletes a role from database
+   * @param roleName name of role
+   */
+  def deleteRole(roleName: String): Future[Try[Vector[Int]]] = {
+    val reassignedStatement = sql"""REASSIGN OWNED BY #${roleName} TO postgres"""
+    val dropOwnedStatement = sql"""DROP OWNED BY #${roleName}"""
+    val dropRoleStatement = sql"""DROP ROLE #${roleName}"""
+    db.run(
+      reassignedStatement.as[Int].asTry andThen dropOwnedStatement.as[Int].asTry andThen dropRoleStatement.as[Int].asTry
+    )
+  }
+
+  /**
+   * Grants a role access to a database
+   * @param roleName name of role
+   * @param databaseName name of database
+   */
+  def grantDatabaseAccess(roleName: String, databaseName: String): Future[Try[Vector[Int]]] = {
+    val grantDatabaseAccessStatement = sql"""GRANT ALL PRIVILEGES ON DATABASE #${databaseName} to #${roleName}"""
+    db.run(grantDatabaseAccessStatement.as[Int].asTry)
   }
 }

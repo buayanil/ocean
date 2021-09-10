@@ -63,6 +63,16 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
     }
   }
 
+  def createSecuredRole(roleName: String, groupName: String, password: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.createSecuredRole(roleName, groupName, password), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = handleCreateRoleThrowable(throwable)
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
   private def handleCreateRoleThrowable(throwable: Throwable): ErrorMessage = {
     throwable match {
       case exception: PSQLException if exception.getMessage.contains("already exists") =>
@@ -85,8 +95,36 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
       case Success(_) => Right(true)
       case Failure(throwable) =>
         val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_PG_CLUSTER_DELETED_ROLE_FAILED,
+          ErrorMessage.CODE_PG_CLUSTER_DELETE_DATABASE_FAILED,
           ErrorMessage.MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def deleteRole(roleName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.deleteRole(roleName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_DELETED_ROLE_FAILED,
+          ErrorMessage.MESSAGE_PG_CLUSTER_DELETE_ROLE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def grantDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.grantDatabaseAccess(roleName, databaseName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_GRANT_FAILED,
+          ErrorMessage.MESSAGE_ROLE_GRANT_FAILED,
           developerMessage = throwable.getMessage
         )
         logger.error(errorMessage.toString)

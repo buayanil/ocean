@@ -5,14 +5,13 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.Logger
-
 import actions.{UserAction, UserRequest}
 import forms.{CreateRoleForm, RoleExistsForm}
 import models.{ErrorResponse, ExistsRoleResponse, RoleDeletedResponse}
-import services.RoleService
+import services.{DatabaseManagerService, RoleService}
 
 
-class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction, roleService: RoleService) extends AbstractController(cc) {
+class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction, roleService: RoleService, databaseManagerService: DatabaseManagerService) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -39,10 +38,10 @@ class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction,
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       createRoleFormData => {
-        roleService.addRole(createRoleFormData, request.user) match {
+        databaseManagerService.addRole(createRoleFormData, request.user) match {
           case Left(error) =>
             logger.error(error.toString)
-            BadRequest(Json.toJson(ErrorResponse(List(error))))
+            BadRequest(Json.toJson(ErrorResponse(error)))
           case Right(instance) => Ok(Json.toJson(instance))
         }
       }
@@ -68,10 +67,10 @@ class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction,
   }
 
   def deleteRole(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-    roleService.deleteRole(id, request.user) match {
+    databaseManagerService.deleteRole(id) match {
       case Left(error) =>
         logger.error(error.toString)
-        BadRequest(Json.toJson(ErrorResponse(List(error))))
+        BadRequest(Json.toJson(ErrorResponse(error)))
       case Right(rows) => Ok(Json.toJson((RoleDeletedResponse(rows))))
     }
   }
