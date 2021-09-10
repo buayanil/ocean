@@ -1,5 +1,5 @@
 import React from 'react'
-import { HomeIcon, DatabaseIcon, CogIcon } from '@heroicons/react/outline'
+import { HomeIcon, DatabaseIcon, CogIcon, QuestionMarkCircleIcon } from '@heroicons/react/outline'
 
 // TODO: create a map for all routes
 export type LinkProps = {
@@ -33,10 +33,18 @@ export const SettingsNavigation: Navigation = {
   icon: CogIcon,
 }
 
+export const FAQNavigation: Navigation = {
+  name: 'FAQ',
+  to: '/faq',
+  section: 'secondary',
+  icon: QuestionMarkCircleIcon,
+}
+
 // HINT: INSERT NEW NAVIGATION HERE
 
 export const navigation = [
   OverviewNavigation,
   DatabasesNavigation,
   SettingsNavigation,
+  FAQNavigation,
 ]

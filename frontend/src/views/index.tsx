@@ -21,6 +21,7 @@ const DatabaseDetailView = React.lazy(
   () => import("./databases/DatabaseDetailView")
 );
 const SettingsView = React.lazy(() => import("./SettingsView"));
+const FAQView = React.lazy(() => import("./FAQView"));
 const PageNotFoundView = React.lazy(() => import("./PageNotFoundView"));
 
 const RootView: React.FC = () => {
@@ -67,6 +68,10 @@ const RootView: React.FC = () => {
           <ProtectedRoute
             path="/settings"
             render={(props: any) => <SettingsView {...props} />}
+          />
+          <ProtectedRoute
+            path="/faq"
+            render={(props: any) => <FAQView {...props} />}
           />
           <Route
             path="/error"
