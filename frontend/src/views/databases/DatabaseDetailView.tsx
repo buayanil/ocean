@@ -29,7 +29,7 @@ const {
   REACT_APP_POSTGRESQL_PORT,
   REACT_APP_MONGODB_HOSTNAME,
   REACT_APP_MONGODB_PORT,
-  REACT_APP_PHPPGADMIN_URL,
+  REACT_APP_ADMINER_URL,
 } = process.env;
 
 
@@ -119,7 +119,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
           database={database}
           host={database ? getHostFor(database) : undefined}
           user={user}
-          pgAdminUrl={REACT_APP_PHPPGADMIN_URL}
+          pgAdminUrl={REACT_APP_ADMINER_URL}
         />
       );
     } else if (selectedId === 2) {

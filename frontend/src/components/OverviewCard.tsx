@@ -74,7 +74,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdm
                       href={pgAdminUrl || "#"}
                       target="_blank" rel="noopener noreferrer"
                       className="border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                      phpPgAdmin
+                      Adminer
                     </a>
                   </div>
                 </div>
