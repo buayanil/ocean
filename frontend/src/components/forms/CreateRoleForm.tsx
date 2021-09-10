@@ -19,6 +19,8 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
         roleName: yup
             .string()
             .required("Name is required")
+            .min(4, "Name should be of minimum 4 characters length")
+            .matches(/^[a-z][a-z0-9_]*$/, "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.")
             .test("unique_test", "Name is already registered", (value, ctx) =>
                 validateDatabaseValues(value, ctx)
             )
