@@ -21,7 +21,9 @@ class UserServiceSpec extends Specification with Mockito {
       ldapService.authenticate(any[String], any[String]).returns(Right(ldapUser))
       val tokenService = mock[TokenService]
       tokenService.encode(any[String], any[Long]).returns("token")
-      val userService = new UserService(ldapService, tokenService, userRepository)
+      val pgClusterService = mock[PgClusterService]
+
+      val userService = new UserService(ldapService, tokenService, userRepository, pgClusterService)
 
       // Act
       val actual = userService.login("username", "password")
@@ -41,7 +43,8 @@ class UserServiceSpec extends Specification with Mockito {
       ldapService.authenticate(any[String], any[String]).returns(Right(ldapUser))
       val tokenService = mock[TokenService]
       tokenService.encode(any[String], any[Long]).returns("token")
-      val userService = new UserService(ldapService, tokenService, userRepository)
+      val pgClusterService = mock[PgClusterService]
+      val userService = new UserService(ldapService, tokenService, userRepository, pgClusterService)
 
       // Act
       val actual = userService.login("username", "password")
@@ -56,7 +59,8 @@ class UserServiceSpec extends Specification with Mockito {
       val ldapService = mock[LdapService]
       ldapService.authenticate(any[String], any[String]).returns(Left(List(ErrorMessage("", ""))))
       val tokenService = mock[TokenService]
-      val userService = new UserService(ldapService, tokenService, userRepository)
+      val pgClusterService = mock[PgClusterService]
+      val userService = new UserService(ldapService, tokenService, userRepository, pgClusterService)
 
       // Act
       val actual = userService.login("username", "password")

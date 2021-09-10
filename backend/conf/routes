@@ -2,17 +2,22 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET           /                          controllers.HomeController.index
+GET           /                           controllers.HomeController.index()
 
 # Users
-GET           /user                      controllers.UserController.index
-POST          /login                     controllers.UserController.login
+GET           /user                       controllers.UserController.index()
+POST          /login                      controllers.UserController.login()
 
 # Databases
-GET           /databases                 controllers.InstanceController.listAll
-GET           /databases/:id             controllers.InstanceController.get(id: Long)
+GET           /databases                  controllers.InstanceController.listAll()
+GET           /databases/:id              controllers.InstanceController.get(id: Long)
+POST          /databases                  controllers.InstanceController.addInstance()
+POST          /databases/_exists_         controllers.InstanceController.existsInstance()
+GET           /databases/:id/roles        controllers.RoleController.listInstanceRoles(id: Long)
 
-POST          /databases                 controllers.InstanceController.addInstance
-POST          /databases/_exists_        controllers.InstanceController.existsInstance
+# Database roles
+POST          /roles                      controllers.RoleController.addRole()
+POST          /roles/_exists_             controllers.RoleController.existsRole()
+DELETE        /roles/:id                  controllers.RoleController.deleteRole(id: Long)
 
-DELETE        /databases/:id             controllers.InstanceController.deleteInstance(id: Long)
+DELETE        /databases/:id              controllers.InstanceController.deleteInstance(id: Long)

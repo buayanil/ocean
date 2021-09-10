@@ -27,3 +27,15 @@ case class InstanceDeletedResponse(rows: Int) extends Response
 object InstanceDeletedResponse {
   implicit val instanceDeletedResponseWrites: OWrites[InstanceDeletedResponse] = Json.writes[InstanceDeletedResponse]
 }
+
+case class ExistsRoleResponse(exists: Boolean) extends Response
+
+object ExistsRoleResponse {
+  implicit val existsInstanceResponseWrites: OWrites[ExistsRoleResponse] = Json.writes[ExistsRoleResponse]
+}
+
+case class RoleDeletedResponse(rows: Int) extends Response
+
+object RoleDeletedResponse {
+  implicit val instanceDeletedResponseWrites: OWrites[RoleDeletedResponse] = Json.writes[RoleDeletedResponse]
+}

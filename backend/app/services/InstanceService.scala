@@ -61,13 +61,16 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
         val errorMessage = handleAddInstanceThrowable(exception)
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Success(instance) =>
+      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
         pgClusterService.createDatabase(instance.name, user.username) match {
           case Left(errorMessage) =>
             logger.error(errorMessage.toString)
             Left(errorMessage)
           case Right(_) => Right(instance)
         }
+      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
+        // TODO: mongodb not implemented yet
+        Right(instance)
     }
   }
 
@@ -103,44 +106,16 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
   }
 
   def deleteInstance(instanceId: Long, userId: Long): Either[ErrorMessage, Int] = {
-    Await.result(instanceRepository.get(instanceId, userId), Duration.Inf) match {
+    Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_INSTANCE_DELETE_NOT_FOUND,
-          ErrorMessage.MESSAGE_INSTANCE_DELETE_NOT_FOUND,
+          ErrorMessage.CODE_INSTANCE_DELETE_FAILED,
+          ErrorMessage.MESSAGE_INSTANCE_DELETE_FAILED,
           developerMessage = exception.getMessage
         )
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Success(instances) if instances.length > 1 =>
-        val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_INSTANCE_DELETE_CONSTRAINT_ERROR,
-          ErrorMessage.MESSAGE_INSTANCE_DELETE_CONSTRAINT_ERROR,
-          developerMessage = s"Matches: ${instances.length}"
-        )
-        logger.error(errorMessage.toString)
-        Left(errorMessage)
-      case Success(instances) if instances.length == 1 =>
-        Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
-          case Failure(exception) =>
-            val errorMessage = ErrorMessage(
-              ErrorMessage.CODE_INSTANCE_DELETE_FAILED,
-              ErrorMessage.MESSAGE_INSTANCE_DELETE_FAILED,
-              developerMessage = exception.getMessage
-            )
-            logger.error(errorMessage.toString)
-            Left(errorMessage)
-          case Success(rows) if instances.head.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
-            pgClusterService.deleteDatabase(instances.head.name) match {
-              case Right(_) => Right(rows)
-              case Left(errorMessage) =>
-                logger.error(errorMessage.toString)
-                Left(errorMessage)
-            }
-          case Success(rows) if instances.head.engine == Instance.ENGINE_TYPE_MONGODB =>
-            // RESERVED: MongoDB Cluster Service
-            Right(rows)
-        }
+      case Success(rows) => Right(rows)
     }
   }
 }

@@ -3,7 +3,7 @@ package services
 import javax.inject.Inject
 import java.sql.SQLTransientConnectionException
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
@@ -13,9 +13,12 @@ import repositories.PgClusterRepository
 
 
 
-class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
+class PgClusterService @Inject()(configuration: Configuration, pgClusterRepository: PgClusterRepository) {
 
   val logger: Logger = Logger(this.getClass)
+
+  val LDAP_GROUP_NAME: String = configuration.get[String]("ldap_role")
+  val GENERIC_GROUP_NAME: String = configuration.get[String]("generic_role")
 
   def createDatabase(databaseName: String, ownerName: String): Either[ErrorMessage, Boolean] = {
     Await.result(pgClusterRepository.createDatabase(databaseName, ownerName), Duration.Inf) match {
@@ -50,8 +53,18 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
     }
   }
 
-  def createRole(roleName: String): Either[ErrorMessage, Boolean] = {
-    Await.result(pgClusterRepository.createRole(roleName), Duration.Inf) match {
+  def createRole(roleName: String, groupName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.createRole(roleName, groupName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = handleCreateRoleThrowable(throwable)
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def createSecuredRole(roleName: String, groupName: String, password: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.createSecuredRole(roleName, groupName, password), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
         val errorMessage = handleCreateRoleThrowable(throwable)
@@ -82,8 +95,36 @@ class PgClusterService @Inject()(pgClusterRepository: PgClusterRepository) {
       case Success(_) => Right(true)
       case Failure(throwable) =>
         val errorMessage = ErrorMessage(
-          ErrorMessage.CODE_PG_CLUSTER_DELETED_ROLE_FAILED,
+          ErrorMessage.CODE_PG_CLUSTER_DELETE_DATABASE_FAILED,
           ErrorMessage.MESSAGE_PG_CLUSTER_DELETE_DATABASE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def deleteRole(roleName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.deleteRole(roleName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_PG_CLUSTER_DELETED_ROLE_FAILED,
+          ErrorMessage.MESSAGE_PG_CLUSTER_DELETE_ROLE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def grantDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.grantDatabaseAccess(roleName, databaseName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_GRANT_FAILED,
+          ErrorMessage.MESSAGE_ROLE_GRANT_FAILED,
           developerMessage = throwable.getMessage
         )
         logger.error(errorMessage.toString)
