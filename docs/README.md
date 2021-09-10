@@ -290,8 +290,8 @@ Also increase the maximum connections. Each PostgreSQL connection consumes RAM f
 Integrate LDAP and generic authentication in file ``
 
 ```
-host    all             ldap_role       all                     ldap ldapscheme="ldaps" ldapserver="login-dc-01.login.htw-berlin.de" ldapprefix="cn=" ldapsuffix=", ou=idmusers,dc=login,dc=htw-berlin,dc=de" ldapport=636
-host    all             generic_role    all                     md5
+host    all             +ldap_role       all                     ldap ldapscheme="ldaps" ldapserver="login-dc-01.login.htw-berlin.de" ldapprefix="cn=" ldapsuffix=", ou=idmusers,dc=login,dc=htw-berlin,dc=de" ldapport=636
+host    all             +generic_role    all                     md5
 
 ```
 
