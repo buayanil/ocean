@@ -120,7 +120,6 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
 
   def grantDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
     Await.result(pgClusterRepository.grantDatabaseAccess(roleName, databaseName), Duration.Inf) match {
-      case Success(_) => Right(true)
       case Failure(throwable) =>
         val errorMessage = ErrorMessage(
           ErrorMessage.CODE_ROLE_GRANT_FAILED,
@@ -129,6 +128,21 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         )
         logger.error(errorMessage.toString)
         Left(errorMessage)
+      case Success(_) => Right(true)
+    }
+  }
+
+  def removeDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(pgClusterRepository.removeDatabaseAccess(roleName, databaseName), Duration.Inf) match {
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_REVOKE_FAILED,
+          ErrorMessage.MESSAGE_ROLE_REVOKE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(_) => Right(true)
     }
   }
 }
