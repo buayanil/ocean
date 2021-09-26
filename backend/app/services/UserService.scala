@@ -60,4 +60,17 @@ class UserService @Inject()(ldapService: LdapService, tokenService: TokenService
     }
   }
 
+  def getAllForPattern(pattern: String): Either[ErrorMessage, Seq[User]]= {
+    Await.result(userRepository.getAllForPattern(pattern), Duration.Inf) match {
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_USER_LIST_FAILED,
+          ErrorMessage.MESSAGE_USER_LIST_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(users) => Right(users)
+    }
+  }
 }

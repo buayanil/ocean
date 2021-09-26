@@ -7,7 +7,7 @@ import play.api.libs.json._
 import play.api.Logger
 
 import actions.{UserAction, UserRequest}
-import forms.CredentialsForm
+import forms.{CredentialsForm, UserSearchForm}
 import models.{ErrorResponse, LoginSuccessResponse}
 import services.UserService
 
@@ -44,4 +44,21 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
     )
   }
 
+  def getAllForPattern: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+    UserSearchForm.form.bindFromRequest.fold(
+      formWithErrors => {
+        logger.warn(formWithErrors.errors.toString)
+        UnprocessableEntity(Json.toJson(formWithErrors.errors))
+      },
+      userSearchFormData => {
+        userService.getAllForPattern(userSearchFormData.username) match {
+          case Left(error) =>
+            logger.error(error.toString)
+            BadRequest(Json.toJson(ErrorResponse(List(error))))
+          case Right(users) =>
+            Ok(Json.toJson(users))
+        }
+      }
+    )
+  }
 }

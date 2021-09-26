@@ -30,8 +30,10 @@ object ErrorMessage {
 
   // User
   val CODE_USER_GET_FAILED = "user/get-failed"
+  val CODE_USER_LIST_FAILED = "user/list-failed"
 
   val MESSAGE_USER_GET_FAILED = "Could not get the user."
+  val MESSAGE_USER_LIST_FAILED = "Could not get the user list."
 
   // Instance
   val CODE_INSTANCE_LIST_FAILED = "database/list-failed"
