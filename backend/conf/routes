@@ -6,6 +6,7 @@ GET           /                                 controllers.HomeController.index
 
 # Users
 GET           /user                             controllers.UserController.index()
+GET           /users                            controllers.UserController.getAll
 POST          /users                            controllers.UserController.getAllForPattern()
 POST          /login                            controllers.UserController.login()
 

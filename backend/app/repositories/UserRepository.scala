@@ -41,6 +41,11 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     dbConfig.db.run(action)
   }
 
+  def getAll: Future[Try[Seq[User]]] = {
+    val action = users.result.asTry
+    dbConfig.db.run(action)
+  }
+
   def getAllForPattern(pattern: String): Future[Try[Seq[User]]] = {
     val action = users.filter(user => user.username like s"%${pattern}%").result.asTry
     dbConfig.db.run(action)

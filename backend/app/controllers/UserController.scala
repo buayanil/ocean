@@ -44,6 +44,16 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
     )
   }
 
+  def getAll: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+      userService.getAll match {
+        case Left(error) =>
+          logger.error(error.toString)
+          BadRequest(Json.toJson(ErrorResponse(List(error))))
+        case Right(users) =>
+          Ok(Json.toJson(users))
+      }
+  }
+
   def getAllForPattern: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     UserSearchForm.form.bindFromRequest.fold(
       formWithErrors => {
