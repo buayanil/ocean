@@ -138,7 +138,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
               </div>
               <div className="text-sm font-light">
                 Names must be lowercase and start with a letter. They can be
-                between 4 and 32 characters long and may contain dashes.
+                between 4 and 32 characters long and may contain underscores.
               </div>
               <div className="mt-3">
                 <label
@@ -168,7 +168,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
               <Alert errorMessage={errorMessage} />
               <button
                 type="submit"
-                disabled={values.name === "" || !isValid || processing}
+                disabled={values.name === "" || !isValid || processing || isValidating}
                 className="mt-6 px-4 w-full py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
                 Create a database

@@ -15,18 +15,3 @@ object Instance {
   val ENGINE_TYPE_MONGODB = "M"
   val ENGINE_ALLOWED = List(ENGINE_TYPE_POSTGRESQL, ENGINE_TYPE_MONGODB)
 }
-
-case class CreateInstanceFormData(name: String, engine: String)
-
-object CreateInstanceForm {
-
-  val form: Form[CreateInstanceFormData] = Form(
-    mapping(
-      "name" ->
-        nonEmptyText
-          .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$")),
-      "engine" ->
-        nonEmptyText.verifying("Invalid engine type.", engine => Instance.ENGINE_ALLOWED.contains(engine)),
-    )(CreateInstanceFormData.apply)(CreateInstanceFormData.unapply)
-  )
-}

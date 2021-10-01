@@ -5,11 +5,12 @@ import java.time.Instant
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
 import play.api.Logger
+
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
-
-import models.{CreateInstanceFormData, ErrorMessage, Instance, User}
+import forms.{CreateInstanceFormData, ExistsInstanceFormData}
+import models.{ErrorMessage, Instance, User}
 import repositories.InstanceRepository
 
 
@@ -91,8 +92,8 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
     }
   }
 
-  def existsInstance(createInstanceFormData: CreateInstanceFormData): Either[ErrorMessage, Boolean] = {
-    Await.result(instanceRepository.exists(createInstanceFormData.name, createInstanceFormData.engine), Duration.Inf) match {
+  def existsInstance(existsFormData: ExistsInstanceFormData): Either[ErrorMessage, Boolean] = {
+    Await.result(instanceRepository.exists(existsFormData.name, existsFormData.engine), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage =  ErrorMessage(
           ErrorMessage.CODE_INSTANCE_EXISTS_FAILED,
