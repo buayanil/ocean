@@ -157,7 +157,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="db-postgresql-htw1-70738"
+                    placeholder="abcd_1234"
                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
