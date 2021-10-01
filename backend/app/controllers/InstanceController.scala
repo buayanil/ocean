@@ -5,8 +5,10 @@ import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponent
 import play.api.data.FormError
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.Logger
+
 import actions.{UserAction, UserRequest}
-import models.{CreateInstanceForm, ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
+import forms.{CreateInstanceForm, ExistsInstanceForm, ExistsInstanceFormData}
+import models.{ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
 import services.{DatabaseManagerService, InstanceService}
 
 
@@ -58,13 +60,13 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
   }
 
   def existsInstance(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-    CreateInstanceForm.form.bindFromRequest.fold(
+    ExistsInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      createInstanceFormData => {
-        instanceService.existsInstance(createInstanceFormData) match {
+      existsInstanceFormData => {
+        instanceService.existsInstance(existsInstanceFormData) match {
           case Left(error) =>
             logger.error(error.toString)
             BadRequest(Json.toJson(ErrorResponse(List(error))))
