@@ -30,9 +30,9 @@ class InvitationRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, i
     def * =
       (id, instanceId, userId, createdAt) <> ((Invitation.apply _).tupled, Invitation.unapply)
 
-    foreignKey("instances", instanceId, instanceRepository.instances)(_.id, onDelete = ForeignKeyAction.Cascade)
+    foreignKey("instances", instanceId, instanceRepository.instances)(_.id, onDelete = ForeignKeyAction.SetNull)
 
-    foreignKey("users", instanceId, userRepository.users)(_.id, onDelete = ForeignKeyAction.Cascade)
+    foreignKey("users", instanceId, userRepository.users)(_.id, onDelete = ForeignKeyAction.SetNull)
 
     def idx = index("idx_instanceId_user_id", (instanceId, userId), unique = true)
   }

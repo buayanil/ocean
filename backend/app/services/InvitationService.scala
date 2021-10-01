@@ -54,7 +54,7 @@ class InvitationService @Inject()(invitationRepository: InvitationRepository) {
 
   def addInvitation(createInvitationFormData: CreateInvitationFormData): Either[ErrorMessage, Invitation] = {
     val localTimestamp = Timestamp.from(Instant.now)
-    val localInvitation = Invitation(0, createInvitationFormData.instanceId, createInvitationFormData.instanceId, localTimestamp)
+    val localInvitation = Invitation(0, createInvitationFormData.instanceId, createInvitationFormData.userId, localTimestamp)
     Await.result(invitationRepository.addInvitation(localInvitation), Duration.Inf) match {
       case Failure(throwable) =>
         val errorMessage = handleAddInvitationThrowable(throwable)
