@@ -4,6 +4,7 @@ import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success}
 
 import repositories.UserRepository
 import models.{ErrorMessage, LdapUser, User}
@@ -38,4 +39,52 @@ class UserService @Inject()(ldapService: LdapService, tokenService: TokenService
     User(0L, ldapUser.username, ldapUser.firstName, ldapUser.lastName, ldapUser.mail, ldapUser.employeeType)
   }
 
+  def getUserById(userId: Long): Either[ErrorMessage, User] = {
+    Await.result(userRepository.getUserById(userId), Duration.Inf) match {
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_USER_GET_FAILED,
+          ErrorMessage.MESSAGE_USER_GET_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(users) if users.nonEmpty => Right(users.head)
+      case _ =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_USER_GET_FAILED,
+          ErrorMessage.MESSAGE_USER_GET_FAILED,
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
+  def getAll: Either[ErrorMessage, Seq[User]]= {
+    Await.result(userRepository.getAll, Duration.Inf) match {
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_USER_LIST_FAILED,
+          ErrorMessage.MESSAGE_USER_LIST_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(users) => Right(users)
+    }
+  }
+
+  def getAllForPattern(pattern: String): Either[ErrorMessage, Seq[User]]= {
+    Await.result(userRepository.getAllForPattern(pattern), Duration.Inf) match {
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_USER_LIST_FAILED,
+          ErrorMessage.MESSAGE_USER_LIST_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+      case Success(users) => Right(users)
+    }
+  }
 }

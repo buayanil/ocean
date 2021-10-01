@@ -12,13 +12,12 @@ import models.Instance
 
 
 @Singleton
-class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, userRepository: UserRepository)(implicit ec: ExecutionContext) {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
-
 
   class InstanceTable(tag: Tag) extends Table[Instance](tag, "instances") {
 
@@ -46,8 +45,7 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     /**
      * OneToMany relationship using a foreign key constraint.
      */
-    def user =
-      foreignKey("users", userId, TableQuery[InstanceTable])(_.id, onDelete = ForeignKeyAction.Cascade)
+    foreignKey("users", userId, TableQuery[userRepository.UserTable])(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
   val instances = TableQuery[InstanceTable]
@@ -77,6 +75,5 @@ class InstanceRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     val action = instances.filter(_.id === id).filter(_.userId === userId).delete.asTry
     dbConfig.db.run(action)
   }
-
 }
 

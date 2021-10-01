@@ -28,6 +28,13 @@ object ErrorMessage {
   val MESSAGE_LDAP_AUTHENTICATION_FAILED = "An account with this profile was not found."
   val MESSAGE_LDAP_CONNECTION_CONFIG = "The authentication service cannot load its internal configuration."
 
+  // User
+  val CODE_USER_GET_FAILED = "user/get-failed"
+  val CODE_USER_LIST_FAILED = "user/list-failed"
+
+  val MESSAGE_USER_GET_FAILED = "Could not get the user."
+  val MESSAGE_USER_LIST_FAILED = "Could not get the user list."
+
   // Instance
   val CODE_INSTANCE_LIST_FAILED = "database/list-failed"
   val CODE_INSTANCE_GET_FAILED = "database/get-failed"
@@ -63,6 +70,7 @@ object ErrorMessage {
   val CODE_ROLES_DATABASE_DELETE_FAILED = "role/delete-failed"
   val CODE_ROLE_DELETE_WRONG_PERMISSION = "role/delete-wrong-permission"
   val CODE_ROLE_GRANT_FAILED = "role/database-grant-failed"
+  val CODE_ROLE_REVOKE_FAILED = "role/database-revoke-failed"
 
   val MESSAGE_ROLE_FAILED = "Could not get the role list."
   val MESSAGE_ROLE_GET_FAILED = "Could not get the database role."
@@ -77,6 +85,20 @@ object ErrorMessage {
   val MESSAGE_ROLE_DATABASE_DELETE_FAILED = "Could not delete all database roles."
   val MESSAGE_ROLE_DELETE_WRONG_PERMISSION = "Only the owner can delete a role."
   val MESSAGE_ROLE_GRANT_FAILED = "Role could not get access to database."
+  val MESSAGE_ROLE_REVOKE_FAILED = "Role could not revoke user access from database."
+
+  // Invitations
+  val CODE_INVITATION_LIST_FAILED = "invitation/list-failed"
+  val CODE_INVITATION_GET_FAILED = "invitation/get-failed"
+  val CODE_INVITATION_CREATE_FAILED = "invitation/create-failed"
+  val CODE_INVITATION_DELETE_FAILED = "invitation/delete-failed"
+  val CODE_INVITATION_CREATE_DUPLICATED = "invitation/create-duplicated"
+
+  val MESSAGE_INVITATION_LIST_FAILED = "Could not get the invitation list."
+  val MESSAGE_INVITATION_GET_FAILED = "Could not get the invitation."
+  val MESSAGE_INVITATION_CREATE_FAILED = "Could not create an invitation."
+  val MESSAGE_INVITATION_DELETE_FAILED = "Could not delete the invitation."
+  val MESSAGE_INVITATION_CREATE_DUPLICATED = "Invitation name exists already."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"

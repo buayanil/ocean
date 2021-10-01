@@ -2,22 +2,29 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET           /                           controllers.HomeController.index()
+GET           /                                 controllers.HomeController.index()
 
 # Users
-GET           /user                       controllers.UserController.index()
-POST          /login                      controllers.UserController.login()
+GET           /user                             controllers.UserController.index()
+GET           /users                            controllers.UserController.getAll
+POST          /users                            controllers.UserController.getAllForPattern()
+POST          /login                            controllers.UserController.login()
 
 # Databases
-GET           /databases                  controllers.InstanceController.listAll()
-GET           /databases/:id              controllers.InstanceController.get(id: Long)
-POST          /databases                  controllers.InstanceController.addInstance()
-POST          /databases/_exists_         controllers.InstanceController.existsInstance()
-GET           /databases/:id/roles        controllers.RoleController.listInstanceRoles(id: Long)
+GET           /databases                        controllers.InstanceController.listAll()
+GET           /databases/:id                    controllers.InstanceController.get(id: Long)
+POST          /databases                        controllers.InstanceController.addInstance()
+POST          /databases/_exists_               controllers.InstanceController.existsInstance()
+GET           /databases/:id/roles              controllers.RoleController.listInstanceRoles(id: Long)
+GET           /databases/:id/invitations        controllers.InvitationController.getAllForInstance(id: Long)
 
 # Database roles
-POST          /roles                      controllers.RoleController.addRole()
-POST          /roles/_exists_             controllers.RoleController.existsRole()
-DELETE        /roles/:id                  controllers.RoleController.deleteRole(id: Long)
+POST          /roles                            controllers.RoleController.addRole()
+POST          /roles/_exists_                   controllers.RoleController.existsRole()
+DELETE        /roles/:id                        controllers.RoleController.deleteRole(id: Long)
 
-DELETE        /databases/:id              controllers.InstanceController.deleteInstance(id: Long)
+# Database invitations
+POST          /invitations                      controllers.InvitationController.addInvitation()
+DELETE        /invitations/:id                  controllers.InvitationController.deleteInvitation(id: Long)
+
+DELETE        /databases/:id                    controllers.InstanceController.deleteInstance(id: Long)

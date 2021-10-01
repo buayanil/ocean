@@ -3,6 +3,7 @@ package repositories
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import scala.util.Try
 import scala.concurrent.{ExecutionContext, Future}
 
 import models.User
@@ -11,13 +12,13 @@ import models.User
 @Singleton
 class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
 
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
 
 
-  private class UserTable(tag: Tag) extends Table[User](tag, "users") {
+  class UserTable(tag: Tag) extends Table[User](tag, "users") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def username = column[String]("username")
@@ -29,14 +30,25 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     def * = (id, username, firstName, lastName, mail, employeeType) <> ((User.apply _).tupled, User.unapply)
   }
 
-  private val users = TableQuery[UserTable]
-
-  def list(): Future[Seq[User]] = db.run {
-    users.result
-  }
+  val users = TableQuery[UserTable]
 
   def getByUsername(username: String): Future[Option[User]] = db.run {
     users.filter(user => user.username === username).result.headOption
+  }
+
+  def getUserById(userId: Long): Future[Try[Seq[User]]] = {
+    val action = users.filter(_.id === userId).result.asTry
+    dbConfig.db.run(action)
+  }
+
+  def getAll: Future[Try[Seq[User]]] = {
+    val action = users.result.asTry
+    dbConfig.db.run(action)
+  }
+
+  def getAllForPattern(pattern: String): Future[Try[Seq[User]]] = {
+    val action = users.filter(user => user.username like s"%${pattern}%").result.asTry
+    dbConfig.db.run(action)
   }
 
   // TODO: use asTry
@@ -52,5 +64,4 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
       into ((entry, id) => User(id, entry._1, entry._2, entry._3, entry._4, entry._5))
       ) += (username, firstname, lastName, mail, employeeType)
   }
-
 }

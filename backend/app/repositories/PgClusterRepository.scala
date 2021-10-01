@@ -90,4 +90,14 @@ class PgClusterRepository @Inject() ()(implicit ec: ExecutionContext) {
     val grantDatabaseAccessStatement = sql"""GRANT ALL PRIVILEGES ON DATABASE #${databaseName} to #${roleName}"""
     db.run(grantDatabaseAccessStatement.as[Int].asTry)
   }
+
+  /**
+   * Revoke role access from a database
+   * @param roleName name of role
+   * @param databaseName name of database
+   */
+  def removeDatabaseAccess(roleName: String, databaseName: String): Future[Try[Vector[Int]]] = {
+    val revokeDatabaseAccessStatement = sql"""REVOKE ALL PRIVILEGES ON DATABASE #${databaseName} FROM #${roleName}"""
+    db.run(revokeDatabaseAccessStatement.as[Int].asTry)
+  }
 }

@@ -15,15 +15,6 @@ export interface CredentialProperties {
   password: string;
 }
 
-export interface UserProperties {
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  mail: string;
-  employeeType: string;
-}
-
 export enum StoreStatus {
   PARTIALLY_LOADED = "PARTIALLY_LOADED",
   FULLY_LOADED = "FULLY_LOADED",
