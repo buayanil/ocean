@@ -1,4 +1,3 @@
-/* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
 
 
@@ -21,9 +20,9 @@ const EngineSelector: React.FC<EngineSelectorProps> = ({ engineOptions, selected
 
     const getClassName = (value: string) => {
         if (selectedValue === value) {
-            return "text-blue-500 bg-blue overflow-hidden shadow divide-y divide-blue-500 border rounded-sm border-blue-500 hover:bg-blue-100";
+            return "text-blue-500 bg-blue shadow divide-y divide-blue-500 border rounded-sm border-blue-500 hover:bg-blue-100";
         } else {
-            return "bg-white overflow-hidden shadow divide-y divide-gray-200 rounded-sm hover:bg-gray-100"
+            return "bg-white shadow divide-y divide-gray-200 rounded-sm hover:bg-gray-100"
         }
     }
 

@@ -14,6 +14,12 @@ export class UserClient {
    * Get user data
    */
   public static getUser = () => axiosInstance.get<any>("/user");
+
+  /**
+   * Search for users
+   */
+  public static getUsers = () =>
+    axiosInstance.get<any>("/users");
 }
 
 export class UserValidation {
@@ -30,10 +36,25 @@ export class UserValidation {
     employeeType: yup.string().required(),
   });
 
+  public static getUsersSchema = yup
+    .array()
+    .required()
+    .of(
+      yup.object().shape({
+        id: yup.number().required(),
+        username: yup.string().required(),
+        firstName: yup.string().required(),
+        lastName: yup.string().required(),
+        mail: yup.string().required(),
+        employeeType: yup.string().required(),
+      })
+    );
+
   public static loginSchema = yup.object().shape({
-    username: yup.string()
-    .required("Username is required")
-    .matches(/^[a-z0-9]*$/, "Username must contain small letters or digits."),
+    username: yup
+      .string()
+      .required("Username is required")
+      .matches(/^[a-z0-9]*$/, "Username must contain small letters or digits."),
     password: yup
       .string()
       .min(4, "Password should be of minimum 4 characters length")

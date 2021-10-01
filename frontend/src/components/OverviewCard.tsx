@@ -1,7 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
 
-import { DatabaseProperties, HostProperties, UserProperties } from '../types/models';
+import { DatabaseProperties, HostProperties } from '../types/models';
+import { UserProperties } from '../types/user';
 import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
 
 export interface OverviewCardProps {

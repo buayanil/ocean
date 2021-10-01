@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from "@heroicons/react/solid";
 
+import { UserProperties } from "../types/user";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { logout } from "../redux/slices/session/sessionSlice";
-import { UserProperties } from "../types/models";
 import { navigation, SettingsNavigation } from "../constants/menu.";
 import CreateDropdown from "../components/CreateDropdown";
 
@@ -343,7 +343,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             </div>
           </div>
         </div>
-        <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
+        <main className="flex-1 pb-8 z-0">
           <div className="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
             <div className="mt-8">{children}</div>
           </div>
