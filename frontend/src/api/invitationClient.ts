@@ -6,7 +6,7 @@ export class InvitationClient {
    * Get all invitations for a database
    */
   public static getInvitationsForDatabase = async (databaseId: number): Promise<InvitationProperties[]> => {
-    const {data} = await axiosInstance.get<InvitationProperties[]>(`databases/${databaseId.toString()}/invitations`);
+    const { data } = await axiosInstance.get<InvitationProperties[]>(`databases/${databaseId.toString()}/invitations`);
     return data
   }
 

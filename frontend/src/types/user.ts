@@ -11,9 +11,12 @@ export interface UserProperties {
 
 export type InvitedUserProperties = Pick<
   UserProperties,
-  "username" | "firstName" | "lastName"
+  "id" | "username" | "firstName" | "lastName"
 > &
-  Pick<InvitationProperties, "id" | "createdAt">;
+  Pick<InvitationProperties, "createdAt">
+  & {
+    invitationId: number;
+  };
 
 export class User {
   public static getDisplayName = (user: UserProperties): string => {
@@ -33,8 +36,9 @@ export class User {
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
-          id: invitation.id,
+          id: user.id,
           createdAt: invitation.createdAt,
+          invitationId: invitation.id,
         };
         result.push(invitedUser)
       }

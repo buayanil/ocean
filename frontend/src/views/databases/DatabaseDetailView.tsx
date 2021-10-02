@@ -86,13 +86,11 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Other users except our user
   const otherUsers = (users || []).filter(_ => _.id !== user?.id)
 
-  const onCreateOrDeleteInvitation = (value: UserProperties) => {
+  const onDeleteInvitation = (value: UserProperties) => {
     if (invitations) {
       const invitation = invitations.find(invitation => invitation.userId === value.id);
       if (invitation) {
         deleteInvitationMutation.mutate(invitation.id);
-      } else {
-        createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id });
       }
     }
   }
@@ -133,14 +131,18 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       );
     } else if (selectedId === 3) {
       return <div className="z-50">
-        <UserSelector users={otherUsers} selectedUserIds={Invitation.getUserIds(invitations)} onSelect={onCreateOrDeleteInvitation} />
+        <UserSelector 
+          users={otherUsers}
+          selectedUserIds={Invitation.getUserIds(invitations)}
+          onSelect={(value) => createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id })}
+          onDeselect={onDeleteInvitation} />
         <div className="my-5">
           <Headline title="Invitations" size="medium" />
           <p className="mt-1 text-sm text-gray-500">
             Invite other people
           </p>
         </div>
-        <InvitationList users={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onCreateOrDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
+        <InvitationList users={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
       </div>
     }
   };
