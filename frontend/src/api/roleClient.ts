@@ -8,7 +8,7 @@ export class RoleClient {
    * Get all roles for a database
    */
   public static getRolesForDatabase = async (databaseId: number): Promise<RoleProperties[]> => {
-    const { data } = await axiosInstance.get<any>(`databases/${databaseId.toString()}/roles`);
+    const { data } = await axiosInstance.get<RoleProperties[]>(`databases/${databaseId.toString()}/roles`);
     return data;
   }
 
@@ -16,11 +16,10 @@ export class RoleClient {
    * Creates a role for a database
    */
   public static createRoleForDatabase = async (role: UpstreamCreateRoleProperties): Promise<RoleProperties> => {
-    const { data } = await axiosInstance.post<any>("/roles", role);
+    const { data } = await axiosInstance.post<RoleProperties>("/roles", role);
     return data;
   }
     
-
   /**
    * Checks if role exists for a database
    */

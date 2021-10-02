@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -13,11 +13,8 @@ import { deleteModalContent } from "../../constants/modals";
 import { RoleClient } from "../../api/roleClient";
 import { InvitationClient } from "../../api/invitationClient";
 import { UserClient } from "../../api/userClient";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import {
-  deleteDatabaseStart,
-  getDatabaseStart,
-} from "../../redux/slices/data/databaseSlice";
+import { DatabaseClient } from "../../api/databaseClient";
+import { useAppSelector } from "../../redux/hooks";
 import AppLayout from "../../layouts/AppLayout";
 import TabList from "../../components/TabList";
 import ActionDropdown from "../../components/ActionDropdown";
@@ -45,80 +42,49 @@ interface DatabaseDetailViewProps { }
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
   const history = useHistory();
-  // Redux
-  const dispatch = useAppDispatch();
-  const { loading, error, databases } = useAppSelector(
-    (state) => state.data.database
-  );
   const { user } = useAppSelector((state) => state.data.user);
   // Tab Selection
   const [selectedId, setSelectedId] = useState<number>(1);
-  // Delete Modal
+  // Modals
   const [openDeleteDatabaseModal, setDeleteDatabaseOpenModal] = useState<boolean>(false);
-  // Create Role Modal
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
-  // Delete database process
-  const [deleteDatabaseProcess, setDeleteDatabaseProcess] = useState<boolean>(false);
-  // Current database id
-  const databaseId = Number.parseInt(id);
-  // Current database
-  const database = databases.find(
-    (database) => database.id === databaseId
-  );
   // Queries
   const queryClient = useQueryClient()
-  const { data: users } = useQuery("users", () => UserClient.getUsers())
+  const { data: database } = useQuery(["database", id], () => DatabaseClient.getDatabase(Number.parseInt(id)))
   const { data: roles } = useQuery("roles", () => RoleClient.getRolesForDatabase(Number.parseInt(id)))
-  const { data: invitations } = useQuery(["invitations"], () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
+  const { data: invitations } = useQuery("invitations", () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
+  const { data: users } = useQuery("users", () => UserClient.getUsers())
   // Mutations
   const createRoleMutation = useMutation((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["roles"])
+      queryClient.invalidateQueries("roles")
       setOpenCreateRoleModal(false);
     }
   })
   const deleteRoleMutation = useMutation((id: number) => RoleClient.deleteRoleForDatabase(id), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["roles"])
+      queryClient.invalidateQueries("roles")
     }
   })
   const createInvitationMutation = useMutation((invitation: UpstreamCreateInvitationProperties) => InvitationClient.createInvitationForDatabase(invitation), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["invitations"])
+      queryClient.invalidateQueries("invitations")
     },
   })
   const deleteInvitationMutation = useMutation((id: number) => InvitationClient.deleteInvitationForDatabase(id), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["invitations"])
+      queryClient.invalidateQueries("invitations")
     },
+  })
+  const deleteDatabaseMutation = useMutation((id: number) => DatabaseClient.deleteDatabase(id), {
+    onSuccess: () => {
+      setDeleteDatabaseOpenModal(false);
+      queryClient.invalidateQueries("databases")
+      history.push("/databases");
+    }
   })
   // Other users except our user
   const otherUsers = (users || []).filter(_ => _.id !== user?.id)
-
-  useEffect(() => {
-    dispatch(getDatabaseStart(databaseId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
-
-  useEffect(() => {
-    // HINT: Database deleted
-    if (!loading && deleteDatabaseProcess) {
-      setDeleteDatabaseProcess(false);
-      setDeleteDatabaseOpenModal(false);
-      const deleted = !databases.some(
-        (database) => database.id === Number.parseInt(id)
-      );
-      if (error === undefined && deleted) {
-        history.push("/databases");
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
-
-  const onDeleteDatabase = () => {
-    setDeleteDatabaseProcess(true);
-    dispatch(deleteDatabaseStart(Number.parseInt(id)));
-  };
 
   const onCreateOrDeleteInvitation = (value: UserProperties) => {
     if (invitations) {
@@ -129,13 +95,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id });
       }
     }
-
   }
 
   const renderTabContent = (): React.ReactNode => {
-    const database = databases.find(
-      (database) => database.id === Number.parseInt(id)
-    );
     if (selectedId === 1) {
       return (
         <OverviewCard
@@ -225,7 +187,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
           <ActionDropdown onDelete={() => setDeleteDatabaseOpenModal(true)} />
         </div>
       </div>
-      <Alert errorMessage={error} />
+      <Alert errorMessage={undefined} />
       <TabList
         tabs={tabs}
         selectedId={selectedId}
@@ -236,7 +198,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       <DeleteModal
         open={openDeleteDatabaseModal}
         modalContent={deleteModalContent}
-        onSubmit={onDeleteDatabase}
+        onSubmit={() => deleteDatabaseMutation.mutate(Number.parseInt(id))}
         onClose={() => setDeleteDatabaseOpenModal(false)}
       />
       <CreateRoleModal

@@ -39,20 +39,6 @@ export class UserValidation {
     employeeType: yup.string().required(),
   });
 
-  public static getUsersSchema = yup
-    .array()
-    .required()
-    .of(
-      yup.object().shape({
-        id: yup.number().required(),
-        username: yup.string().required(),
-        firstName: yup.string().required(),
-        lastName: yup.string().required(),
-        mail: yup.string().required(),
-        employeeType: yup.string().required(),
-      })
-    );
-
   public static loginSchema = yup.object().shape({
     username: yup
       .string()

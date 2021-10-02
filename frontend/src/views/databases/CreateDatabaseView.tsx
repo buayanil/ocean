@@ -1,43 +1,32 @@
 import React from "react";
-import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useMutation, useQueryClient } from "react-query";
 
 import { UpstreamDatabaseProperties } from "../../types/models";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { createDatabaseStart } from "../../redux/slices/data/databaseSlice";
+import { DatabaseClient } from "../../api/databaseClient";
 import { DatabasesNavigation } from "../../constants/menu.";
 import AppLayout from "../../layouts/AppLayout";
-import CreateDatabaseForm from "../../components/CreateDatabaseForm";
+import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 
 interface CreateDatabaseViewProps {}
 
 const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   const history = useHistory();
-  const { loading, error } = useAppSelector((state) => state.data.database);
-  const dispatch = useAppDispatch();
-  const [processing, setProcessing] = useState<boolean>(false);
-
-  const onSubmit = (database: UpstreamDatabaseProperties) => {
-    setProcessing(true);
-    dispatch(createDatabaseStart(database));
-  };
-
-  useEffect(() => {
-    if (!loading && processing) {
-      setProcessing(false);
-      if (error === undefined) {
-        history.push(DatabasesNavigation.to);
-      }
+  // Queries
+  const queryClient = useQueryClient()
+  const createDatabaseMutation = useMutation((database: UpstreamDatabaseProperties) => DatabaseClient.createDatabase(database), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["databases"])
+      history.push(DatabasesNavigation.to);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  })
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <CreateDatabaseForm
-        processing={processing}
-        errorMessage={error}
-        onSubmit={onSubmit}
+        processing={createDatabaseMutation.isLoading}
+        errorMessage={createDatabaseMutation.isError ? "Ein Fehler is aufgetreten" : undefined}
+        onSubmit={(value) => createDatabaseMutation.mutate(value)}
       />
     </AppLayout>
   );
