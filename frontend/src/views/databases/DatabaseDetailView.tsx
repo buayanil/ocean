@@ -12,13 +12,13 @@ import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
 import { RoleClient } from "../../api/roleClient";
 import { InvitationClient } from "../../api/invitationClient";
+import { UserClient } from "../../api/userClient";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   deleteDatabaseStart,
   getDatabaseStart,
 } from "../../redux/slices/data/databaseSlice";
 import AppLayout from "../../layouts/AppLayout";
-import { getUsersStart } from "../../redux/slices/data/userSlice";
 import TabList from "../../components/TabList";
 import ActionDropdown from "../../components/ActionDropdown";
 import DeleteModal from "../../components/DeleteModal";
@@ -50,7 +50,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { loading, error, databases } = useAppSelector(
     (state) => state.data.database
   );
-  const { user, users } = useAppSelector((state) => state.data.user);
+  const { user } = useAppSelector((state) => state.data.user);
   // Tab Selection
   const [selectedId, setSelectedId] = useState<number>(1);
   // Delete Modal
@@ -65,10 +65,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const database = databases.find(
     (database) => database.id === databaseId
   );
-  // Other users except our user
-  const otherUser = users.filter(_ => _.id !== user?.id)
   // Queries
   const queryClient = useQueryClient()
+  const { data: users } = useQuery("users", () => UserClient.getUsers())
   const { data: roles } = useQuery("roles", () => RoleClient.getRolesForDatabase(Number.parseInt(id)))
   const { data: invitations } = useQuery(["invitations"], () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
   // Mutations
@@ -93,10 +92,11 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       queryClient.invalidateQueries(["invitations"])
     },
   })
+  // Other users except our user
+  const otherUsers = (users || []).filter(_ => _.id !== user?.id)
 
   useEffect(() => {
     dispatch(getDatabaseStart(databaseId));
-    dispatch(getUsersStart())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
@@ -171,14 +171,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       );
     } else if (selectedId === 3) {
       return <div className="z-50">
-        <UserSelector users={otherUser} selectedUserIds={Invitation.getUserIds(invitations)} onSelect={onCreateOrDeleteInvitation} />
+        <UserSelector users={otherUsers} selectedUserIds={Invitation.getUserIds(invitations)} onSelect={onCreateOrDeleteInvitation} />
         <div className="my-5">
           <Headline title="Invitations" size="medium" />
           <p className="mt-1 text-sm text-gray-500">
             Invite other people
           </p>
         </div>
-        <InvitationList users={User.getInvitedUsers(otherUser, invitations ? invitations : [])} onDelete={(user) => onCreateOrDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
+        <InvitationList users={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onCreateOrDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
       </div>
     }
   };
@@ -232,7 +232,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         onSelect={(value) => setSelectedId(value)}
       />
       <div className="mt-4">{renderTabContent()}</div>
-      {/*Modal area*/}
+      {/* Modals*/}
       <DeleteModal
         open={openDeleteDatabaseModal}
         modalContent={deleteModalContent}

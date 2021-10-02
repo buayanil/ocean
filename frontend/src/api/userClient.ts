@@ -2,6 +2,7 @@ import * as yup from "yup";
 
 import { axiosInstance } from "./client";
 import { CredentialProperties } from "../types/models";
+import { UserProperties } from "../types/user";
 
 export class UserClient {
   /**
@@ -18,8 +19,10 @@ export class UserClient {
   /**
    * Search for users
    */
-  public static getUsers = () =>
-    axiosInstance.get<any>("/users");
+  public static getUsers = async (): Promise<UserProperties[]> => {
+    const { data } = await axiosInstance.get<any>("/users");
+    return data;
+  }
 }
 
 export class UserValidation {

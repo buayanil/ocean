@@ -4,13 +4,12 @@ import { UserProperties } from "../../../types/user";
 
 interface UserState {
   user?: UserProperties;
-  users: UserProperties[];
   loading: boolean;
   error?: string;
   isLoadingGetUsers: boolean;
 }
 
-const initialState: UserState = { loading: false, users:[], isLoadingGetUsers: false };
+const initialState: UserState = { loading: false, isLoadingGetUsers: false };
 
 export const userSlice = createSlice({
   name: "userSlice",
@@ -30,24 +29,10 @@ export const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
-    getUsersStart: (state) => {
-      state.isLoadingGetUsers = true;
-      state.error = undefined;
-      state.users = [];
-    },
-    getUsersSuccess: (state, { payload }: PayloadAction<UserProperties[]>) => {
-      state.users = payload;
-      state.error = undefined;
-      state.isLoadingGetUsers = false;
-    },
-    getUsersFailed: (state, action: PayloadAction<string>) => {
-      state.error = action.payload;
-      state.isLoadingGetUsers = false;
-    },
   },
 });
 
-export const { getUserStart, getUserSuccess, getUserFailed, getUsersStart, getUsersSuccess, getUsersFailed } =
+export const { getUserStart, getUserSuccess, getUserFailed } =
   userSlice.actions;
 
 export default userSlice.reducer;
