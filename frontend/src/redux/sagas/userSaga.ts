@@ -13,9 +13,6 @@ import {
   getUserSuccess,
   getUserFailed,
   getUserStart,
-  getUsersStart,
-  getUsersSuccess,
-  getUsersFailed,
 } from "../slices/data/userSlice";
 import { CredentialProperties } from "../../types/models";
 
@@ -70,34 +67,8 @@ export function* getUserAsync() {
     yield put(getUserFailed(networkError.toString()));
   }
 }
-export function* getUsersAsync() {
-  try {
-    const response: SagaReturnType<typeof UserClient.getUsers> = yield call(
-      UserClient.getUsers
-    );
-    if (response.status === 200) {
-      try {
-        const users = UserValidation.getUsersSchema.validateSync(response.data);
-        if (users) {
-          yield put(getUsersSuccess(users));
-        } else {
-          yield put(getUsersFailed(""));
-        }
-      } catch (parseError) {
-        yield put(getUsersFailed(parseError.toString()));
-      }
-    }
-  } catch (networkError) {
-    if (networkError.response.status === 401) {
-      // HINT: token expired
-      yield put(logout());
-    }
-    yield put(getUserFailed(networkError.toString()));
-  }
-}
 
 export default function* authSaga() {
   yield takeLatest(loginStart.type, loginAsync);
   yield takeLatest(getUserStart.type, getUserAsync);
-  yield takeLatest(getUsersStart.type, getUsersAsync);
 }

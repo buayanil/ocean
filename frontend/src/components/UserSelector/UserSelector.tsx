@@ -9,6 +9,7 @@ export interface UserSelectorProps {
     users: UserProperties[];
     selectedUserIds: number[];
     onSelect?: (value: UserProperties) => void;
+    onDeselect?: (value: UserProperties) => void;
 }
 
 
@@ -16,11 +17,16 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-const UserSelector: React.FC<UserSelectorProps> = ({ users, selectedUserIds, onSelect }) => {
+const UserSelector: React.FC<UserSelectorProps> = ({ users, selectedUserIds, onSelect, onDeselect }) => {
 
     const onChange = (value: UserProperties | undefined) => {
-        if (value && onSelect) {
-            onSelect(value)
+        if (value) {
+            const isSelected = selectedUserIds.find(id => id === value.id)
+            if (isSelected === undefined && onSelect) {
+                onSelect(value)
+            } else if (isSelected && onDeselect) {
+                onDeselect(value)
+            }
         }
     }
 

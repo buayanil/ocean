@@ -7,12 +7,12 @@ import {
   BanIcon,
 } from "@heroicons/react/outline";
 
-import { engineOptions } from "../constants/engines";
-import { UpstreamDatabaseProperties } from "../types/models";
-import { DatabaseClient, DatabaseValidation } from "../api/databaseClient";
-import Alert from "./Alert";
-import Headline from "./Headline";
-import EngineSelector from "./EngineSelector/EngineSelector";
+import { engineOptions } from "../../constants/engines";
+import { UpstreamDatabaseProperties } from "../../types/models";
+import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
+import Alert from "../Alert";
+import Headline from "../Headline";
+import EngineSelector from "../EngineSelector/EngineSelector";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;

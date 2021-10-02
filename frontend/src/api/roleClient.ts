@@ -1,21 +1,25 @@
 import * as yup from "yup";
 
-import { UpstreamCreateRoleProperties } from "../types/role";
+import { RoleProperties, UpstreamCreateRoleProperties } from "../types/role";
 import { axiosInstance } from "./client";
 
 export class RoleClient {
   /**
    * Get all roles for a database
    */
-  public static getRolesForDatabase = (databaseId: number) =>
-    axiosInstance.get<any>(`databases/${databaseId.toString()}/roles`);
+  public static getRolesForDatabase = async (databaseId: number): Promise<RoleProperties[]> => {
+    const { data } = await axiosInstance.get<RoleProperties[]>(`databases/${databaseId.toString()}/roles`);
+    return data;
+  }
 
   /**
    * Creates a role for a database
    */
-  public static createRoleForDatabase = (role: UpstreamCreateRoleProperties) =>
-    axiosInstance.post<any>("/roles", role);
-
+  public static createRoleForDatabase = async (role: UpstreamCreateRoleProperties): Promise<RoleProperties> => {
+    const { data } = await axiosInstance.post<RoleProperties>("/roles", role);
+    return data;
+  }
+    
   /**
    * Checks if role exists for a database
    */
@@ -25,35 +29,16 @@ export class RoleClient {
   /**
    * Deletes a database by id
    */
-  public static deleteRoleForDatabase = (id: number) =>
-    axiosInstance.delete<any>(`/roles/${id.toString()}`);
+  public static deleteRoleForDatabase = async (id: number) => {
+    const { data } = await axiosInstance.delete<any>(`/roles/${id.toString()}`);
+    return data
+  }
+    
 }
 
 export class RoleValidation {
-  public static getRolesForDatabaseSchema = yup
-    .array()
-    .required()
-    .of(
-      yup.object().shape({
-        id: yup.number().required(),
-        instanceId: yup.number().required(),
-        name: yup.string().required(),
-        password: yup.string().required(),
-      })
-    );
-
-  public static createRoleForDatabaseSchema = yup.object().shape({
-    id: yup.number().required(),
-    instanceId: yup.number().required(),
-    name: yup.string().required(),
-    password: yup.string().required(),
-  });
-
   public static existsRoleForDatabaseSchema = yup.object().shape({
     exists: yup.boolean().required(),
   });
 
-  public static deleteDatabaseSchema = yup.object().shape({
-    rows: yup.number().required(),
-  });
 }

@@ -1,25 +1,32 @@
 import * as yup from "yup";
 
 import { axiosInstance } from "./client";
-import { UpstreamDatabaseProperties } from "../types/models";
+import { DatabaseProperties, UpstreamDatabaseProperties } from "../types/models";
 
 export class DatabaseClient {
   /**
    * Get all databases related to this user
    */
-  public static getAllDatabases = () => axiosInstance.get<any>("/databases");
-
+  public static getAllDatabases = async (): Promise<DatabaseProperties[]> => {
+    const { data } = await axiosInstance.get<DatabaseProperties[]>("/databases");
+    return data
+  }
+  
   /**
    * Get a single database by id
    */
-  public static getDatabase = (id: number) =>
-    axiosInstance.get<any>(`/databases/${id.toString()}`);
+  public static getDatabase = async (id: number): Promise<DatabaseProperties> => {
+    const { data } = await axiosInstance.get<DatabaseProperties>(`/databases/${id.toString()}`);
+    return data;
+  }
 
   /**
    * Creates a database
    */
-  public static createDatabase = (database: UpstreamDatabaseProperties) =>
-    axiosInstance.post<any>("/databases", database);
+  public static createDatabase = async (database: UpstreamDatabaseProperties): Promise<DatabaseProperties> => {
+    const { data } = await axiosInstance.post<DatabaseProperties>("/databases", database);
+    return data;
+  }
 
   /**
    * Checkfs if a database already exists
@@ -30,63 +37,15 @@ export class DatabaseClient {
   /**
    * Deletes a database by id
    */
-  public static deleteDatabase = (id: number) =>
-    axiosInstance.delete<any>(`/databases/${id.toString()}`);
+  public static deleteDatabase = async (id: number) => {
+    const { data } = await axiosInstance.delete<any>(`/databases/${id.toString()}`);
+    return data;
+  }
+    
 }
 
 export class DatabaseValidation {
-  public static getAllDatabasesSchema = yup
-    .array()
-    .required()
-    .of(
-      yup.object().shape({
-        id: yup.number().required(),
-        name: yup.string().required(),
-        engine: yup.string().required(),
-        createdAt: yup
-          .date()
-          .required()
-          .transform(function (_castValue, originalValue) {
-            return Number.isNaN(originalValue)
-              ? new Date()
-              : new Date(originalValue);
-          }),
-      })
-    );
-
-  public static getDatabaseSchema = yup.object().shape({
-    id: yup.number().required(),
-    name: yup.string().required(),
-    engine: yup.string().required(),
-    createdAt: yup
-      .date()
-      .required()
-      .transform(function (_castValue, originalValue) {
-        return Number.isNaN(originalValue)
-          ? new Date()
-          : new Date(originalValue);
-      }),
-  });
-
-  public static createDatabaseSchema = yup.object().shape({
-    id: yup.number().required(),
-    name: yup.string().required(),
-    engine: yup.string().required(),
-    createdAt: yup
-      .date()
-      .required()
-      .transform(function (_castValue, originalValue) {
-        return Number.isNaN(originalValue)
-          ? new Date()
-          : new Date(originalValue);
-      }),
-  });
-
   public static existsDatabaseSchema = yup.object().shape({
     exists: yup.boolean().required(),
-  });
-
-  public static deleteDatabaseSchema = yup.object().shape({
-    rows: yup.number().required(),
   });
 }
