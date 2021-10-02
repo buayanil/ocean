@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { DatabaseProperties, HostProperties } from "../../types/models";
 import { User, UserProperties } from "../../types/user";
-import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
+import { UpstreamCreateRoleProperties } from "../../types/role";
+import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
-import AppLayout from "../../layouts/AppLayout";
+import { RoleClient } from "../../api/roleClient";
+import { InvitationClient } from "../../api/invitationClient";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   deleteDatabaseStart,
   getDatabaseStart,
 } from "../../redux/slices/data/databaseSlice";
-import { createRoleForDatabaseStart, deleteRoleForDatabaseStart, getRolesForDatabaseStart } from "../../redux/slices/data/roleSlice";
+import AppLayout from "../../layouts/AppLayout";
 import { getUsersStart } from "../../redux/slices/data/userSlice";
 import TabList from "../../components/TabList";
 import ActionDropdown from "../../components/ActionDropdown";
@@ -26,9 +29,6 @@ import RoleList from "../../components/RoleList/RoleList";
 import Headline from "../../components/Headline";
 import UserSelector from "../../components/UserSelector/UserSelector";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
-import { InvitationClient } from "../../api/invitationClient";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import InvitationList from "../../components/InvitationList/InvitationList";
 
 const {
@@ -50,9 +50,6 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { loading, error, databases } = useAppSelector(
     (state) => state.data.database
   );
-  const { roles, isLoadingCreateRole } = useAppSelector(
-    (state) => state.data.role
-  );
   const { user, users } = useAppSelector((state) => state.data.user);
   // Tab Selection
   const [selectedId, setSelectedId] = useState<number>(1);
@@ -62,8 +59,6 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
   // Delete database process
   const [deleteDatabaseProcess, setDeleteDatabaseProcess] = useState<boolean>(false);
-  // Create role for database process
-  const [createRoleProcess, setCreateRoleProcess] = useState<boolean>(false);
   // Current database id
   const databaseId = Number.parseInt(id);
   // Current database
@@ -74,24 +69,33 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const otherUser = users.filter(_ => _.id !== user?.id)
   // Queries
   const queryClient = useQueryClient()
-  const {
-    data: invitations,
-  } = useQuery(["invitations", id], () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)), { cacheTime: 0 });
+  const { data: roles } = useQuery("roles", () => RoleClient.getRolesForDatabase(Number.parseInt(id)))
+  const { data: invitations } = useQuery(["invitations"], () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
   // Mutations
+  const createRoleMutation = useMutation((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["roles"])
+      setOpenCreateRoleModal(false);
+    }
+  })
+  const deleteRoleMutation = useMutation((id: number) => RoleClient.deleteRoleForDatabase(id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["roles"])
+    }
+  })
   const createInvitationMutation = useMutation((invitation: UpstreamCreateInvitationProperties) => InvitationClient.createInvitationForDatabase(invitation), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["invitations", id])
+      queryClient.invalidateQueries(["invitations"])
     },
   })
   const deleteInvitationMutation = useMutation((id: number) => InvitationClient.deleteInvitationForDatabase(id), {
     onSuccess: () => {
-      queryClient.invalidateQueries(["invitations", id])
+      queryClient.invalidateQueries(["invitations"])
     },
   })
 
   useEffect(() => {
     dispatch(getDatabaseStart(databaseId));
-    dispatch(getRolesForDatabaseStart(databaseId))
     dispatch(getUsersStart())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
@@ -111,29 +115,10 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  useEffect(() => {
-    // HINT: Role created
-    if (!isLoadingCreateRole && createRoleProcess) {
-      setCreateRoleProcess(false);
-      setOpenCreateRoleModal(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingCreateRole])
-
-
   const onDeleteDatabase = () => {
     setDeleteDatabaseProcess(true);
     dispatch(deleteDatabaseStart(Number.parseInt(id)));
   };
-
-  const onCreateRole = (value: UpstreamCreateRoleProperties) => {
-    setCreateRoleProcess(true);
-    dispatch(createRoleForDatabaseStart(value));
-  };
-
-  const onDeleteRole = (value: RoleProperties) => {
-    dispatch(deleteRoleForDatabaseStart(value.id))
-  }
 
   const onCreateOrDeleteInvitation = (value: UserProperties) => {
     if (invitations) {
@@ -174,14 +159,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
               <button
                 type="button"
                 className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                disabled={isLoadingCreateRole}
+                disabled={createRoleMutation.isLoading}
                 onClick={() => setOpenCreateRoleModal(true)}
               >
                 Add new user
               </button>
             </div>
           </div>
-          <RoleList roles={roles} onDelete={onDeleteRole} />
+          <RoleList roles={roles || []} onDelete={(role) => deleteRoleMutation.mutate(role.id)} />
         </div>
       );
     } else if (selectedId === 3) {
@@ -257,7 +242,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       <CreateRoleModal
         database={database}
         open={openCreateRoleModal}
-        onSubmit={(value) => onCreateRole(value)}
+        onSubmit={(value) => createRoleMutation.mutate(value)}
         onClose={() => setOpenCreateRoleModal(false)}
       />
     </AppLayout>
