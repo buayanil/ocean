@@ -2,31 +2,33 @@ import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import { AxiosError } from "axios";
 
 import { DatabaseProperties, HostProperties } from "../../types/models";
 import { User, UserProperties } from "../../types/user";
-import { UpstreamCreateRoleProperties } from "../../types/role";
+import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
-import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
-import { RoleClient } from "../../api/roleClient";
+import { tabs } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
+import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
 import { DatabaseClient } from "../../api/databaseClient";
 import { useAppSelector } from "../../redux/hooks";
-import AppLayout from "../../layouts/AppLayout";
-import TabList from "../../components/TabList";
-import ActionDropdown from "../../components/ActionDropdown";
-import DeleteModal from "../../components/DeleteModal";
-import OverviewCard from "../../components/OverviewCard";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
+import AppLayout from "../../layouts/AppLayout";
+import ActionDropdown from "../../components/ActionDropdown";
 import Alert from "../../components/Alert";
-import RoleList from "../../components/RoleList/RoleList";
-import Headline from "../../components/Headline";
-import UserSelector from "../../components/UserSelector/UserSelector";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
+import DeleteModal from "../../components/DeleteModal";
+import Headline from "../../components/Headline";
 import InvitationList from "../../components/InvitationList/InvitationList";
+import Notification from "../../components/Notification/Notification";
+import OverviewCard from "../../components/OverviewCard";
+import RoleList from "../../components/RoleList/RoleList";
+import TabList from "../../components/TabList";
+import UserSelector from "../../components/UserSelector/UserSelector";
 
 const {
   REACT_APP_POSTGRESQL_HOSTNAME,
@@ -48,6 +50,15 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Modals
   const [openDeleteDatabaseModal, setDeleteDatabaseOpenModal] = useState<boolean>(false);
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
+  // Notifications
+  const [showUserAddSuccessNotification, setShowUserAddSuccessNotification] = useState<boolean>(false);
+  const [showUserAddFailedNotification, setShowUserAddFailedNotification] = useState<boolean>(false);
+  const [showUserDeleteSuccessNotification, setShowUserDeleteSuccessNotification] = useState<boolean>(false);
+  const [showUserDeleteFailedNotification, setShowUserDeleteFailedNotification] = useState<boolean>(false);
+  const [showInvitationAddSuccessNotification, setShowInvitationAddSuccessNotification] = useState<boolean>(false);
+  const [showInvitationAddFailedNotification, setShowInvitationAddFailedNotification] = useState<boolean>(false);
+  const [showInvitationDeleteSuccessNotification, setShowInvitationDeleteSuccessNotification] = useState<boolean>(false);
+  const [showInvitationDeleteFailedNotification, setShowInvitationDeleteFailedNotification] = useState<boolean>(false);
   // Queries
   const queryClient = useQueryClient()
   const { data: database } = useQuery(["database", id], () => DatabaseClient.getDatabase(Number.parseInt(id)))
@@ -55,33 +66,55 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { data: invitations } = useQuery("invitations", () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
   const { data: users } = useQuery("users", () => UserClient.getUsers())
   // Mutations
-  const createRoleMutation = useMutation((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
+  const createRoleMutation = useMutation<RoleProperties, AxiosError, UpstreamCreateRoleProperties>((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
     onSuccess: () => {
       queryClient.invalidateQueries("roles")
       setOpenCreateRoleModal(false);
+      setShowUserAddSuccessNotification(true)
+    },
+    onError: (_value) => {
+      queryClient.invalidateQueries("roles")
+      setOpenCreateRoleModal(false);
+      setShowUserAddFailedNotification(true)
     }
   })
   const deleteRoleMutation = useMutation((id: number) => RoleClient.deleteRoleForDatabase(id), {
     onSuccess: () => {
       queryClient.invalidateQueries("roles")
+      setShowUserDeleteSuccessNotification(true)
+    },
+    onError: (_value) => {
+      queryClient.invalidateQueries("roles")
+      setShowUserDeleteFailedNotification(true)
     }
   })
   const createInvitationMutation = useMutation((invitation: UpstreamCreateInvitationProperties) => InvitationClient.createInvitationForDatabase(invitation), {
     onSuccess: () => {
       queryClient.invalidateQueries("invitations")
+      setShowInvitationAddSuccessNotification(true)
     },
+    onError: () => {
+      queryClient.invalidateQueries("invitations")
+      setShowInvitationAddFailedNotification(true)
+    }
   })
   const deleteInvitationMutation = useMutation((id: number) => InvitationClient.deleteInvitationForDatabase(id), {
     onSuccess: () => {
       queryClient.invalidateQueries("invitations")
+      setShowInvitationDeleteSuccessNotification(true)
     },
+    onError: () => {
+      queryClient.invalidateQueries("invitations")
+      setShowInvitationDeleteFailedNotification(true)
+    }
   })
   const deleteDatabaseMutation = useMutation((id: number) => DatabaseClient.deleteDatabase(id), {
     onSuccess: () => {
       setDeleteDatabaseOpenModal(false);
       queryClient.invalidateQueries("databases")
       history.push("/databases");
-    }
+    },
+
   })
   // Other users except our user
   const otherUsers = (users || []).filter(_ => _.id !== user?.id)
@@ -94,6 +127,22 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       }
     }
   }
+
+  const getHostFor = (
+    database: DatabaseProperties
+  ): HostProperties | undefined => {
+    if (database.engine === "P") {
+      return {
+        hostname: REACT_APP_POSTGRESQL_HOSTNAME || "",
+        port: Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432"),
+      };
+    } else if (database.engine === "M") {
+      return {
+        hostname: REACT_APP_MONGODB_HOSTNAME || "",
+        port: Number.parseInt(REACT_APP_MONGODB_PORT || "27017"),
+      };
+    }
+  };
 
   const renderTabContent = (): React.ReactNode => {
     if (selectedId === 1) {
@@ -131,7 +180,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       );
     } else if (selectedId === 3) {
       return <div className="z-50">
-        <UserSelector 
+        <UserSelector
           users={otherUsers}
           selectedUserIds={Invitation.getUserIds(invitations)}
           onSelect={(value) => createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id })}
@@ -147,21 +196,83 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     }
   };
 
-  const getHostFor = (
-    database: DatabaseProperties
-  ): HostProperties | undefined => {
-    if (database.engine === "P") {
-      return {
-        hostname: REACT_APP_POSTGRESQL_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432"),
-      };
-    } else if (database.engine === "M") {
-      return {
-        hostname: REACT_APP_MONGODB_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_MONGODB_PORT || "27017"),
-      };
-    }
-  };
+  const renderModals = (): React.ReactElement => {
+    return (
+      <div>
+        <DeleteModal
+          open={openDeleteDatabaseModal}
+          modalContent={deleteModalContent}
+          onSubmit={() => deleteDatabaseMutation.mutate(Number.parseInt(id))}
+          onClose={() => setDeleteDatabaseOpenModal(false)}
+        />
+        <CreateRoleModal
+          database={database}
+          open={openCreateRoleModal}
+          onSubmit={(value) => createRoleMutation.mutate(value)}
+          onClose={() => setOpenCreateRoleModal(false)}
+        />
+      </div>
+    )
+  }
+
+  const renderNotifications = (): React.ReactElement => {
+    return (
+      <div>
+        <Notification
+          show={showUserAddSuccessNotification}
+          title="Successfully created!"
+          description="User was added to the database"
+          onClose={() => setShowUserAddSuccessNotification(false)}
+        />
+        <Notification
+          show={showUserAddFailedNotification}
+          title="Something went wrong :("
+          description="User was not added to the database"
+          variant="error"
+          onClose={() => setShowUserAddFailedNotification(false)}
+        />
+        <Notification
+          show={showUserDeleteSuccessNotification}
+          title="Successfully deleted!"
+          description="User was deleted"
+          onClose={() => setShowUserDeleteSuccessNotification(false)}
+        />
+        <Notification
+          show={showUserDeleteFailedNotification}
+          title="Something went wrong :("
+          description="User was not deleted from the database"
+          variant="error"
+          onClose={() => setShowUserDeleteFailedNotification(false)}
+        />
+        <Notification
+          show={showInvitationAddSuccessNotification}
+          title="Successfully created!"
+          description="Invitation was added to the database"
+          onClose={() => setShowInvitationAddSuccessNotification(false)}
+        />
+        <Notification
+          show={showInvitationAddFailedNotification}
+          title="Something went wrong :("
+          description="Invitation was not added to the database"
+          variant="error"
+          onClose={() => setShowInvitationAddFailedNotification(false)}
+        />
+        <Notification
+          show={showInvitationDeleteSuccessNotification}
+          title="Successfully delete!"
+          description="Invitation was deleted to the database"
+          onClose={() => setShowInvitationDeleteSuccessNotification(false)}
+        />
+        <Notification
+          show={showInvitationDeleteFailedNotification}
+          title="Something went wrong :("
+          description="Invitation was not deleted from the database"
+          variant="error"
+          onClose={() => setShowInvitationDeleteFailedNotification(false)}
+        />
+      </div>
+    )
+  }
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
@@ -196,19 +307,8 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         onSelect={(value) => setSelectedId(value)}
       />
       <div className="mt-4">{renderTabContent()}</div>
-      {/* Modals*/}
-      <DeleteModal
-        open={openDeleteDatabaseModal}
-        modalContent={deleteModalContent}
-        onSubmit={() => deleteDatabaseMutation.mutate(Number.parseInt(id))}
-        onClose={() => setDeleteDatabaseOpenModal(false)}
-      />
-      <CreateRoleModal
-        database={database}
-        open={openCreateRoleModal}
-        onSubmit={(value) => createRoleMutation.mutate(value)}
-        onClose={() => setOpenCreateRoleModal(false)}
-      />
+      {renderModals()}
+      {renderNotifications()}
     </AppLayout>
   );
 };
