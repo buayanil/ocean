@@ -8,25 +8,26 @@ import { User, UserProperties } from "../../types/user";
 import { UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
-import { tabs } from "../../constants/tabs";
 import { deleteModalContent } from "../../constants/modals";
-import { RoleClient } from "../../api/roleClient";
+import { tabs } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
+import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
 import { DatabaseClient } from "../../api/databaseClient";
 import { useAppSelector } from "../../redux/hooks";
-import AppLayout from "../../layouts/AppLayout";
-import TabList from "../../components/TabList";
-import ActionDropdown from "../../components/ActionDropdown";
-import DeleteModal from "../../components/DeleteModal";
-import OverviewCard from "../../components/OverviewCard";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
+import AppLayout from "../../layouts/AppLayout";
+import ActionDropdown from "../../components/ActionDropdown";
 import Alert from "../../components/Alert";
-import RoleList from "../../components/RoleList/RoleList";
-import Headline from "../../components/Headline";
-import UserSelector from "../../components/UserSelector/UserSelector";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
+import DeleteModal from "../../components/DeleteModal";
+import Headline from "../../components/Headline";
 import InvitationList from "../../components/InvitationList/InvitationList";
+import Notification from "../../components/Notification/Notification";
+import OverviewCard from "../../components/OverviewCard";
+import RoleList from "../../components/RoleList/RoleList";
+import TabList from "../../components/TabList";
+import UserSelector from "../../components/UserSelector/UserSelector";
 
 const {
   REACT_APP_POSTGRESQL_HOSTNAME,
@@ -48,6 +49,8 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Modals
   const [openDeleteDatabaseModal, setDeleteDatabaseOpenModal] = useState<boolean>(false);
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
+  const [showUserAddedNotification, setShowUserAddedNotification] = useState<boolean>(false);
+  const [showInvitationAddedNotification, setShowInvitationAddedNotification] = useState<boolean>(false);
   // Queries
   const queryClient = useQueryClient()
   const { data: database } = useQuery(["database", id], () => DatabaseClient.getDatabase(Number.parseInt(id)))
@@ -59,6 +62,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     onSuccess: () => {
       queryClient.invalidateQueries("roles")
       setOpenCreateRoleModal(false);
+      setShowUserAddedNotification(true)
     }
   })
   const deleteRoleMutation = useMutation((id: number) => RoleClient.deleteRoleForDatabase(id), {
@@ -69,6 +73,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const createInvitationMutation = useMutation((invitation: UpstreamCreateInvitationProperties) => InvitationClient.createInvitationForDatabase(invitation), {
     onSuccess: () => {
       queryClient.invalidateQueries("invitations")
+      setShowInvitationAddedNotification(true)
     },
   })
   const deleteInvitationMutation = useMutation((id: number) => InvitationClient.deleteInvitationForDatabase(id), {
@@ -131,7 +136,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       );
     } else if (selectedId === 3) {
       return <div className="z-50">
-        <UserSelector 
+        <UserSelector
           users={otherUsers}
           selectedUserIds={Invitation.getUserIds(invitations)}
           onSelect={(value) => createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id })}
@@ -208,6 +213,19 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         open={openCreateRoleModal}
         onSubmit={(value) => createRoleMutation.mutate(value)}
         onClose={() => setOpenCreateRoleModal(false)}
+      />
+      {/* Notifications */}
+      <Notification 
+        show={showUserAddedNotification} 
+        title="Successfully created!"
+        description="User was added to the database"
+        onClose={() => setShowUserAddedNotification(false)} 
+      />
+      <Notification 
+        show={showInvitationAddedNotification} 
+        title="Successfully created!"
+        description="Invitation was added to the database"
+        onClose={() => setShowInvitationAddedNotification(false)} 
       />
     </AppLayout>
   );
