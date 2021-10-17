@@ -1,16 +1,14 @@
 import React, { Suspense } from "react";
-import { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Redirect,
   Route,
   Switch,
 } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 
 import SignInView from "./SignInView";
 import LoadingView from "./LoadingView";
-import { getUserStart } from "../redux/slices/data/userSlice";
 
 const OverviewView = React.lazy(() => import("./OverviewView"));
 const DatabasesView = React.lazy(() => import("./databases/DatabasesView"));
@@ -26,15 +24,7 @@ const PageNotFoundView = React.lazy(() => import("./PageNotFoundView"));
 
 const RootView: React.FC = () => {
   const { token } = useAppSelector((state) => state.session.session);
-  const { user } = useAppSelector((state) => state.data.user);
-  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (token && user === undefined) {
-      dispatch(getUserStart());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
 
   return (
     <Router>

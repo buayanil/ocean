@@ -10,7 +10,7 @@ export interface TabProperties {
 export interface TabListProps {
     tabs: ReadonlyArray<TabProperties>;
     selectedId: number;
-    onSelect: (id: number) => void;
+    onSelect?: (id: number) => void;
 }
 
 
@@ -33,7 +33,7 @@ const TabList: React.FC<TabListProps> = ({ tabs, selectedId, onSelect }) => {
                             'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer'
                         )}
                         aria-current={tab.id === selectedId ? 'page' : undefined}
-                        onClick={() => onSelect(tab.id)}
+                        onClick={() => onSelect && onSelect(tab.id)}
                     >
                         {tab.name}
                     </div>
