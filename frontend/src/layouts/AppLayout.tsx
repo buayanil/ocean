@@ -2,11 +2,13 @@ import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from "@heroicons/react/solid";
+import { useQuery } from "react-query";
 
 import { UserProperties } from "../types/user";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/session/sessionSlice";
 import { navigation, SettingsNavigation } from "../constants/menu.";
+import { UserClient } from "../api/userClient";
 import CreateDropdown from "../components/CreateDropdown";
 
 function classNames(...classes: string[]) {
@@ -22,7 +24,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   selectedNavigation,
 }) => {
-  const { loading, user } = useAppSelector((state) => state.data.user);
+  const userQuery = useQuery("user", () => UserClient.getUser(), { staleTime: 1000_1000 })
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -254,10 +256,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   <>
                     <div>
                       <Menu.Button
-                        disabled={loading}
+                        disabled={userQuery.isFetching}
                         className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
                       >
-                        {loading ? (
+                        {userQuery.isFetching ? (
                           <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" />
                         ) : (
                           <svg className="rounded-full" height="36" width="36">
@@ -275,18 +277,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                               x="17"
                               y="23"
                             >
-                              {getAbbreviationFor(user)}
+                              {getAbbreviationFor(userQuery.data)}
                             </text>
                           </svg>
                         )}
-                        {loading ? (
+                        {userQuery.isFetching ? (
                           <span className="animate-pulse hidden ml-3 lg:block">
                             <div className="rounded-md w-24 h-8 bg-gray-200" />
                           </span>
                         ) : (
                           <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
                             <span className="sr-only">Open user menu for </span>
-                            {user && user.firstName}
+                            {userQuery.data && userQuery.data.firstName}
                           </span>
                         )}
                         <ChevronDownIcon

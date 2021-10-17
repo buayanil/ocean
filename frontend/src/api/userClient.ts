@@ -14,29 +14,23 @@ export class UserClient {
   /**
    * Get user data
    */
-  public static getUser = () => axiosInstance.get<any>("/user");
+  public static getUser = async (): Promise<UserProperties> => {
+    const { data } = await axiosInstance.get<UserProperties>("/user");
+    return data;
+  };
 
   /**
    * Search for users
    */
   public static getUsers = async (): Promise<UserProperties[]> => {
-    const { data } = await axiosInstance.get<any>("/users");
+    const { data } = await axiosInstance.get<UserProperties[]>("/users");
     return data;
-  }
+  };
 }
 
 export class UserValidation {
   public static tokenSchema = yup.object().shape({
     token: yup.string().required(),
-  });
-
-  public static userSchema = yup.object().shape({
-    id: yup.number().required(),
-    username: yup.string().required(),
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
-    mail: yup.string().required(),
-    employeeType: yup.string().required(),
   });
 
   public static loginSchema = yup.object().shape({

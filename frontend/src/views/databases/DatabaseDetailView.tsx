@@ -10,12 +10,11 @@ import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { deleteModalContent } from "../../constants/modals";
-import { tabs } from "../../constants/tabs";
+import { detailViewTabs } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
 import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
 import { DatabaseClient } from "../../api/databaseClient";
-import { useAppSelector } from "../../redux/hooks";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
 import AppLayout from "../../layouts/AppLayout";
 import ActionDropdown from "../../components/ActionDropdown";
@@ -44,7 +43,6 @@ interface DatabaseDetailViewProps { }
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const { user } = useAppSelector((state) => state.data.user);
   // Tab Selection
   const [selectedId, setSelectedId] = useState<number>(1);
   // Modals
@@ -65,6 +63,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const { data: roles } = useQuery("roles", () => RoleClient.getRolesForDatabase(Number.parseInt(id)))
   const { data: invitations } = useQuery("invitations", () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
   const { data: users } = useQuery("users", () => UserClient.getUsers())
+  const { data: user } = useQuery("user", () => UserClient.getUser())
   // Mutations
   const createRoleMutation = useMutation<RoleProperties, AxiosError, UpstreamCreateRoleProperties>((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
     onSuccess: () => {
@@ -302,7 +301,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       </div>
       <Alert errorMessage={undefined} />
       <TabList
-        tabs={tabs}
+        tabs={detailViewTabs}
         selectedId={selectedId}
         onSelect={(value) => setSelectedId(value)}
       />
