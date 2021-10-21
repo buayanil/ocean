@@ -1,15 +1,33 @@
 package services
 
-import forms.CreateRoleFormData
-import models.{ErrorMessage, Instance, Invitation, Role, User}
+import forms.{CreateInstanceFormData, CreateRoleFormData}
+import models.{ErrorMessage, Instance, Role, User}
 import play.api.Logger
 
+import java.sql.Timestamp
+import java.time.Instant
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 
 class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, roleService: RoleService, instanceService: InstanceService, invitationService: InvitationService, userService: UserService) {
 
   val logger: Logger = Logger(this.getClass)
+
+  def addInstance(createInstanceFormData: CreateInstanceFormData, user: User): Either[List[ErrorMessage], Instance] = {
+    val localTimestamp = Timestamp.from(Instant.now)
+    val localInstance = Instance(0, user.id, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
+    instanceService.addInstance(localInstance) match {
+      case Left(errorMessage) => Left(List(errorMessage))
+      case Right(instance) if instance.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
+        pgClusterService.createDatabase(instance.name, user.username) match {
+          case Left(errorMessage) => Left(List(errorMessage))
+          case Right(_) => Right(instance)
+        }
+      case Right(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
+        // TODO: NotImplementedYet
+        Right(instance)
+    }
+  }
 
   def deleteDatabase(instanceId: Long, user: User): Either[List[ErrorMessage], Int] = {
     instanceService.getInstance(instanceId, user.id) match {

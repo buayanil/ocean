@@ -2,9 +2,7 @@ package models
 
 import java.sql.Timestamp
 import play.api.libs.json.{Json, OWrites}
-import play.api.data.Form
-import play.api.data.Forms.mapping
-import play.api.data.Forms._
+
 
 final case class Instance(id: Long = 0, userId: Long, name: String, engine: String, createdAt: Timestamp)
 
