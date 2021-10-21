@@ -1,6 +1,5 @@
 package services
 
-import forms.CreateRoleFormData
 import org.specs2.mutable._
 import org.specs2.mock.Mockito
 import java.sql.Timestamp
@@ -50,28 +49,10 @@ class RoleServiceSpec extends Specification with Mockito {
   }
 
   "RoleService#addRole" should {
-    "return an error if the user is not the owner of the database" in {
-      // Arrange
-      val user = User(1, "", "", "", "", "")
-      val roleRepository = mock[RoleRepository]
-      val instanceService = mock[InstanceService]
-      val createRoleFormData = CreateRoleFormData(1, "")
-      instanceService.getInstance(any[Long], any[Long]).returns(Left(ErrorMessage("", "")))
-      val roleService = new RoleService(roleRepository, instanceService)
-
-      // Act
-      val actual = roleService.addRole(createRoleFormData, user)
-
-      // Assert
-      (actual.isLeft must be).equalTo(true)
-    }
-
     "returns the added role" in {
       // Arrange
-      val user = User(1, "", "", "", "", "")
       val instance = Instance(1, 1, "", "", Timestamp.from(Instant.now))
       val role = Role(1, 1, "", "")
-      val createRoleFormData = CreateRoleFormData(1, "")
       val roleRepository = mock[RoleRepository]
       roleRepository.addRole(any[Role]).returns(Future.successful(Success(role)))
       val instanceService = mock[InstanceService]
@@ -79,7 +60,7 @@ class RoleServiceSpec extends Specification with Mockito {
       val roleService = new RoleService(roleRepository, instanceService)
 
       // Act
-      val actual = roleService.addRole(createRoleFormData, user)
+      val actual = roleService.addRole(Role(1, 1, "name", "password"))
 
       // Assert
       (actual.isRight must be).equalTo(true)

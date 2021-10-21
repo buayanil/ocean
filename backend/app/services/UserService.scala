@@ -7,7 +7,7 @@ import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
 import repositories.UserRepository
-import models.{ErrorMessage, LdapUser, User}
+import models.{ErrorMessage, User}
 
 
 class UserService @Inject()(ldapService: LdapService, tokenService: TokenService, userRepository: UserRepository, pgClusterService: PgClusterService) {
@@ -22,7 +22,7 @@ class UserService @Inject()(ldapService: LdapService, tokenService: TokenService
       case Right(ldapUser) => Await.result(userRepository.getByUsername(ldapUser.username), Duration.Inf) match {
         case Some(user) => Right(tokenService.encode(user.username))
         case None => Await.result(
-          userRepository.addUser(getUserFor(ldapUser)), Duration.Inf) match {
+          userRepository.addUser(ldapUser), Duration.Inf) match {
           case user =>
             pgClusterService.createRole(user.username, pgClusterService.LDAP_GROUP_NAME) match {
               case Left(errorMessage: ErrorMessage) =>
@@ -33,10 +33,6 @@ class UserService @Inject()(ldapService: LdapService, tokenService: TokenService
         }
       }
     }
-  }
-
-  private def getUserFor(ldapUser: LdapUser): User = {
-    User(0L, ldapUser.username, ldapUser.firstName, ldapUser.lastName, ldapUser.mail, ldapUser.employeeType)
   }
 
   def getUserById(userId: Long): Either[ErrorMessage, User] = {

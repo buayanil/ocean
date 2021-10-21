@@ -4,7 +4,7 @@ import org.specs2.mutable._
 import org.specs2.mock.Mockito
 import scala.concurrent.Future
 
-import models.{ErrorMessage, LdapUser, User}
+import models.{ErrorMessage, User}
 import repositories.UserRepository
 
 
@@ -14,7 +14,7 @@ class UserServiceSpec extends Specification with Mockito {
     "return a token if the user is valid and already in the database" in {
       // Arrange
       val user = User(id=1, "username", "firstName", "lastName", "mail", "employeeType")
-      val ldapUser = LdapUser("username", "firstName", "lastName", "mail", "employeeType")
+      val ldapUser = User(0L, "username", "firstName", "lastName", "mail", "employeeType")
       val userRepository = mock[UserRepository]
       userRepository.getByUsername(any[String]).returns(Future.successful(Some(user)))
       val ldapService = mock[LdapService]
@@ -35,7 +35,7 @@ class UserServiceSpec extends Specification with Mockito {
     "return a token if the user is valid and needs to be created" in {
       // Arrange
       val user = User(id=1, "username", "firstName", "lastName", "mail", "employeeType")
-      val ldapUser = LdapUser("username", "firstName", "lastName", "mail", "employeeType")
+      val ldapUser = User(0L, "username", "firstName", "lastName", "mail", "employeeType")
       val userRepository = mock[UserRepository]
       userRepository.getByUsername(any[String]).returns(Future.successful(None))
       userRepository.addUser(any[User]).returns(Future.successful(user))

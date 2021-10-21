@@ -9,21 +9,21 @@ import org.apache.directory.api.ldap.model.message.SearchScope
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException
 import org.apache.directory.ldap.client.api.{LdapConnectionConfig, LdapNetworkConnection}
 import play.api.{Configuration, Logger}
-import scala.collection.mutable.ListBuffer
 
-import models.{ErrorMessage, LdapUser}
+import scala.collection.mutable.ListBuffer
+import models.{ErrorMessage, User}
 
 
 class LdapService @Inject()(config: Configuration) {
 
   val logger: Logger = Logger(this.getClass)
 
-  def authenticate(username: String, password: String): Either[List[ErrorMessage], LdapUser] = {
+  def authenticate(username: String, password: String): Either[List[ErrorMessage], User] = {
     val ldapConnectionConfig = getLdapConnectionConfig(username, password)
     ldapConnectionConfig match {
       case Right(config) => fetchLdapRole(config, username) match {
-        case Right(entry) => getProfileFor(entry, username) match {
-          case Right(ldapUser) => Right(ldapUser)
+        case Right(entry) => getUserForEntry(entry, username) match {
+          case Right(user) => Right(user)
           case Left(error) =>
             logger.error(error.toString)
             Left(List(error))
@@ -38,13 +38,13 @@ class LdapService @Inject()(config: Configuration) {
     }
   }
 
-  def getProfileFor(entry: Entry, username: String): Either[ErrorMessage, LdapUser] = {
+  def getUserForEntry(entry: Entry, username: String): Either[ErrorMessage, User] = {
     try {
       val firstName = getStringWithFallBack(entry, "givenName", "Undefined")
       val lastName = getStringWithFallBack(entry, "sn", "Undefined")
       val mail = getStringWithFallBack(entry, "mail", "")
       val employeeType = getStringWithFallBack(entry, "employeetype", "Uncategorized")
-      Right(LdapUser(username, firstName, lastName, mail, employeeType))
+      Right(User(0L, username, firstName, lastName, mail, employeeType))
     } catch {
       case e: LdapInvalidAttributeValueException =>
         Left(ErrorMessage(ErrorMessage.CODE_LDAP_ENTRY_MISSING, ErrorMessage.MESSAGE_LDAP_ENTRY_MISSING, developerMessage=e.getMessage))
