@@ -40,14 +40,25 @@ class LdapService @Inject()(config: Configuration) {
 
   def getProfileFor(entry: Entry, username: String): Either[ErrorMessage, LdapUser] = {
     try {
-      val firstName = entry.get("givenName").getString
-      val lastName = entry.get("sn").getString
-      val mail = entry.get("mail").getString
-      val employeeType = entry.get("employeetype").getString
+      val firstName = getStringWithFallBack(entry, "givenName", "Undefined")
+      val lastName = getStringWithFallBack(entry, "sn", "Undefined")
+      val mail = getStringWithFallBack(entry, "mail", "")
+      val employeeType = getStringWithFallBack(entry, "employeetype", "Uncategorized")
       Right(LdapUser(username, firstName, lastName, mail, employeeType))
     } catch {
       case e: LdapInvalidAttributeValueException =>
         Left(ErrorMessage(ErrorMessage.CODE_LDAP_ENTRY_MISSING, ErrorMessage.MESSAGE_LDAP_ENTRY_MISSING, developerMessage=e.getMessage))
+    }
+  }
+
+  private def getStringWithFallBack(entry: Entry, key: String, fallBack: String): String = {
+    try {
+      entry.get(key).getString
+    } catch {
+      case e: NullPointerException =>
+        val errorMessage = ErrorMessage(ErrorMessage.CODE_LDAP_ENTRY_MISSING, ErrorMessage.MESSAGE_LDAP_ENTRY_MISSING, developerMessage=e.getMessage)
+        logger.warn(errorMessage.toString)
+        fallBack
     }
   }
 
