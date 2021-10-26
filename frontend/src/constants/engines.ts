@@ -13,7 +13,7 @@ export const engineOptions: ReadonlyArray<EngineOption> = [
   },
   {
     id: 2,
-    label: "MongoDB (in Arbeit)",
+    label: "MongoDB (in Arbeit :))",
     value: "M",
     imageSrc: mongodbLogo,
     alt: "mongodb logo",
