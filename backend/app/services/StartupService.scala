@@ -8,7 +8,7 @@ import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
 import models.ErrorMessage
-import repositories.PgClusterRepository
+import repositories.cluster.PgClusterRepository
 
 
 class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClusterRepository) {

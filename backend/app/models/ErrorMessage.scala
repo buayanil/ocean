@@ -117,6 +117,13 @@ object ErrorMessage {
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "Could not create the role. Unknown error."
   val MESSAGE_PG_CLUSTER_DELETE_ROLE_FAILED = "Could not delete the role."
 
+  // MongoDB Cluster
+  val CODE_MONGODB_CLUSTER_CREATED_DATABASE_FAILED = "pg_cluster/create-database-failed"
+  val CODE_MONGODB_CLUSTER_CREATED_USER = "pg_cluster/create-user-exists"
+
+  val MESSAGE_MONGODB_CLUSTER_CREATED_DATABASE_FAILED = "Could not create the database."
+  val MESSAGE_MONGODB_CLUSTER_CREATED_USER = "Could not create the user."
+
   // Startup
   val CODE_STARTUP_LDAP_ROLE_CONFIG_MISSING = "startup/ldap-role-config-missing"
   val CODE_STARTUP_LDAP_ROLE_EXIST_FAILED = "startup/ldap-role-exists-failed"

@@ -5,6 +5,7 @@ import play.api.Logger
 
 import models.{ErrorMessage, Invitation, User}
 import forms.CreateInvitationFormData
+import services.cluster.PgClusterService
 
 
 class InvitationManagerService @Inject()(pgClusterService: PgClusterService, invitationService: InvitationService, instanceService: InstanceService, userService: UserService) {

@@ -1,15 +1,16 @@
 package services
 
-import forms.{CreateInstanceFormData, CreateRoleFormData}
-import models.{ErrorMessage, Instance, Role, User}
-import play.api.Logger
-
 import java.sql.Timestamp
 import java.time.Instant
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 
-class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, roleService: RoleService, instanceService: InstanceService, invitationService: InvitationService, userService: UserService) {
+import forms.CreateInstanceFormData
+import models.{ErrorMessage, Instance, Role, User}
+import play.api.Logger
+import services.cluster.{MongoDBClusterService, PgClusterService}
+
+class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, mongoDBClusterService: MongoDBClusterService, roleService: RoleService, instanceService: InstanceService, invitationService: InvitationService, userService: UserService) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -24,8 +25,10 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, roleS
           case Right(_) => Right(instance)
         }
       case Right(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
-        // TODO: NotImplementedYet
-        Right(instance)
+        mongoDBClusterService.createDatabase(instance.name) match {
+          case Left(errorMessage) => Left(List(errorMessage))
+          case Right(_) => Right(instance)
+        }
     }
   }
 
@@ -106,35 +109,6 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, roleS
     errors match {
       case ListBuffer() => Right(1)
       case _ => Left(errors.toList)
-    }
-  }
-
-  def addRole(createRoleFormData: CreateRoleFormData, user: User): Either[List[ErrorMessage], Role] = {
-    //  Check if user is the owner of the database
-    instanceService.getInstance(createRoleFormData.instanceId, user.id) match {
-      case Left(value) => Left(List(value))
-      case Right(instance) =>
-        if (createRoleFormData.roleName.startsWith(instance.name)) {
-          val rolePassword = roleService.generateRolePassword()
-          val localRole = Role(0, createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
-          roleService.addRole(localRole) match {
-            case Left(value) => Left(List(value))
-            case Right(role) => pgClusterService.createSecuredRole(role.name, pgClusterService.GENERIC_GROUP_NAME, rolePassword) match {
-              case Left(value) => Left(List(value))
-              case Right(value) => pgClusterService.grantDatabaseAccess(role.name, instance.name) match {
-                case Left(value) => Left(List(value))
-                case Right(value) => Right(role)
-              }
-            }
-          }
-        } else {
-          val errorMessage = ErrorMessage(
-            ErrorMessage.CODE_ROLE_CREATE_INVALID_NAME,
-            ErrorMessage.MESSAGE_ROLE_CREATE_INVALID_NAME
-          )
-          logger.error(errorMessage.toString)
-          Left(List(errorMessage))
-        }
     }
   }
 

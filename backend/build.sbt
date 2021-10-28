@@ -22,4 +22,5 @@ libraryDependencies ++= Seq(
   "com.github.jwt-scala" %% "jwt-core" % "8.0.2",
   "net.logstash.logback" % "logstash-logback-encoder" % "6.6",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.2",
+  "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0",
 )
