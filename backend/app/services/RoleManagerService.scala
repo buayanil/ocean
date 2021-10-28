@@ -3,6 +3,7 @@ package services
 
 import javax.inject.Inject
 import play.api.Logger
+import scala.collection.mutable.ListBuffer
 
 import forms.CreateRoleFormData
 import models.{ErrorMessage, Instance, Role, User}
@@ -48,6 +49,39 @@ class RoleManagerService @Inject()(pgClusterService: PgClusterService,
           logger.error(errorMessage.toString)
           Left(List(errorMessage))
         }
+    }
+  }
+
+  def deleteRole(roleId: Long, user: User): Either[List[ErrorMessage], Int] = {
+    roleService.getRole(roleId) match {
+      case Left(value) => Left(List(value))
+      case Right(role) => instanceService.getInstance(role.instanceId, user.id) match {
+        case Left(value) => Left(List(value))
+        case Right(instance) =>
+          val errors = ListBuffer[ErrorMessage]()
+          instance.engine match {
+            case engine if engine == Instance.ENGINE_TYPE_POSTGRESQL =>
+              // Delete from cluster
+              pgClusterService.deleteRole(role.name) match {
+                case Left(value) => errors += value
+                case Right(value) => Right(value)
+              }
+            case engine if engine == Instance.ENGINE_TYPE_MONGODB =>
+              mongoDBClusterService.deleteUser(instance.name, role.name) match {
+                case Left(value) => errors += value
+                case Right(value) => Right(value)
+              }
+          }
+          // Delete from orm
+          roleService.deleteRole(roleId) match {
+            case Left(value) => errors += value
+            case Right(value) => Right(value)
+          }
+          errors match {
+            case ListBuffer() => Right(1)
+            case _ => Left(errors.toList)
+          }
+      }
     }
   }
 

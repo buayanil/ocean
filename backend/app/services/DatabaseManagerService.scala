@@ -112,26 +112,4 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, mongo
     }
   }
 
-  def deleteRole(roleId: Long): Either[List[ErrorMessage], Int] = {
-    roleService.getRole(roleId) match {
-      case Left(value) => Left(List(value))
-      case Right(role) =>
-        val errors = ListBuffer[ErrorMessage]()
-        // Delete from cluster
-        pgClusterService.deleteRole(role.name) match {
-          case Left(value) => errors += value
-          case Right(value) => Right(value)
-        }
-        // Delete from orm
-        roleService.deleteRole(roleId) match {
-          case Left(value) => errors += value
-          case Right(value) => Right(value)
-        }
-        errors match {
-          case ListBuffer() => Right(1)
-          case _ => Left(errors.toList)
-        }
-    }
-  }
-
 }

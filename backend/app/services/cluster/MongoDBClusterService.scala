@@ -42,5 +42,18 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
     }
   }
 
+  def deleteUser(databaseName: String, username: String): Either[ErrorMessage, Boolean] = {
+    Await.result(mongoDBRepository.deleteUser(databaseName, username), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_MONGODB_DELETED_USER_FAILED,
+          ErrorMessage.MESSAGE_MONGODB_DELETE_USER_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
 
 }

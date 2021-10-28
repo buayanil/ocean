@@ -12,7 +12,11 @@ import models.{ErrorResponse, ExistsRoleResponse, RoleDeletedResponse}
 import services.{DatabaseManagerService, RoleManagerService, RoleService}
 
 
-class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction, roleService: RoleService, databaseManagerService: DatabaseManagerService, roleManagerService: RoleManagerService) extends AbstractController(cc) {
+class RoleController @Inject()(cc: ControllerComponents,
+                               userAction: UserAction,
+                               roleService: RoleService,
+                               databaseManagerService: DatabaseManagerService,
+                               roleManagerService: RoleManagerService) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -68,7 +72,7 @@ class RoleController @Inject()(cc: ControllerComponents, userAction: UserAction,
   }
 
   def deleteRole(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-    databaseManagerService.deleteRole(id) match {
+    roleManagerService.deleteRole(id, request.user) match {
       case Left(error) =>
         logger.error(error.toString)
         BadRequest(Json.toJson(ErrorResponse(error)))

@@ -44,9 +44,7 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
       }
   }
 
-
   def createUser(databaseName: String, username: String, password: String): Future[Try[Boolean]] = {
-    val database = mongoClient.getDatabase(databaseName)
     val readWriteRoleDoc = Document(
       "role" -> BsonString("readWrite"),
       "db" -> BsonString(databaseName)
@@ -56,7 +54,19 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
       "pwd" -> BsonString(password),
       "roles" -> BsonArray(readWriteRoleDoc)
     )
-    database.runCommand(createUserDoc)
+    processCommand(databaseName, createUserDoc)
+  }
+
+  def deleteUser(databaseName: String, username: String): Future[Try[Boolean]] = {
+    val dropUserDoc = Document(
+      "dropUser" -> BsonString(username)
+    )
+    processCommand(databaseName, dropUserDoc)
+  }
+
+  private def processCommand(databaseName: String, document: Document): Future[Try[Boolean]] = {
+    val database = mongoClient.getDatabase(databaseName)
+    database.runCommand(document)
       .toFuture()
       .map(_ => {
         Success(true)
@@ -67,7 +77,7 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
   }
 
   /**
-   * mongo-driver throws a CodecConfigurationException each response.
+   * runCommand throws a CodecConfigurationException.
    * Therefore we just ignore this exception, until there is a fix.
    */
   private def handleThrowable(e: Throwable): Future[Try[Boolean]] = {
