@@ -4,22 +4,20 @@ package repositories.cluster
 import com.mongodb.{MongoClientSettings, ServerAddress}
 import org.mongodb.scala.MongoClient
 import play.api.Configuration
-
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 import com.mongodb.MongoCredential._
-
-import scala.jdk.CollectionConverters._
-
 import org.mongodb.scala.bson._
 import org.mongodb.scala.bson.collection.mutable.Document
+import scala.util.{Failure, Success, Try}
+import scala.jdk.CollectionConverters._
+import scala.concurrent.{ExecutionContext, Future}
 
 
 
 @Singleton
-class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionContext) extends ClusterRepository {
+class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionContext) {
 
+  val initialCollection: String = config.get[String]("mongodb_cluster.initialCollection")
   val mongoClient: MongoClient = MongoClient(getMongoClientSettings)
 
   private def getMongoClientSettings: MongoClientSettings  = {
@@ -38,7 +36,7 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
 
   def createDatabase(databaseName: String): Future[Try[Boolean]] = {
     val database = mongoClient.getDatabase(databaseName)
-    database.createCollection("initial")
+    database.createCollection(initialCollection)
       .toFuture()
       .map(_ => Success(true))
       .recoverWith {
