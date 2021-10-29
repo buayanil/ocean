@@ -3,7 +3,13 @@ export interface CredentialProperties {
   password: string;
 }
 
-export interface HostProperties {
-  hostname: string;
-  port: number;
+export interface BaseModelProps {
+  readonly id: number;
+}
+
+export abstract class BaseModel {
+  public readonly id: number;
+  constructor(props: BaseModelProps) {
+    this.id = props.id;
+  }
 }

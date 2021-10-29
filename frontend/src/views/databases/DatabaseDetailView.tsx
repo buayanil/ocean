@@ -4,8 +4,7 @@ import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 
-import { HostProperties } from "../../types/models";
-import { DatabaseProperties, EngineType } from "../../types/database";
+import { Database } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
@@ -29,14 +28,6 @@ import OverviewCard from "../../components/OverviewCard";
 import RoleList from "../../components/RoleList/RoleList";
 import TabList from "../../components/TabList";
 import UserSelector from "../../components/UserSelector/UserSelector";
-
-const {
-  REACT_APP_POSTGRESQL_HOSTNAME,
-  REACT_APP_POSTGRESQL_PORT,
-  REACT_APP_MONGODB_HOSTNAME,
-  REACT_APP_MONGODB_PORT,
-  REACT_APP_ADMINER_URL,
-} = process.env;
 
 
 interface DatabaseDetailViewProps { }
@@ -128,30 +119,12 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     }
   }
 
-  const getHostFor = (
-    database: DatabaseProperties
-  ): HostProperties | undefined => {
-    if (database.engine === EngineType.PostgreSQL) {
-      return {
-        hostname: REACT_APP_POSTGRESQL_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432"),
-      };
-    } else if (database.engine === EngineType.MongoDB) {
-      return {
-        hostname: REACT_APP_MONGODB_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_MONGODB_PORT || "27017"),
-      };
-    }
-  };
-
   const renderTabContent = (): React.ReactNode => {
     if (selectedId === 1) {
       return (
         <OverviewCard
-          database={database}
-          host={database ? getHostFor(database) : undefined}
+          database={database ? new Database(database) : undefined}
           user={user}
-          pgAdminUrl={REACT_APP_ADMINER_URL}
         />
       );
     } else if (selectedId === 2) {
