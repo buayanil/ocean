@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/outline";
 
 import { engineOptions } from "../../constants/engines";
-import { UpstreamDatabaseProperties } from "../../types/database";
+import { EngineType, UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import Alert from "../Alert";
 import Headline from "../Headline";
@@ -48,7 +48,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
       }
       const payload: UpstreamDatabaseProperties = {
         name: name,
-        engine: engine,
+        engine: engine as EngineType,
       };
       const response = await DatabaseClient.existsDatabase(payload);
       try {
@@ -104,7 +104,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
       <Formik
         initialValues={{
           name: "",
-          engine: "P",
+          engine: EngineType.PostgreSQL,
         }}
         validationSchema={createDatabaseSchema}
         onSubmit={(

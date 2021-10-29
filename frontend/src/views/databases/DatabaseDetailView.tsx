@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 
 import { HostProperties } from "../../types/models";
-import { DatabaseProperties } from "../../types/database";
+import { DatabaseProperties, EngineType } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
@@ -131,12 +131,12 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const getHostFor = (
     database: DatabaseProperties
   ): HostProperties | undefined => {
-    if (database.engine === "P") {
+    if (database.engine === EngineType.PostgreSQL) {
       return {
         hostname: REACT_APP_POSTGRESQL_HOSTNAME || "",
         port: Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432"),
       };
-    } else if (database.engine === "M") {
+    } else if (database.engine === EngineType.MongoDB) {
       return {
         hostname: REACT_APP_MONGODB_HOSTNAME || "",
         port: Number.parseInt(REACT_APP_MONGODB_PORT || "27017"),

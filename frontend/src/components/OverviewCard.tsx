@@ -1,6 +1,6 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
-import { DatabaseProperties } from '../types/database';
+import { DatabaseProperties, EngineType } from '../types/database';
 
 import { HostProperties } from '../types/models';
 import { UserProperties } from '../types/user';
@@ -17,9 +17,9 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdm
 
   const getConnectionString = (): string | undefined => {
     if (database && host && host && user) {
-      if (database.engine === 'P') {
+      if (database.engine === EngineType.PostgreSQL) {
         return `psql -U ${user.username} -h ${host.hostname} -p ${host.port.toString()} -d ${database.name}`
-      } else if (database.engine === 'M') {
+      } else if (database.engine === EngineType.MongoDB) {
         return `mongodb://${host.hostname}:${host.port.toString()}/${database.name} --username ${user.username}`
       } else {
         return ''
