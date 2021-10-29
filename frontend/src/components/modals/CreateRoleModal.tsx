@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react';
 
-import CreateRoleForm from '../forms/CreateRoleForm';
-import { DatabaseProperties } from '../../types/models';
+import { DatabaseProperties } from '../../types/database';
 import { UpstreamCreateRoleProperties } from '../../types/role';
+import CreateRoleForm from '../forms/CreateRoleForm';
 ;
 
 export interface CreateRoleModalProps {

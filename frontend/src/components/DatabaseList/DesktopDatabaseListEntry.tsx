@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { DatabaseIcon } from '@heroicons/react/outline';
 
-import { DatabaseProperties } from '../../types/models';
 import { DatabasesNavigation } from '../../constants/menu.';
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
+import { DatabaseProperties } from '../../types/database';
 
 interface DesktopDatabaseListEntryProps {
     database: DatabaseProperties;

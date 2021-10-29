@@ -4,7 +4,8 @@ import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 
-import { DatabaseProperties, HostProperties } from "../../types/models";
+import { HostProperties } from "../../types/models";
+import { DatabaseProperties } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";

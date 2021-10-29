@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/outline";
 
 import { engineOptions } from "../../constants/engines";
-import { UpstreamDatabaseProperties } from "../../types/models";
+import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import Alert from "../Alert";
 import Headline from "../Headline";

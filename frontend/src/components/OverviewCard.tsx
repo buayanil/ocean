@@ -1,7 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
+import { DatabaseProperties } from '../types/database';
 
-import { DatabaseProperties, HostProperties } from '../types/models';
+import { HostProperties } from '../types/models';
 import { UserProperties } from '../types/user';
 import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
 

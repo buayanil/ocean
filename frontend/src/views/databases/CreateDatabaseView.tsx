@@ -2,13 +2,13 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 
-import { UpstreamDatabaseProperties } from "../../types/models";
+import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient } from "../../api/databaseClient";
 import { DatabasesNavigation } from "../../constants/menu.";
 import AppLayout from "../../layouts/AppLayout";
 import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 
-interface CreateDatabaseViewProps {}
+interface CreateDatabaseViewProps { }
 
 const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   const history = useHistory();
