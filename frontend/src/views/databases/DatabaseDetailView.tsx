@@ -4,13 +4,13 @@ import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 
-import { DatabaseProperties, HostProperties } from "../../types/models";
+import { Database } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { deleteModalContent } from "../../constants/modals";
-import { detailViewTabs } from "../../constants/tabs";
+import { getDetailViewTabsFor } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
 import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
@@ -28,14 +28,6 @@ import OverviewCard from "../../components/OverviewCard";
 import RoleList from "../../components/RoleList/RoleList";
 import TabList from "../../components/TabList";
 import UserSelector from "../../components/UserSelector/UserSelector";
-
-const {
-  REACT_APP_POSTGRESQL_HOSTNAME,
-  REACT_APP_POSTGRESQL_PORT,
-  REACT_APP_MONGODB_HOSTNAME,
-  REACT_APP_MONGODB_PORT,
-  REACT_APP_ADMINER_URL,
-} = process.env;
 
 
 interface DatabaseDetailViewProps { }
@@ -127,30 +119,12 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     }
   }
 
-  const getHostFor = (
-    database: DatabaseProperties
-  ): HostProperties | undefined => {
-    if (database.engine === "P") {
-      return {
-        hostname: REACT_APP_POSTGRESQL_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432"),
-      };
-    } else if (database.engine === "M") {
-      return {
-        hostname: REACT_APP_MONGODB_HOSTNAME || "",
-        port: Number.parseInt(REACT_APP_MONGODB_PORT || "27017"),
-      };
-    }
-  };
-
   const renderTabContent = (): React.ReactNode => {
     if (selectedId === 1) {
       return (
         <OverviewCard
-          database={database}
-          host={database ? getHostFor(database) : undefined}
+          database={database ? new Database(database) : undefined}
           user={user}
-          pgAdminUrl={REACT_APP_ADMINER_URL}
         />
       );
     } else if (selectedId === 2) {
@@ -301,7 +275,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       </div>
       <Alert errorMessage={undefined} />
       <TabList
-        tabs={detailViewTabs}
+        tabs={getDetailViewTabsFor(database?.engine)}
         selectedId={selectedId}
         onSelect={(value) => setSelectedId(value)}
       />

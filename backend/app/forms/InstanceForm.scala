@@ -12,7 +12,11 @@ object CreateInstanceForm {
     mapping(
       "name" ->
         nonEmptyText
-          .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$")),
+          .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$"))
+          .verifying("Name contains illegal words",
+            name => !List(
+              "system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1").contains(name)
+          ),
       "engine" ->
         nonEmptyText.verifying("Invalid engine type.", engine => Instance.ENGINE_ALLOWED.contains(engine)),
     )(CreateInstanceFormData.apply)(CreateInstanceFormData.unapply)

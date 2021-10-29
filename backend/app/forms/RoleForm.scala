@@ -10,8 +10,8 @@ object CreateRoleForm {
   val form: Form[CreateRoleFormData] = Form(
     mapping(
       "instanceId" -> longNumber,
-      "roleName" -> nonEmptyText,
-
+      "roleName" -> nonEmptyText
+        .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$")),
     )(CreateRoleFormData.apply)(CreateRoleFormData.unapply)
   )
 }

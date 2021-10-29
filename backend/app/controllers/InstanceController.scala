@@ -7,7 +7,7 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.Logger
 
 import actions.{UserAction, UserRequest}
-import forms.{CreateInstanceForm, ExistsInstanceForm, ExistsInstanceFormData}
+import forms.{CreateInstanceForm, ExistsInstanceForm}
 import models.{ErrorResponse, ExistsInstanceResponse, InstanceDeletedResponse}
 import services.{DatabaseManagerService, InstanceService}
 
@@ -49,10 +49,10 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
       createInstanceFormData => {
-        instanceService.addInstance(createInstanceFormData, request.user) match {
+        databaseManagerService.addInstance(createInstanceFormData, request.user) match {
           case Left(error) =>
             logger.error(error.toString)
-            BadRequest(Json.toJson(ErrorResponse(List(error))))
+            BadRequest(Json.toJson(ErrorResponse(error)))
           case Right(instance) => Ok(Json.toJson(instance))
         }
       }

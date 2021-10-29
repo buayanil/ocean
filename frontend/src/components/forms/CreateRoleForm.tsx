@@ -2,8 +2,8 @@ import React from "react";
 import { Field, Form, Formik } from "formik";
 import * as yup from "yup";
 
+import { DatabaseProperties } from "../../types/database";
 import { UpstreamCreateRoleProperties } from "../../types/role";
-import { DatabaseProperties } from "../../types/models";
 import { RoleClient, RoleValidation } from "../../api/roleClient";
 
 

@@ -1,4 +1,4 @@
-package repositories
+package repositories.cluster
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

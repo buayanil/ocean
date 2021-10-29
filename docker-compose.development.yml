@@ -1,4 +1,4 @@
-version: "3"
+version: "3.1"
 
 services:
   # Ldap authentication server
@@ -47,6 +47,15 @@ services:
       MYSQL_DATABASE: internal
       MYSQL_USER: foo
       MYSQL_PASSWORD: bar
+  # MongoDB for managed databases    
+  mongodb_cluster:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: toor 
+    ports:
+      - 27017:27017
   # Postgres CLI tool    
   adminer:
     depends_on:

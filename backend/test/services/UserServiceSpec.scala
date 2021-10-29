@@ -2,10 +2,11 @@ package services
 
 import org.specs2.mutable._
 import org.specs2.mock.Mockito
-import scala.concurrent.Future
 
+import scala.concurrent.Future
 import models.{ErrorMessage, User}
 import repositories.UserRepository
+import services.cluster.PgClusterService
 
 
 class UserServiceSpec extends Specification with Mockito {

@@ -1,16 +1,15 @@
-package services
+package services.cluster
 
-import javax.inject.Inject
-import java.sql.SQLTransientConnectionException
 import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
+import java.sql.SQLTransientConnectionException
+import javax.inject.Inject
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
 import models.ErrorMessage
-import repositories.PgClusterRepository
-
+import repositories.cluster.PgClusterRepository
 
 
 class PgClusterService @Inject()(configuration: Configuration, pgClusterRepository: PgClusterRepository) {

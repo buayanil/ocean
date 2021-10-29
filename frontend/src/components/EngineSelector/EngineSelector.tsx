@@ -19,11 +19,13 @@ export interface EngineSelectorProps {
 const EngineSelector: React.FC<EngineSelectorProps> = ({ engineOptions, selectedValue, error, onSelect }) => {
 
     const getClassName = (value: string) => {
+        const result = ["cursor-pointer"];
         if (selectedValue === value) {
-            return "text-blue-500 bg-blue shadow divide-y divide-blue-500 border rounded-sm border-blue-500 hover:bg-blue-100";
+            result.push("text-blue-500 bg-blue shadow divide-y divide-blue-500 border rounded-sm border-blue-500 hover:bg-blue-100");
         } else {
-            return "bg-white shadow divide-y divide-gray-200 rounded-sm hover:bg-gray-100"
+            result.push("bg-white shadow divide-y divide-gray-200 rounded-sm hover:bg-gray-100");
         }
+        return result.join(" ")
     }
 
     return (

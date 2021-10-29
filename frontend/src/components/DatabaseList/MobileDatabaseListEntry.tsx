@@ -1,8 +1,8 @@
 import React from 'react';
 import { DatabaseIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
-import { DatabaseProperties } from '../../types/models';
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
+import { DatabaseProperties } from '../../types/database';
 
 interface MobileDatabaseListEntryProps {
     database: DatabaseProperties;

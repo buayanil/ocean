@@ -8,6 +8,7 @@ import scala.util.{Failure, Success}
 
 import repositories.UserRepository
 import models.{ErrorMessage, User}
+import services.cluster.PgClusterService
 
 
 class UserService @Inject()(ldapService: LdapService, tokenService: TokenService, userRepository: UserRepository, pgClusterService: PgClusterService) {

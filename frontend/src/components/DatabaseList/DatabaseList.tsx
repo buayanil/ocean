@@ -3,7 +3,7 @@ import { compareDesc, formatDistance } from 'date-fns';
 
 import MobileDatabaseListEntry from './MobileDatabaseListEntry';
 import DesktopDatabaseListEntry from './DesktopDatabaseListEntry';
-import { DatabaseProperties } from '../../types/models';
+import { DatabaseProperties } from '../../types/database';
 
 
 export interface DatabaseListProps {

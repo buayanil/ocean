@@ -1,28 +1,26 @@
-/* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
 
-import { DatabaseProperties, HostProperties } from '../types/models';
+import { Database, EngineType } from '../types/database';
 import { UserProperties } from '../types/user';
 import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
 
 export interface OverviewCardProps {
-  database?: DatabaseProperties;
-  host?: HostProperties;
+  database?: Database;
   user?: UserProperties;
-  pgAdminUrl?: string;
 }
 
-const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdminUrl }) => {
+const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
 
-  const getConnectionString = (): string | undefined => {
-    if (database && host && host && user) {
-      if (database.engine === 'P') {
-        return `psql -U ${user.username} -h ${host.hostname} -p ${host.port.toString()} -d ${database.name}`
-      } else if (database.engine === 'M') {
-        return `mongodb://${host.hostname}:${host.port.toString()}/${database.name} --username ${user.username}`
-      } else {
-        return ''
-      }
+  const getEngineConnectionString = (): string => {
+    if (database?.engine === EngineType.PostgreSQL) {
+      return database.connectionString(user?.username || "")
+    } else if (database?.engine === EngineType.MongoDB) {
+      return database.connectionString() || ""
+    } else if (database === undefined) {
+      return ".."
+    } else {
+      const assertNever = (_: never): string => "";
+      return assertNever(database?.engine);
     }
   }
 
@@ -38,15 +36,15 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdm
 
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Host</dt>
-            {host ?
-              <dd className="mt-1 text-sm text-gray-900">{host.hostname}</dd> :
+            <dt className="text-sm font-medium text-gray-500">Hostname</dt>
+            {database ?
+              <dd className="mt-1 text-sm text-gray-900">{database.hostname}</dd> :
               <dd className="animate-pulse mt-1 h-6 w-48 bg-gray-200" />}
           </div>
           <div className="sm:col-span-1">
             <dt className="text-sm font-medium text-gray-500">Port</dt>
-            {host ?
-              <dd className="mt-1 text-sm text-gray-900">{host.port.toString()}</dd> :
+            {database ?
+              <dd className="mt-1 text-sm text-gray-900">{database.port.toString()}</dd> :
               <dd className="animate-pulse mt-1 h-6 w-24 bg-gray-200" />}
           </div>
           <div className="sm:col-span-1">
@@ -57,22 +55,21 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, host, user, pgAdm
           </div>
           <div className="sm:col-span-2">
             <dt className="text-sm font-medium text-gray-500">Connection String</dt>
-            {database && host && user ?
+            {database && user ?
               <dd className="mt-2 text-sm text-gray-900">
-                {/*TODO: clipboard*/}
                 <div className="flex flex-col space-y-2">
                   <div>
-                    <span className="px-2 py-1 rounded bg-gray-200">{getConnectionString()}</span>
+                    <span className="px-2 py-1 rounded bg-gray-200">{getEngineConnectionString()}</span>
                   </div>
                   <div>
                     <button
                       className="mr-2 border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      onClick={() => navigator.clipboard.writeText(getConnectionString() || "Some went wrong :(")}
+                      onClick={() => navigator.clipboard.writeText(getEngineConnectionString())}
                     >
                       Strg-C
                     </button>
                     <a
-                      href={pgAdminUrl || "#"}
+                      href={database.adminerUrl || "#"}
                       target="_blank" rel="noopener noreferrer"
                       className="border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                       Adminer

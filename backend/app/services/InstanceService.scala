@@ -1,20 +1,18 @@
 package services
 
-import java.sql.Timestamp
-import java.time.Instant
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
 import play.api.Logger
-
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
-import forms.{CreateInstanceFormData, ExistsInstanceFormData}
-import models.{ErrorMessage, Instance, User}
+
+import forms.ExistsInstanceFormData
+import models.{ErrorMessage, Instance}
 import repositories.InstanceRepository
 
 
-class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepository: InstanceRepository) {
+class InstanceService @Inject()(instanceRepository: InstanceRepository) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -54,24 +52,13 @@ class InstanceService @Inject()(pgClusterService: PgClusterService, instanceRepo
     }
   }
 
-  def addInstance(createInstanceFormData: CreateInstanceFormData, user: User): Either[ErrorMessage, Instance] = {
-    val localTimestamp = Timestamp.from(Instant.now)
-    val localInstance = Instance(0, user.id, createInstanceFormData.name, createInstanceFormData.engine, localTimestamp)
+  def addInstance(localInstance: Instance): Either[ErrorMessage, Instance] = {
     Await.result(instanceRepository.addInstance(localInstance), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = handleAddInstanceThrowable(exception)
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
-        pgClusterService.createDatabase(instance.name, user.username) match {
-          case Left(errorMessage) =>
-            logger.error(errorMessage.toString)
-            Left(errorMessage)
-          case Right(_) => Right(instance)
-        }
-      case Success(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
-        // TODO: mongodb not implemented yet
-        Right(instance)
+      case Success(instance) => Right(instance)
     }
   }
 

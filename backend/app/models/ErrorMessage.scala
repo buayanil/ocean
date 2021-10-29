@@ -93,12 +93,14 @@ object ErrorMessage {
   val CODE_INVITATION_CREATE_FAILED = "invitation/create-failed"
   val CODE_INVITATION_DELETE_FAILED = "invitation/delete-failed"
   val CODE_INVITATION_CREATE_DUPLICATED = "invitation/create-duplicated"
+  val CODE_INVITATION_NOT_SUPPORTED = "invitation/not-supported"
 
   val MESSAGE_INVITATION_LIST_FAILED = "Could not get the invitation list."
   val MESSAGE_INVITATION_GET_FAILED = "Could not get the invitation."
   val MESSAGE_INVITATION_CREATE_FAILED = "Could not create an invitation."
   val MESSAGE_INVITATION_DELETE_FAILED = "Could not delete the invitation."
   val MESSAGE_INVITATION_CREATE_DUPLICATED = "Invitation name exists already."
+  val MESSAGE_INVITATION_NOT_SUPPORTED = "Invitation not supported."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
@@ -116,6 +118,17 @@ object ErrorMessage {
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_EXIST = "Could not create the role. Role already exists."
   val MESSAGE_PG_CLUSTER_CREATED_ROLE_UNKNOWN = "Could not create the role. Unknown error."
   val MESSAGE_PG_CLUSTER_DELETE_ROLE_FAILED = "Could not delete the role."
+
+  // MongoDB Cluster
+  val CODE_MONGODB_CLUSTER_CREATED_DATABASE_FAILED = "pg_cluster/create-database-failed"
+  val CODE_MONGODB_CLUSTER_CREATED_USER = "pg_cluster/create-user-exists"
+  val CODE_MONGODB_DELETED_DATABASE_FAILED = "pg_cluster/delete-database-failed"
+  val CODE_MONGODB_DELETED_USER_FAILED = "pg_cluster/delete-user-failed"
+
+  val MESSAGE_MONGODB_CLUSTER_CREATED_DATABASE_FAILED = "Could not create the database."
+  val MESSAGE_MONGODB_CLUSTER_CREATED_USER = "Could not create the user."
+  val MESSAGE_MONGODB_DELETE_DATABASE_FAILED = "Could not delete the database."
+  val MESSAGE_MONGODB_DELETE_USER_FAILED = "Could not delete the user."
 
   // Startup
   val CODE_STARTUP_LDAP_ROLE_CONFIG_MISSING = "startup/ldap-role-config-missing"
