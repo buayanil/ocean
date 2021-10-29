@@ -10,7 +10,7 @@ import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { deleteModalContent } from "../../constants/modals";
-import { detailViewTabs } from "../../constants/tabs";
+import { getDetailViewTabsFor } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
 import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
@@ -275,7 +275,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       </div>
       <Alert errorMessage={undefined} />
       <TabList
-        tabs={detailViewTabs}
+        tabs={getDetailViewTabsFor(database?.engine)}
         selectedId={selectedId}
         onSelect={(value) => setSelectedId(value)}
       />

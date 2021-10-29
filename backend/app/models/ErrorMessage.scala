@@ -93,12 +93,14 @@ object ErrorMessage {
   val CODE_INVITATION_CREATE_FAILED = "invitation/create-failed"
   val CODE_INVITATION_DELETE_FAILED = "invitation/delete-failed"
   val CODE_INVITATION_CREATE_DUPLICATED = "invitation/create-duplicated"
+  val CODE_INVITATION_NOT_SUPPORTED = "invitation/not-supported"
 
   val MESSAGE_INVITATION_LIST_FAILED = "Could not get the invitation list."
   val MESSAGE_INVITATION_GET_FAILED = "Could not get the invitation."
   val MESSAGE_INVITATION_CREATE_FAILED = "Could not create an invitation."
   val MESSAGE_INVITATION_DELETE_FAILED = "Could not delete the invitation."
   val MESSAGE_INVITATION_CREATE_DUPLICATED = "Invitation name exists already."
+  val MESSAGE_INVITATION_NOT_SUPPORTED = "Invitation not supported."
 
   // Postgres Cluster
   val CODE_PG_CLUSTER_CREATED_DATABASE_EXIST = "pg_cluster/create-database-failed-exists"
