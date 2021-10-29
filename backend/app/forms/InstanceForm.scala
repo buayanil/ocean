@@ -14,7 +14,7 @@ object CreateInstanceForm {
         nonEmptyText
           .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$"))
           .verifying("Name contains illegal words",
-            name => List(
+            name => !List(
               "system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1").contains(name)
           ),
       "engine" ->
