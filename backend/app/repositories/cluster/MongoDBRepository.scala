@@ -57,12 +57,23 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
     processCommand(databaseName, createUserDoc)
   }
 
+  def deleteDatabase(databaseName: String): Future[Try[Boolean]]  = {
+    val database = mongoClient.getDatabase(databaseName)
+    database.drop()
+      .toFuture()
+      .map(_ => Success(true))
+      .recoverWith {
+        case e: Throwable => handleThrowable(e)
+      }
+  }
+
   def deleteUser(databaseName: String, username: String): Future[Try[Boolean]] = {
     val dropUserDoc = Document(
       "dropUser" -> BsonString(username)
     )
     processCommand(databaseName, dropUserDoc)
   }
+
 
   private def processCommand(databaseName: String, document: Document): Future[Try[Boolean]] = {
     val database = mongoClient.getDatabase(databaseName)

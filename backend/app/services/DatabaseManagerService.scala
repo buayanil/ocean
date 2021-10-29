@@ -35,14 +35,14 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, mongo
   def deleteDatabase(instanceId: Long, user: User): Either[List[ErrorMessage], Int] = {
     instanceService.getInstance(instanceId, user.id) match {
       case Right(instance) if instance.engine == Instance.ENGINE_TYPE_POSTGRESQL =>
-        deletePostgresDatabase(instance, user, instance.name)
+        deletePostgresDatabase(instance, user)
       case Right(instance) if instance.engine == Instance.ENGINE_TYPE_MONGODB =>
-        deleteMongoDBDatabase(instanceId, user)
+        deleteMongoDBDatabase(instance, user)
       case Left(value) => Left(List(value))
     }
   }
 
-  def deletePostgresDatabase(instance: Instance, user: User, databaseName: String): Either[List[ErrorMessage], Int] = {
+  def deletePostgresDatabase(instance: Instance, user: User): Either[List[ErrorMessage], Int] = {
     val errors = ListBuffer[ErrorMessage]()
     // Roles
     val roleNames: Seq[Role] = roleService.listInstanceRoles(instance.id, user) match {
@@ -82,13 +82,14 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, mongo
       case Right(value) => Right(value)
     }
 
-    // Delete instance
-    instanceService.deleteInstance(instance.id, user.id) match {
+    // Delete orm database
+    pgClusterService.deleteDatabase(instance.name) match {
       case Left(value) => errors += value
       case Right(value) => Right(value)
     }
-    // Delete orm database
-    pgClusterService.deleteDatabase(databaseName) match {
+
+    // Delete instance
+    instanceService.deleteInstance(instance.id, user.id) match {
       case Left(value) => errors += value
       case Right(value) => Right(value)
     }
@@ -99,13 +100,38 @@ class DatabaseManagerService @Inject()(pgClusterService: PgClusterService, mongo
     }
   }
 
-  def deleteMongoDBDatabase(instanceId: Long, user: User): Either[List[ErrorMessage], Int] = {
+  def deleteMongoDBDatabase(instance: Instance, user: User): Either[List[ErrorMessage], Int] = {
     val errors = ListBuffer[ErrorMessage]()
-    // Delete instance
-    instanceService.deleteInstance(instanceId, user.id) match {
+    // Roles
+    val roleNames: Seq[Role] = roleService.listInstanceRoles(instance.id, user) match {
+      case Left(value) =>
+        errors += value
+        Seq()
+      case Right(values) => values
+    }
+    // Delete cluster roles
+    roleNames.foreach(role => mongoDBClusterService.deleteUser(instance.name, role.name) match {
+      case Left(value) => errors += value
+      case Right(value) => Right(value)
+    })
+    // Delete orm roles
+    roleService.deleteDatabaseRoles(instance.id) match {
       case Left(value) => errors += value
       case Right(value) => Right(value)
     }
+
+    // Delete cluster database
+    mongoDBClusterService.deleteDatabase(instance.name) match {
+      case Left(value) => errors += value
+      case Right(value) => Right(value)
+    }
+
+    // Delete instance
+    instanceService.deleteInstance(instance.id, user.id) match {
+      case Left(value) => errors += value
+      case Right(value) => Right(value)
+    }
+
     errors match {
       case ListBuffer() => Right(1)
       case _ => Left(errors.toList)

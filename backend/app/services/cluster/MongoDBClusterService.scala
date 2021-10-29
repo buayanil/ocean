@@ -42,6 +42,20 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
     }
   }
 
+  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] = {
+    Await.result(mongoDBRepository.deleteDatabase(databaseName), Duration.Inf) match {
+      case Success(_) => Right(true)
+      case Failure(throwable) =>
+        val errorMessage = ErrorMessage(
+          ErrorMessage.CODE_MONGODB_DELETED_DATABASE_FAILED,
+          ErrorMessage.MESSAGE_MONGODB_DELETE_DATABASE_FAILED,
+          developerMessage = throwable.getMessage
+        )
+        logger.error(errorMessage.toString)
+        Left(errorMessage)
+    }
+  }
+
   def deleteUser(databaseName: String, username: String): Either[ErrorMessage, Boolean] = {
     Await.result(mongoDBRepository.deleteUser(databaseName, username), Duration.Inf) match {
       case Success(_) => Right(true)
