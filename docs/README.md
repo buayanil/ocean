@@ -232,6 +232,12 @@ Environment="PG_CLUSTER_PORT="
 Environment="PG_CLUSTER_DATABASE="
 Environment="PG_CLUSTER_USER="
 Environment="PG_CLUSTER_PASSWORD="
+Environment="MONGODB_CLUSTER_HOSTNAME="
+Environment="MONGODB_CLUSTER_PORT="
+Environment="MONGODB_CLUSTER_DATABASE="
+Environment="MONGODB_CLUSTER_USER="
+Environment="MONGODB_CLUSTER_PASSWORD="
+
 
 ExecStart=/bin/bash /home/local/ocean/backend/target/universal/backend-1.0/bin/backend -Dlogger.resource=logback.production.xml -Dhttps.port=9443 -Dhttp.port=disabled -Dplay.server.https.keyStore.path='/home/local/cert/keystore.p12' -Dplay.server.https.keyStore.password='change_me' -Dplay.server.https.keyStore.type='pkcs12'
 
@@ -303,6 +309,7 @@ Revoke public schema access
 
 ```REVOKE CREATE ON SCHEMA public FROM PUBLIC;```
 
+
 ### phpPgAdmin
 
 Install phpPgAdmin
@@ -357,3 +364,92 @@ Runs the tests
 
 Builds the app for production
 ```sbt dist```
+
+# Docker (New)
+
+## Install Docker Engine
+
+Install packages to allow apt to use a repository over HTTPS:
+
+```apt-get install ca-certificates curl gnupg lsb-release```
+
+Add Docker’s official GPG key:
+```curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg```
+
+Use the following command to set up the stable repository.
+
+```
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com
+ linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+Install Docker Engine
+
+```
+apt-get update
+apt-get install docker-ce docker-ce-cli containerd.io
+```
+
+Check the server status of docker
+
+```systemctl status docker```
+
+## Install Docker Compose
+
+Download the current stable release of 
+
+```curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose```
+
+Apply executable permission to the binary
+
+```chmod +x /usr/local/bin/docker-compose```
+
+Test installation
+
+```docker-compose --version```
+
+
+## Setting up a MongoDB Container
+
+Before creating the compose file, let’s search for the official MongoDB container image using the search command.
+
+```docker search mongodb```
+
+Create a directory called “mongodb” to hold the docker-compose file.
+
+```
+mkdir -pv mongodb/database
+```
+
+The following `docker-compose.yml` file will be created within the `mongodb` directory.
+
+```
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME:
+      - MONGO_INITDB_ROOT_PASSWORD:
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+```
+
+Start the MongoDB Container as detached background process
+
+```
+docker-compose up -d
+```
+
+
+Check the status of the container
+
+```
+docker ps -a
+
+```
