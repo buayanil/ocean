@@ -29,7 +29,7 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
 
     val credential = createCredential(username, databaseName, password.toCharArray)
     MongoClientSettings.builder()
-      .applyToClusterSettings(block => block.hosts(List(new ServerAddress(serverName, portNumber)).asJava))
+      .applyToClusterSettings(block => block.hosts(List(new ServerAddress(serverName, 27017)).asJava))
       .credential(credential)
       .build()
   }
