@@ -1,10 +1,19 @@
 package models
 
+import io.swagger.annotations.{ApiModel, ApiModelProperty}
+
 import java.sql.Timestamp
 import play.api.libs.json.{Json, OWrites}
 
+import scala.annotation.meta.field
 
-final case class Instance(id: Long = 0, userId: Long, name: String, engine: String, createdAt: Timestamp)
+@ApiModel("Database")
+final case class Instance(
+                           @(ApiModelProperty@field) id: Long = 0,
+                           @(ApiModelProperty@field) userId: Long,
+                           @(ApiModelProperty@field) name: String,
+                           @(ApiModelProperty@field) engine: String,
+                           @(ApiModelProperty@field) createdAt: Timestamp)
 
 object Instance {
   implicit val InstanceWrites: OWrites[Instance] = Json.writes[Instance]

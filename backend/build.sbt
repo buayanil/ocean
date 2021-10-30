@@ -23,4 +23,9 @@ libraryDependencies ++= Seq(
   "net.logstash.logback" % "logstash-logback-encoder" % "6.6",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.2",
   "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0",
+  // see https://github.com/swagger-api/swagger-play/pull/220
+  "com.github.dwickern" %% "swagger-play2.8" % "3.1.0",
+  "io.swagger" % "swagger-core" % "1.6.2",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.11.1",
+  "org.webjars" % "swagger-ui" % "3.52.5",
 )
