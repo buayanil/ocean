@@ -11,12 +11,13 @@ POST          /users                            controllers.UserController.getAl
 POST          /login                            controllers.UserController.login()
 
 # Databases
-GET           /databases                        controllers.InstanceController.listAll()
-GET           /databases/:id                    controllers.InstanceController.get(id: Long)
-POST          /databases                        controllers.InstanceController.addInstance()
-POST          /databases/_exists_               controllers.InstanceController.existsInstance()
-GET           /databases/:id/roles              controllers.RoleController.listInstanceRoles(id: Long)
-GET           /databases/:id/invitations        controllers.InvitationController.getAllForInstance(id: Long)
+GET           /databases                        controllers.InstanceController.getDatabases
+GET           /databases/:id                    controllers.InstanceController.getDatabaseById(id: Long)
+GET           /databases/:id/roles              controllers.RoleController.getRolesByDatabaseId(id: Long)
+GET           /databases/:id/invitations        controllers.InvitationController.getInvitationsByDatabaseId(id: Long)
+POST          /databases                        controllers.InstanceController.addDatabase()
+POST          /databases/_exists_               controllers.InstanceController.existsDatabase()
+DELETE        /databases/:id                    controllers.InstanceController.deleteDatabase(id: Long)
 
 # Database roles
 POST          /roles                            controllers.RoleController.addRole()
@@ -27,4 +28,7 @@ DELETE        /roles/:id                        controllers.RoleController.delet
 POST          /invitations                      controllers.InvitationController.addInvitation()
 DELETE        /invitations/:id                  controllers.InvitationController.deleteInvitation(id: Long)
 
-DELETE        /databases/:id                    controllers.InstanceController.deleteInstance(id: Long)
+# Swagger
+GET           /swagger.json                     controllers.Assets.at(path="/public", file="swagger.json")
+GET           /docs/swagger-ui/*file            controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
+
