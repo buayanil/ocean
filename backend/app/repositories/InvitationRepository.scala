@@ -1,18 +1,22 @@
 package repositories
 
 import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
+import models.Invitation
 import play.api.db.slick.DatabaseConfigProvider
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.util.Try
 import slick.jdbc.JdbcProfile
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
-import models.Invitation
-
-
 @Singleton
-class InvitationRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanceRepository: InstanceRepository, userRepository: UserRepository)(implicit ec: ExecutionContext) {
+class InvitationRepository @Inject() (
+  dbConfigProvider: DatabaseConfigProvider,
+  instanceRepository: InstanceRepository,
+  userRepository: UserRepository
+)(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
@@ -25,7 +29,10 @@ class InvitationRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, i
 
     def userId = column[Long]("user_id")
 
-    def createdAt = column[Timestamp]("created_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def createdAt = column[Timestamp](
+      "created_at",
+      SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
+    )
 
     def * =
       (id, instanceId, userId, createdAt) <> ((Invitation.apply _).tupled, Invitation.unapply)

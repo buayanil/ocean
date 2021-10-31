@@ -1,20 +1,19 @@
 package services
 
-import org.specs2.mutable._
+import models.ErrorMessage
+import models.User
 import org.specs2.mock.Mockito
-
-import scala.concurrent.Future
-import models.{ErrorMessage, User}
+import org.specs2.mutable._
 import repositories.UserRepository
+import scala.concurrent.Future
 import services.cluster.PgClusterService
-
 
 class UserServiceSpec extends Specification with Mockito {
 
   "UserService#login" should {
     "return a token if the user is valid and already in the database" in {
       // Arrange
-      val user = User(id=1, "username", "firstName", "lastName", "mail", "employeeType")
+      val user = User(id = 1, "username", "firstName", "lastName", "mail", "employeeType")
       val ldapUser = User(0L, "username", "firstName", "lastName", "mail", "employeeType")
       val userRepository = mock[UserRepository]
       userRepository.getByUsername(any[String]).returns(Future.successful(Some(user)))
@@ -35,7 +34,7 @@ class UserServiceSpec extends Specification with Mockito {
 
     "return a token if the user is valid and needs to be created" in {
       // Arrange
-      val user = User(id=1, "username", "firstName", "lastName", "mail", "employeeType")
+      val user = User(id = 1, "username", "firstName", "lastName", "mail", "employeeType")
       val ldapUser = User(0L, "username", "firstName", "lastName", "mail", "employeeType")
       val userRepository = mock[UserRepository]
       userRepository.getByUsername(any[String]).returns(Future.successful(None))

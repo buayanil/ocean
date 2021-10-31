@@ -2,7 +2,8 @@ package forms
 
 import models.Instance
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.mapping
+import play.api.data.Forms.nonEmptyText
 
 case class CreateInstanceFormData(name: String, engine: String)
 
@@ -12,17 +13,21 @@ object CreateInstanceForm {
     mapping(
       "name" ->
         nonEmptyText
-          .verifying("Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.", name => name.matches("[a-z][a-z0-9_]*$"))
-          .verifying("Name contains illegal words",
-            name => !List(
-              "system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1").contains(name)
+          .verifying(
+            "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
+            name => name.matches("[a-z][a-z0-9_]*$")
+          )
+          .verifying(
+            "Name contains illegal words",
+            name =>
+              !List("system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1")
+                .contains(name)
           ),
       "engine" ->
         nonEmptyText.verifying("Invalid engine type.", engine => Instance.ENGINE_ALLOWED.contains(engine)),
     )(CreateInstanceFormData.apply)(CreateInstanceFormData.unapply)
   )
 }
-
 
 case class ExistsInstanceFormData(name: String, engine: String)
 

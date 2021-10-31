@@ -1,15 +1,16 @@
 package services
 
-import org.specs2.mutable._
-import org.specs2.mock.Mockito
 import java.sql.Timestamp
 import java.time.Instant
+import models.ErrorMessage
+import models.Instance
+import models.Role
+import models.User
+import org.specs2.mock.Mockito
+import org.specs2.mutable._
+import repositories.RoleRepository
 import scala.concurrent.Future
 import scala.util.Success
-
-import models.{ErrorMessage, Instance, Role, User}
-import repositories.RoleRepository
-
 
 class RoleServiceSpec extends Specification with Mockito {
 

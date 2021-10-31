@@ -1,18 +1,24 @@
 package controllers
 
+import actions.UserAction
+import actions.UserRequest
+import forms.CredentialsForm
+import forms.UserSearchForm
 import javax.inject.Inject
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents, Request}
+import models.ErrorResponse
+import models.LoginSuccessResponse
 import play.api.data.FormError
 import play.api.libs.json._
+import play.api.mvc.AbstractController
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.ControllerComponents
+import play.api.mvc.Request
 import play.api.Logger
-
-import actions.{UserAction, UserRequest}
-import forms.{CredentialsForm, UserSearchForm}
-import models.{ErrorResponse, LoginSuccessResponse}
 import services.UserService
 
-
-class UserController @Inject()(cc: ControllerComponents, userService: UserService, userAction: UserAction) extends AbstractController(cc) {
+class UserController @Inject() (cc: ControllerComponents, userService: UserService, userAction: UserAction)
+    extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -33,25 +39,24 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      formData => {
+      formData =>
         userService.login(formData.username, formData.password) match {
           case Left(error) =>
             logger.warn(error.toString)
             BadRequest(Json.toJson(ErrorResponse(error)))
           case Right(token) => Ok(Json.toJson(LoginSuccessResponse(token)))
         }
-      }
     )
   }
 
   def getAll: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
-      userService.getAll match {
-        case Left(error) =>
-          logger.error(error.toString)
-          BadRequest(Json.toJson(ErrorResponse(List(error))))
-        case Right(users) =>
-          Ok(Json.toJson(users))
-      }
+    userService.getAll match {
+      case Left(error) =>
+        logger.error(error.toString)
+        BadRequest(Json.toJson(ErrorResponse(List(error))))
+      case Right(users) =>
+        Ok(Json.toJson(users))
+    }
   }
 
   def getAllForPattern: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
@@ -60,7 +65,7 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      userSearchFormData => {
+      userSearchFormData =>
         userService.getAllForPattern(userSearchFormData.username) match {
           case Left(error) =>
             logger.error(error.toString)
@@ -68,7 +73,6 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
           case Right(users) =>
             Ok(Json.toJson(users))
         }
-      }
     )
   }
 }

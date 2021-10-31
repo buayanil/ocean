@@ -1,26 +1,28 @@
 package repositories.cluster
 
-
-import com.mongodb.{MongoClientSettings, ServerAddress}
-import org.mongodb.scala.MongoClient
-import play.api.Configuration
-import javax.inject.{Inject, Singleton}
+import com.mongodb.MongoClientSettings
 import com.mongodb.MongoCredential._
+import com.mongodb.ServerAddress
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.mongodb.scala.bson._
 import org.mongodb.scala.bson.collection.mutable.Document
-import scala.util.{Failure, Success, Try}
+import org.mongodb.scala.MongoClient
+import play.api.Configuration
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
-import scala.concurrent.{ExecutionContext, Future}
-
-
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 @Singleton
-class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionContext) {
+class MongoDBRepository @Inject() (config: Configuration)(implicit ec: ExecutionContext) {
 
   val initialCollection: String = config.get[String]("mongodb_cluster.initialCollection")
   val mongoClient: MongoClient = MongoClient(getMongoClientSettings)
 
-  private def getMongoClientSettings: MongoClientSettings  = {
+  private def getMongoClientSettings: MongoClientSettings = {
     val serverName = config.get[String]("mongodb_cluster.serverName")
     val databaseName = config.get[String]("mongodb_cluster.databaseName")
     val portNumber = config.get[Int]("mongodb_cluster.portNumber")
@@ -28,7 +30,8 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
     val password = config.get[String]("mongodb_cluster.password")
 
     val credential = createCredential(username, databaseName, password.toCharArray)
-    MongoClientSettings.builder()
+    MongoClientSettings
+      .builder()
       .applyToClusterSettings(block => block.hosts(List(new ServerAddress(serverName, 27017)).asJava))
       .credential(credential)
       .build()
@@ -36,11 +39,12 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
 
   def createDatabase(databaseName: String): Future[Try[Boolean]] = {
     val database = mongoClient.getDatabase(databaseName)
-    database.createCollection(initialCollection)
+    database
+      .createCollection(initialCollection)
       .toFuture()
       .map(_ => Success(true))
-      .recoverWith {
-        case e: Throwable => handleThrowable(e)
+      .recoverWith { case e: Throwable =>
+        handleThrowable(e)
       }
   }
 
@@ -57,13 +61,14 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
     processCommand(databaseName, createUserDoc)
   }
 
-  def deleteDatabase(databaseName: String): Future[Try[Boolean]]  = {
+  def deleteDatabase(databaseName: String): Future[Try[Boolean]] = {
     val database = mongoClient.getDatabase(databaseName)
-    database.drop()
+    database
+      .drop()
       .toFuture()
       .map(_ => Success(true))
-      .recoverWith {
-        case e: Throwable => handleThrowable(e)
+      .recoverWith { case e: Throwable =>
+        handleThrowable(e)
       }
   }
 
@@ -74,28 +79,23 @@ class MongoDBRepository @Inject()(config: Configuration)(implicit ec: ExecutionC
     processCommand(databaseName, dropUserDoc)
   }
 
-
   private def processCommand(databaseName: String, document: Document): Future[Try[Boolean]] = {
     val database = mongoClient.getDatabase(databaseName)
-    database.runCommand(document)
+    database
+      .runCommand(document)
       .toFuture()
-      .map(_ => {
-        Success(true)
-      })
-      .recoverWith {
-        case e: Throwable => handleThrowable(e)
+      .map(_ => Success(true))
+      .recoverWith { case e: Throwable =>
+        handleThrowable(e)
       }
   }
 
-  /**
-   * runCommand throws a CodecConfigurationException.
-   * Therefore we just ignore this exception, until there is a fix.
-   */
-  private def handleThrowable(e: Throwable): Future[Try[Boolean]] = {
+  /** runCommand throws a CodecConfigurationException. Therefore we just ignore this exception, until there is a fix.
+    */
+  private def handleThrowable(e: Throwable): Future[Try[Boolean]] =
     e match {
       case value: UnsupportedOperationException => Future.successful(Success(true))
-      case _ => Future.successful(Failure(e))
+      case _                                    => Future.successful(Failure(e))
     }
-  }
 
 }

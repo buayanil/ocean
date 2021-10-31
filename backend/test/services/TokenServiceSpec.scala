@@ -1,10 +1,10 @@
 package services
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import java.io.File
-import play.api.Configuration
 import org.specs2.mutable._
-
+import play.api.Configuration
 
 class TokenServiceSpec extends Specification {
 

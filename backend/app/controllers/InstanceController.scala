@@ -1,19 +1,34 @@
 package controllers
 
-import javax.inject.Inject
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import play.api.data.FormError
-import play.api.libs.json.{JsValue, Json, Writes}
-import play.api.Logger
-import actions.{UserAction, UserRequest}
-import forms.{CreateInstanceForm, ExistsInstanceForm}
+import actions.UserAction
+import actions.UserRequest
+import forms.CreateInstanceForm
+import forms.ExistsInstanceForm
 import io.swagger.annotations._
-import models.{ErrorResponse, ExistsInstanceResponse, Instance, InstanceDeletedResponse}
-import services.{DatabaseManagerService, InstanceService}
-
+import javax.inject.Inject
+import models.ErrorResponse
+import models.ExistsInstanceResponse
+import models.Instance
+import models.InstanceDeletedResponse
+import play.api.data.FormError
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
+import play.api.mvc.AbstractController
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.ControllerComponents
+import play.api.Logger
+import services.DatabaseManagerService
+import services.InstanceService
 
 @Api(value = "Databases")
-class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAction, instanceService: InstanceService, databaseManagerService: DatabaseManagerService) extends AbstractController(cc) {
+class InstanceController @Inject() (
+  cc: ControllerComponents,
+  userAction: UserAction,
+  instanceService: InstanceService,
+  databaseManagerService: DatabaseManagerService
+) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -31,8 +46,7 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     response = classOf[Instance],
     responseContainer = "List"
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(value = Array(new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
   def getDatabases: Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.listAll(request.user.id) match {
       case Left(error) =>
@@ -48,10 +62,15 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     httpMethod = "GET",
     response = classOf[Instance]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
-  def getDatabaseById(@ApiParam(value = "ID of database that needs to be fetched", required = true) id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
+  def getDatabaseById(
+    @ApiParam(value = "ID of database that needs to be fetched", required = true) id: Long
+  ): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     instanceService.getInstance(id, request.user.id) match {
       case Left(error) =>
         logger.error(error.toString)
@@ -66,23 +85,25 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     httpMethod = "POST",
     response = classOf[Instance]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
   def addDatabase(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      createInstanceFormData => {
+      createInstanceFormData =>
         databaseManagerService.addInstance(createInstanceFormData, request.user) match {
           case Left(error) =>
             logger.error(error.toString)
             BadRequest(Json.toJson(ErrorResponse(error)))
           case Right(instance) => Ok(Json.toJson(instance))
         }
-      }
     )
   }
 
@@ -92,22 +113,20 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     httpMethod = "POST",
     response = classOf[ExistsInstanceResponse]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(value = Array(new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
   def existsDatabase(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     ExistsInstanceForm.form.bindFromRequest.fold(
       formWithErrors => {
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      existsInstanceFormData => {
+      existsInstanceFormData =>
         instanceService.existsInstance(existsInstanceFormData) match {
           case Left(error) =>
             logger.error(error.toString)
             BadRequest(Json.toJson(ErrorResponse(List(error))))
           case Right(exists) => Ok(Json.toJson(ExistsInstanceResponse(exists)))
         }
-      }
     )
   }
 
@@ -117,9 +136,12 @@ class InstanceController @Inject()(cc: ControllerComponents, userAction: UserAct
     httpMethod = "DELETE",
     response = classOf[InstanceDeletedResponse]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
   def deleteDatabase(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     databaseManagerService.deleteDatabase(id, request.user) match {
       case Left(errors) =>

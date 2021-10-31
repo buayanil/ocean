@@ -1,23 +1,25 @@
 package services
 
+import forms.CreateRoleFormData
+import forms.RoleExistsFormData
 import java.security.SecureRandom
 import javax.inject.Inject
+import models.ErrorMessage
+import models.Role
+import models.User
 import org.postgresql.util.PSQLException
 import play.api.Logger
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
-
-import forms.{CreateRoleFormData, RoleExistsFormData}
-import models.{ErrorMessage, Role, User}
 import repositories.RoleRepository
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
+import scala.util.Failure
+import scala.util.Success
 
-
-class RoleService @Inject()(roleRepository: RoleRepository, instanceService: InstanceService) {
+class RoleService @Inject() (roleRepository: RoleRepository, instanceService: InstanceService) {
 
   val logger: Logger = Logger(this.getClass)
 
-  def listInstanceRoles(instanceId: Long, user: User): Either[ErrorMessage, Seq[Role]] = {
+  def listInstanceRoles(instanceId: Long, user: User): Either[ErrorMessage, Seq[Role]] =
     // HINT: Check if the user is owner of the database
     instanceService.getInstance(instanceId, user.id) match {
       case Left(getInstanceThrowable) =>
@@ -41,9 +43,8 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
           case Success(roles) => Right(roles)
         }
     }
-  }
 
-  def addRole(localRole: Role): Either[ErrorMessage, Role] = {
+  def addRole(localRole: Role): Either[ErrorMessage, Role] =
     Await.result(roleRepository.addRole(localRole), Duration.Inf) match {
       case Failure(createRoleThrowable) =>
         val errorMessage = handleAddRoleThrowable(createRoleThrowable)
@@ -51,9 +52,8 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         Left(errorMessage)
       case Success(role) => Right(role)
     }
-  }
 
-  private def handleAddRoleThrowable(exception: Throwable): ErrorMessage = {
+  private def handleAddRoleThrowable(exception: Throwable): ErrorMessage =
     exception match {
       case exception: PSQLException if exception.getMessage.contains("duplicate key value") =>
         ErrorMessage(
@@ -68,7 +68,6 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
           developerMessage = exception.getMessage
         )
     }
-  }
 
   def generateRolePassword(length: Int = 8): String = {
     val algorithm = new SecureRandom
@@ -79,7 +78,7 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
     password.toString
   }
 
-  def getRole(roleId: Long): Either[ErrorMessage, Role]  = {
+  def getRole(roleId: Long): Either[ErrorMessage, Role] =
     Await.result(roleRepository.getRole(roleId), Duration.Inf) match {
       case Failure(getRoleThrowable) =>
         val errorMessage = ErrorMessage(
@@ -98,9 +97,8 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def existsRole(roleExistsFormData: RoleExistsFormData, user: User): Either[ErrorMessage, Boolean] = {
+  def existsRole(roleExistsFormData: RoleExistsFormData, user: User): Either[ErrorMessage, Boolean] =
     instanceService.getInstance(roleExistsFormData.instanceId, user.id) match {
       case Left(getInstanceThrowable) =>
         val errorMessage = ErrorMessage(
@@ -110,36 +108,38 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         )
         logger.error(errorMessage.toString)
         Left(errorMessage)
-      case Right(_) => Await.result(roleRepository.existsRole(roleExistsFormData.roleName, roleExistsFormData.instanceId), Duration.Inf) match {
-        case Failure(existRoleThrowable) =>
-          val errorMessage = ErrorMessage(
-            ErrorMessage.CODE_ROLE_EXISTS_FAILED,
-            ErrorMessage.MESSAGE_ROLE_EXISTS_FAILED,
-            developerMessage = existRoleThrowable.getMessage
-          )
-          logger.error(errorMessage.toString)
-          Left(errorMessage)
-        case Success(exists) =>
-          Right(exists)
-      }
+      case Right(_) =>
+        Await.result(
+          roleRepository.existsRole(roleExistsFormData.roleName, roleExistsFormData.instanceId),
+          Duration.Inf
+        ) match {
+          case Failure(existRoleThrowable) =>
+            val errorMessage = ErrorMessage(
+              ErrorMessage.CODE_ROLE_EXISTS_FAILED,
+              ErrorMessage.MESSAGE_ROLE_EXISTS_FAILED,
+              developerMessage = existRoleThrowable.getMessage
+            )
+            logger.error(errorMessage.toString)
+            Left(errorMessage)
+          case Success(exists) =>
+            Right(exists)
+        }
     }
-  }
 
-  def deleteRole(roleId: Long): Either[ErrorMessage, Int] = {
-      Await.result(roleRepository.deleteRole(roleId), Duration.Inf) match {
-        case Success(rows) => Right(rows)
-        case Failure(deleteRoleThrowable) =>
-          val getRoleErrorMessage = ErrorMessage(
-            ErrorMessage.CODE_ROLE_DELETE_FAILED,
-            ErrorMessage.MESSAGE_ROLE_DELETE_FAILED,
-            developerMessage = deleteRoleThrowable.getMessage
-          )
-          logger.warn(getRoleErrorMessage.toString)
-          Left(getRoleErrorMessage)
-      }
-  }
+  def deleteRole(roleId: Long): Either[ErrorMessage, Int] =
+    Await.result(roleRepository.deleteRole(roleId), Duration.Inf) match {
+      case Success(rows) => Right(rows)
+      case Failure(deleteRoleThrowable) =>
+        val getRoleErrorMessage = ErrorMessage(
+          ErrorMessage.CODE_ROLE_DELETE_FAILED,
+          ErrorMessage.MESSAGE_ROLE_DELETE_FAILED,
+          developerMessage = deleteRoleThrowable.getMessage
+        )
+        logger.warn(getRoleErrorMessage.toString)
+        Left(getRoleErrorMessage)
+    }
 
-  def deleteDatabaseRoles(instanceId: Long): Either[ErrorMessage, Int] = {
+  def deleteDatabaseRoles(instanceId: Long): Either[ErrorMessage, Int] =
     Await.result(roleRepository.deleteDatabaseRoles(instanceId), Duration.Inf) match {
       case Success(rows) => Right(rows)
       case Failure(deleteRolesThrowable) =>
@@ -151,5 +151,4 @@ class RoleService @Inject()(roleRepository: RoleRepository, instanceService: Ins
         logger.warn(deleteRolesErrorMessage.toString)
         Left(deleteRolesErrorMessage)
     }
-  }
 }

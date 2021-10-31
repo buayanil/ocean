@@ -1,25 +1,25 @@
 package services.cluster
 
-import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import java.sql.SQLTransientConnectionException
 import javax.inject.Inject
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
-
 import models.ErrorMessage
+import org.postgresql.util.PSQLException
+import play.api.Configuration
+import play.api.Logger
 import repositories.cluster.PgClusterRepository
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
+import scala.util.Failure
+import scala.util.Success
 
-
-class PgClusterService @Inject()(configuration: Configuration, pgClusterRepository: PgClusterRepository) {
+class PgClusterService @Inject() (configuration: Configuration, pgClusterRepository: PgClusterRepository) {
 
   val logger: Logger = Logger(this.getClass)
 
   val LDAP_GROUP_NAME: String = configuration.get[String]("ldap_role")
   val GENERIC_GROUP_NAME: String = configuration.get[String]("generic_role")
 
-  def createDatabase(databaseName: String, ownerName: String): Either[ErrorMessage, Boolean] = {
+  def createDatabase(databaseName: String, ownerName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.createDatabase(databaseName, ownerName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -27,9 +27,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  private def handleCreateDatabaseThrowable(throwable: Throwable): ErrorMessage = {
+  private def handleCreateDatabaseThrowable(throwable: Throwable): ErrorMessage =
     throwable match {
       case exception: PSQLException if exception.getMessage.contains("already exists") =>
         ErrorMessage(
@@ -50,9 +49,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
           developerMessage = exception.getMessage
         )
     }
-  }
 
-  def createRole(roleName: String, groupName: String): Either[ErrorMessage, Boolean] = {
+  def createRole(roleName: String, groupName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.createRole(roleName, groupName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -60,9 +58,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def createSecuredRole(roleName: String, groupName: String, password: String): Either[ErrorMessage, Boolean] = {
+  def createSecuredRole(roleName: String, groupName: String, password: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.createSecuredRole(roleName, groupName, password), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -70,9 +67,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  private def handleCreateRoleThrowable(throwable: Throwable): ErrorMessage = {
+  private def handleCreateRoleThrowable(throwable: Throwable): ErrorMessage =
     throwable match {
       case exception: PSQLException if exception.getMessage.contains("already exists") =>
         ErrorMessage(
@@ -87,9 +83,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
           developerMessage = exception.getMessage
         )
     }
-  }
 
-  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] = {
+  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.deleteDatabase(databaseName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -101,9 +96,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def deleteRole(roleName: String): Either[ErrorMessage, Boolean] = {
+  def deleteRole(roleName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.deleteRole(roleName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -115,9 +109,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def grantDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
+  def grantDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.grantDatabaseAccess(roleName, databaseName), Duration.Inf) match {
       case Failure(throwable) =>
         val errorMessage = ErrorMessage(
@@ -129,9 +122,8 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         Left(errorMessage)
       case Success(_) => Right(true)
     }
-  }
 
-  def removeDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] = {
+  def removeDatabaseAccess(roleName: String, databaseName: String): Either[ErrorMessage, Boolean] =
     Await.result(pgClusterRepository.removeDatabaseAccess(roleName, databaseName), Duration.Inf) match {
       case Failure(throwable) =>
         val errorMessage = ErrorMessage(
@@ -143,5 +135,4 @@ class PgClusterService @Inject()(configuration: Configuration, pgClusterReposito
         Left(errorMessage)
       case Success(_) => Right(true)
     }
-  }
 }
