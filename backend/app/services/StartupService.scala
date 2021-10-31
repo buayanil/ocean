@@ -1,17 +1,16 @@
 package services
 
-
 import javax.inject.Inject
-import play.api.{Configuration, Logger}
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
-
 import models.ErrorMessage
+import play.api.Configuration
+import play.api.Logger
 import repositories.cluster.PgClusterRepository
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
+import scala.util.Failure
+import scala.util.Success
 
-
-class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClusterRepository) {
+class StartupService @Inject() (config: Configuration, pgClusterRepository: PgClusterRepository) {
 
   val logger: Logger = Logger(this.getClass)
   runInternal()
@@ -21,7 +20,7 @@ class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClu
     checkForGenericRole()
   }
 
-  def checkForLdapRole(): Unit = {
+  def checkForLdapRole(): Unit =
     config.getOptional[String]("ldap_role") match {
       case None =>
         val errorMessage = ErrorMessage(
@@ -59,9 +58,8 @@ class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClu
             logger.info(f"Ldap role ${ldapRole} exists. No action needed.")
         }
     }
-  }
 
-  def checkForGenericRole(): Unit = {
+  def checkForGenericRole(): Unit =
     config.getOptional[String]("generic_role") match {
       case None =>
         val errorMessage = ErrorMessage(
@@ -99,5 +97,4 @@ class StartupService @Inject()(config: Configuration, pgClusterRepository: PgClu
             logger.info(f"Generic role ${genericRole} exists. No action needed.")
         }
     }
-  }
 }

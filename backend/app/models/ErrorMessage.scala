@@ -1,7 +1,7 @@
 package models
 
-import play.api.libs.json.{Json, OWrites}
-
+import play.api.libs.json.Json
+import play.api.libs.json.OWrites
 
 case class ErrorMessage(code: String, message: String, developerMessage: String = "")
 
@@ -149,4 +149,3 @@ object ErrorMessage {
   val MESSAGE_STARTUP_GENERIC_ROLE_NOT_EXISTS = "Generic role does not exists."
   val MESSAGE_STARTUP_GENERIC_ROLE_CREATE_FAILED = "Could not create generic role."
 }
-

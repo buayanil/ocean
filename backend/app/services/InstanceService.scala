@@ -1,22 +1,22 @@
 package services
 
+import forms.ExistsInstanceFormData
 import javax.inject.Inject
+import models.ErrorMessage
+import models.Instance
 import org.postgresql.util.PSQLException
 import play.api.Logger
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
-
-import forms.ExistsInstanceFormData
-import models.{ErrorMessage, Instance}
 import repositories.InstanceRepository
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
+import scala.util.Failure
+import scala.util.Success
 
-
-class InstanceService @Inject()(instanceRepository: InstanceRepository) {
+class InstanceService @Inject() (instanceRepository: InstanceRepository) {
 
   val logger: Logger = Logger(this.getClass)
 
-  def listAll(userId: Long): Either[ErrorMessage, Seq[Instance]] = {
+  def listAll(userId: Long): Either[ErrorMessage, Seq[Instance]] =
     Await.result(instanceRepository.listAll(userId), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
@@ -28,9 +28,8 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
         Left(errorMessage)
       case Success(instances) => Right(instances)
     }
-  }
 
-  def getInstance(id: Long, userId: Long): Either[ErrorMessage, Instance] = {
+  def getInstance(id: Long, userId: Long): Either[ErrorMessage, Instance] =
     Await.result(instanceRepository.get(id, userId), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
@@ -50,9 +49,8 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def addInstance(localInstance: Instance): Either[ErrorMessage, Instance] = {
+  def addInstance(localInstance: Instance): Either[ErrorMessage, Instance] =
     Await.result(instanceRepository.addInstance(localInstance), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = handleAddInstanceThrowable(exception)
@@ -60,9 +58,8 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
         Left(errorMessage)
       case Success(instance) => Right(instance)
     }
-  }
 
-  private def handleAddInstanceThrowable(exception: Throwable): ErrorMessage = {
+  private def handleAddInstanceThrowable(exception: Throwable): ErrorMessage =
     exception match {
       case exception: PSQLException if exception.getMessage.contains("duplicate key value") =>
         ErrorMessage(
@@ -77,12 +74,11 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
           developerMessage = exception.getMessage
         )
     }
-  }
 
-  def existsInstance(existsFormData: ExistsInstanceFormData): Either[ErrorMessage, Boolean] = {
+  def existsInstance(existsFormData: ExistsInstanceFormData): Either[ErrorMessage, Boolean] =
     Await.result(instanceRepository.exists(existsFormData.name, existsFormData.engine), Duration.Inf) match {
       case Failure(exception) =>
-        val errorMessage =  ErrorMessage(
+        val errorMessage = ErrorMessage(
           ErrorMessage.CODE_INSTANCE_EXISTS_FAILED,
           ErrorMessage.MESSAGE_INSTANCE_EXISTS_FAILED,
           developerMessage = exception.getMessage
@@ -91,9 +87,8 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
         Left(errorMessage)
       case Success(exists) => Right(exists)
     }
-  }
 
-  def deleteInstance(instanceId: Long, userId: Long): Either[ErrorMessage, Int] = {
+  def deleteInstance(instanceId: Long, userId: Long): Either[ErrorMessage, Int] =
     Await.result(instanceRepository.deleteInstance(instanceId, userId), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
@@ -105,5 +100,4 @@ class InstanceService @Inject()(instanceRepository: InstanceRepository) {
         Left(errorMessage)
       case Success(rows) => Right(rows)
     }
-  }
 }

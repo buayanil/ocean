@@ -1,6 +1,7 @@
 package models
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.Json
+import play.api.libs.json.OWrites
 
 sealed trait Response
 
@@ -43,6 +44,6 @@ object RoleDeletedResponse {
 case class InvitationDeletedResponse(rows: Int) extends Response
 
 object InvitationDeletedResponse {
-  implicit val invitationDeletedResponseWrites: OWrites[InvitationDeletedResponse] = Json.writes[InvitationDeletedResponse]
+  implicit val invitationDeletedResponseWrites: OWrites[InvitationDeletedResponse] =
+    Json.writes[InvitationDeletedResponse]
 }
-

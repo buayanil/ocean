@@ -1,13 +1,13 @@
 name := "backend"
- 
+
 version := "1.0"
 
 maintainer := "https://github.com/abteilung6"
-      
+
 lazy val `backend` = (project in file(".")).enablePlugins(PlayScala)
 
-resolvers += "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/"
-      
+resolvers += "Akka Snapshot Repository".at("https://repo.akka.io/snapshots/")
+
 scalaVersion := "2.13.5"
 
 libraryDependencies ++= Seq(
@@ -29,3 +29,6 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.11.1",
   "org.webjars" % "swagger-ui" % "3.52.5",
 )
+
+addCommandAlias("format", "scalafmt; test:scalafmt")
+addCommandAlias("formatCheck", "scalafmtCheck; test:scalafmtCheck")

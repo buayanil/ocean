@@ -1,17 +1,19 @@
 package repositories
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
+import models.Instance
+import models.Role
 import play.api.db.slick.DatabaseConfigProvider
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.util.Try
 import slick.jdbc.JdbcProfile
 
-import models.{Instance, Role}
-
-
-
 @Singleton
-class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanceRepository: InstanceRepository)(implicit ec: ExecutionContext) {
+class RoleRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, instanceRepository: InstanceRepository)(
+  implicit ec: ExecutionContext
+) {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -35,9 +37,8 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
 
     def idx = index("idx_instanceId_name", (instanceId, name), unique = true)
 
-    /**
-     * OneToMany relationship using a foreign key constraint.
-     */
+    /** OneToMany relationship using a foreign key constraint.
+      */
     def fkInstance =
       foreignKey("roles_fk_instance_id", instanceId, roles)(_.id, onDelete = ForeignKeyAction.Cascade)
   }
@@ -54,7 +55,8 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
   }
 
   def existsRole(roleName: String, instanceId: Long): Future[Try[Boolean]] = {
-    val existRoleStatement = roles.filter(role => role.name === roleName && role.instanceId === instanceId).exists.result.asTry
+    val existRoleStatement =
+      roles.filter(role => role.name === roleName && role.instanceId === instanceId).exists.result.asTry
     dbConfig.db.run(existRoleStatement)
   }
 
@@ -64,7 +66,8 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
   }
 
   def getRoleWithInstance(roleId: Long): Future[Try[Seq[(Role, Instance)]]] = {
-    val getRoleWithInstanceStatement = roles.filter(_.id === roleId).join(instanceRepository.instances).on((a, b) => a.instanceId ===b.id).result.asTry
+    val getRoleWithInstanceStatement =
+      roles.filter(_.id === roleId).join(instanceRepository.instances).on((a, b) => a.instanceId === b.id).result.asTry
     dbConfig.db.run(getRoleWithInstanceStatement)
   }
 
@@ -78,4 +81,3 @@ class RoleRepository @Inject()(dbConfigProvider: DatabaseConfigProvider, instanc
     dbConfig.db.run(deleteDatabaseRolesStatement)
   }
 }
-

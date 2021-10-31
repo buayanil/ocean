@@ -1,22 +1,38 @@
 package controllers
 
+import actions.UserAction
+import actions.UserRequest
+import forms.CreateRoleForm
+import forms.RoleExistsForm
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import javax.inject.Inject
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import models.ErrorResponse
+import models.ExistsRoleResponse
+import models.Role
+import models.RoleDeletedResponse
 import play.api.data.FormError
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
+import play.api.mvc.AbstractController
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.ControllerComponents
 import play.api.Logger
-import actions.{UserAction, UserRequest}
-import forms.{CreateRoleForm, RoleExistsForm}
-import io.swagger.annotations.{Api, ApiOperation, ApiParam, ApiResponse, ApiResponses}
-import models.{ErrorResponse, ExistsRoleResponse, Role, RoleDeletedResponse}
-import services.{RoleManagerService, RoleService}
-
+import services.RoleManagerService
+import services.RoleService
 
 @Api(value = "Roles")
-class RoleController @Inject()(cc: ControllerComponents,
-                               userAction: UserAction,
-                               roleService: RoleService,
-                               roleManagerService: RoleManagerService) extends AbstractController(cc) {
+class RoleController @Inject() (
+  cc: ControllerComponents,
+  userAction: UserAction,
+  roleService: RoleService,
+  roleManagerService: RoleManagerService
+) extends AbstractController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -34,10 +50,15 @@ class RoleController @Inject()(cc: ControllerComponents,
     response = classOf[Role],
     responseContainer = "List"
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
-  def getRolesByDatabaseId(@ApiParam(value = "ID of database that needs to be fetched", required = true) instanceId: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
+  def getRolesByDatabaseId(
+    @ApiParam(value = "ID of database that needs to be fetched", required = true) instanceId: Long
+  ): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     roleService.listInstanceRoles(instanceId, request.user) match {
       case Left(error) =>
         logger.error(error.toString)
@@ -52,23 +73,25 @@ class RoleController @Inject()(cc: ControllerComponents,
     httpMethod = "POST",
     response = classOf[Role]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
   def addRole(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     CreateRoleForm.form.bindFromRequest.fold(
       formWithErrors => {
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      createRoleFormData => {
+      createRoleFormData =>
         roleManagerService.addRole(createRoleFormData, request.user) match {
           case Left(error) =>
             logger.error(error.toString)
             BadRequest(Json.toJson(ErrorResponse(error)))
           case Right(instance) => Ok(Json.toJson(instance))
         }
-      }
     )
   }
 
@@ -78,15 +101,14 @@ class RoleController @Inject()(cc: ControllerComponents,
     httpMethod = "POST",
     response = classOf[ExistsRoleResponse]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(value = Array(new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
   def existsRole(): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     RoleExistsForm.form.bindFromRequest.fold(
       formWithErrors => {
         logger.warn(formWithErrors.errors.toString)
         UnprocessableEntity(Json.toJson(formWithErrors.errors))
       },
-      roleExistsFormData => {
+      roleExistsFormData =>
         roleService.existsRole(roleExistsFormData, request.user) match {
           case Left(error) =>
             logger.error(error.toString)
@@ -94,7 +116,6 @@ class RoleController @Inject()(cc: ControllerComponents,
           case Right(exists) =>
             Ok(Json.toJson(ExistsRoleResponse(exists)))
         }
-      }
     )
   }
 
@@ -104,9 +125,12 @@ class RoleController @Inject()(cc: ControllerComponents,
     httpMethod = "DELETE",
     response = classOf[RoleDeletedResponse]
   )
-  @ApiResponses(value = Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
-    new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])))
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "Invalid ID supplied", response = classOf[ErrorResponse]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[ErrorResponse])
+    )
+  )
   def deleteRole(id: Long): Action[AnyContent] = userAction { implicit request: UserRequest[AnyContent] =>
     roleManagerService.deleteRole(id, request.user) match {
       case Left(error) =>

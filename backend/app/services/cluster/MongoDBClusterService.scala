@@ -1,20 +1,19 @@
 package services.cluster
 
 import javax.inject.Inject
-import play.api.Logger
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
-
 import models.ErrorMessage
+import play.api.Logger
 import repositories.cluster.MongoDBRepository
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
+import scala.util.Failure
+import scala.util.Success
 
-
-class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
+class MongoDBClusterService @Inject() (mongoDBRepository: MongoDBRepository) {
 
   val logger: Logger = Logger(this.getClass)
 
-  def createDatabase(databaseName: String): Either[ErrorMessage, Boolean] = {
+  def createDatabase(databaseName: String): Either[ErrorMessage, Boolean] =
     Await.result(mongoDBRepository.createDatabase(databaseName), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
@@ -26,9 +25,8 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
         Left(errorMessage)
       case Success(value) => Right(value)
     }
-  }
 
-  def createUser(databaseName: String, username: String, password: String): Either[ErrorMessage, Boolean] = {
+  def createUser(databaseName: String, username: String, password: String): Either[ErrorMessage, Boolean] =
     Await.result(mongoDBRepository.createUser(databaseName, username, password), Duration.Inf) match {
       case Failure(exception) =>
         val errorMessage = ErrorMessage(
@@ -40,9 +38,8 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
         Left(errorMessage)
       case Success(value) => Right(value)
     }
-  }
 
-  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] = {
+  def deleteDatabase(databaseName: String): Either[ErrorMessage, Boolean] =
     Await.result(mongoDBRepository.deleteDatabase(databaseName), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -54,9 +51,8 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
-  def deleteUser(databaseName: String, username: String): Either[ErrorMessage, Boolean] = {
+  def deleteUser(databaseName: String, username: String): Either[ErrorMessage, Boolean] =
     Await.result(mongoDBRepository.deleteUser(databaseName, username), Duration.Inf) match {
       case Success(_) => Right(true)
       case Failure(throwable) =>
@@ -68,6 +64,5 @@ class MongoDBClusterService @Inject()(mongoDBRepository: MongoDBRepository) {
         logger.error(errorMessage.toString)
         Left(errorMessage)
     }
-  }
 
 }
