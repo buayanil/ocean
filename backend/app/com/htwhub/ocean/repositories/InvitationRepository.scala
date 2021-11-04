@@ -24,7 +24,7 @@ class InvitationRepository @Inject() (
   dbConfigProvider: DatabaseConfigProvider,
   instanceRepository: InstanceRepository,
   userRepository: UserRepository
-)(implicit ec: ExecutionContext) {
+)(implicit dbWriteOperationsContext: DbWriteOperationsContext) {
 
   import dbConfig._
   import profile.api._
@@ -57,30 +57,22 @@ class InvitationRepository @Inject() (
 
   val invitations = TableQuery[InvitationTable]
 
-  def getInvitationsByInstanceId(instanceId: InstanceId)(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[Invitation]] =
+  def getInvitationsByInstanceId(instanceId: InstanceId): Future[Seq[Invitation]] =
     dbConfig.db.run(
       invitations.filter(_.instanceId === instanceId).result
     )
 
-  def getInvitationById(invitationId: InvitationId)(implicit
-    simpleDbLookupsContext: SimpleDbLookupsContext
-  ): Future[Option[Invitation]] =
+  def getInvitationById(invitationId: InvitationId): Future[Option[Invitation]] =
     dbConfig.db.run(
       invitations.filter(_.id === invitationId).result.headOption
     )
 
-  def addInvitation(invitation: Invitation)(implicit
-    dbWriteOperationsContext: DbWriteOperationsContext
-  ): Future[InvitationId] =
+  def addInvitation(invitation: Invitation): Future[InvitationId] =
     dbConfig.db.run(
       invitations.returning(invitations.map(_.id)) += invitation
     )
 
-  def deleteInvitationById(invitationId: InvitationId)(implicit
-    dbWriteOperationsContext: DbWriteOperationsContext
-  ): Future[Int] =
+  def deleteInvitationById(invitationId: InvitationId): Future[Int] =
     dbConfig.db.run(
       invitations.filter(_.id === invitationId).delete
     )

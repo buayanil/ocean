@@ -1,7 +1,5 @@
 package com.htwhub.ocean.repositories
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.DbWriteOperationsContext
-import com.htwhub.ocean.concurrent.DatabaseContexts.ExpensiveDbLookupsContext
 import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.InstanceId
@@ -10,14 +8,13 @@ import com.htwhub.ocean.models.RoleId
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.db.slick.DatabaseConfigProvider
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import slick.jdbc.JdbcProfile
 import slick.lifted.ForeignKeyQuery
 
 @Singleton
 class RoleRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, instanceRepository: InstanceRepository)(
-  implicit ec: ExecutionContext
+  implicit impleDbLookupsContext: SimpleDbLookupsContext
 ) {
   import dbConfig._
   import profile.api._
@@ -41,35 +38,27 @@ class RoleRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, instan
 
   val roles = TableQuery[RoleTable]
 
-  def getRolesByInstanceId(instanceId: InstanceId)(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[Role]] =
+  def getRolesByInstanceId(instanceId: InstanceId): Future[Seq[Role]] =
     dbConfig.db.run(
       roles.filter(_.instanceId === instanceId).result
     )
 
-  def getRolesByName(roleName: String)(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[Role]] =
+  def getRolesByName(roleName: String): Future[Seq[Role]] =
     dbConfig.db.run(
       roles.filter(_.name === roleName).result
     )
 
-  def getRoleById(roleId: RoleId)(implicit
-    simpleDbLookupsContext: SimpleDbLookupsContext
-  ): Future[Option[Role]] =
+  def getRoleById(roleId: RoleId): Future[Option[Role]] =
     dbConfig.db.run(
       roles.filter(_.id === roleId).result.headOption
     )
 
-  def deleteRoleById(roleId: RoleId)(implicit dbWriteOperationsContext: DbWriteOperationsContext): Future[Int] =
+  def deleteRoleById(roleId: RoleId): Future[Int] =
     dbConfig.db.run(
       roles.filter(_.id === roleId).delete
     )
 
-  def deleteRoleByInstanceId(instanceId: InstanceId)(implicit
-    dbWriteOperationsContext: DbWriteOperationsContext
-  ): Future[Int] =
+  def deleteRolesByInstanceId(instanceId: InstanceId): Future[Int] =
     dbConfig.db.run(
       roles.filter(_.instanceId === instanceId).delete
     )

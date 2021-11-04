@@ -1,7 +1,5 @@
 package com.htwhub.ocean.repositories
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.DbWriteOperationsContext
-import com.htwhub.ocean.concurrent.DatabaseContexts.ExpensiveDbLookupsContext
 import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.InstanceId
@@ -11,7 +9,6 @@ import java.sql.Timestamp
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.db.slick.DatabaseConfigProvider
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import slick.jdbc.JdbcProfile
 import slick.lifted.ForeignKeyQuery
@@ -19,7 +16,7 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
 
 @Singleton
 class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, userRepository: UserRepository)(implicit
-  ec: ExecutionContext
+  simpleDbLookupsContext: SimpleDbLookupsContext
 ) {
 
   import dbConfig._
@@ -48,35 +45,27 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
 
   val instances = TableQuery[InstanceTable]
 
-  def getInstancesByUserId(userId: UserId)(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[Instance]] =
+  def getInstancesByUserId(userId: UserId): Future[Seq[Instance]] =
     dbConfig.db.run(
       instances.filter(_.userId === userId).result
     )
 
-  def getInstancesByName(name: String)(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[Instance]] =
+  def getInstancesByName(name: String): Future[Seq[Instance]] =
     dbConfig.db.run(
       instances.filter(_.name === name).result
     )
 
-  def getInstanceById(instanceId: InstanceId)(implicit
-    simpleDbLookupsContext: SimpleDbLookupsContext
-  ): Future[Option[Instance]] =
+  def getInstanceById(instanceId: InstanceId): Future[Option[Instance]] =
     dbConfig.db.run(
       instances.filter(_.id === instanceId).result.headOption
     )
 
-  def addInstance(instance: Instance)(implicit dbWriteOperationsContext: DbWriteOperationsContext): Future[InstanceId] =
+  def addInstance(instance: Instance): Future[InstanceId] =
     dbConfig.db.run(
       instances.returning(instances.map(_.id)) += instance
     )
 
-  def deleteInstanceById(instanceId: InstanceId)(implicit
-    dbWriteOperationsContext: DbWriteOperationsContext
-  ): Future[Int] =
+  def deleteInstanceById(instanceId: InstanceId): Future[Int] =
     dbConfig.db.run(
       instances.filter(_.id === instanceId).delete
     )
