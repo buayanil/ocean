@@ -1,8 +1,11 @@
 package com.htwhub.ocean.managers
 
+import com.htwhub.ocean.engines.MongoDBEngine
 import com.htwhub.ocean.engines.PostgreSQLEngine
 import com.htwhub.ocean.managers.DatabaseManager.Exceptions
 import com.htwhub.ocean.models.Instance
+import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
+import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.serializers.CreateInstanceFormData
@@ -15,7 +18,11 @@ import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class DatabaseManager @Inject() (instanceService: InstanceService, postgreSQLEngine: PostgreSQLEngine)(implicit
+class DatabaseManager @Inject() (
+  instanceService: InstanceService,
+  postgreSQLEngine: PostgreSQLEngine,
+  mongoDBEngine: MongoDBEngine
+)(implicit
   ec: ExecutionContext
 ) {
 
@@ -29,15 +36,22 @@ class DatabaseManager @Inject() (instanceService: InstanceService, postgreSQLEng
       createInstanceFormData.engine,
       Timestamp.from(Instant.now)
     )
-    val f1 = instanceService.addInstance(localInstance, user.id)
-    val f2 = postgreSQLEngine.createDatabase(createInstanceFormData.name)
-
-    f1
+    instanceService
+      .addInstance(localInstance, user.id)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      .flatMap { instance =>
-        f2
-          .flatMap(_ => Future(instance))
-          .recoverWith { t: Throwable => internalError(t.getMessage) }
+      .flatMap {
+        case instance if instance.engine == PostgreSQLEngineType =>
+          postgreSQLEngine
+            .createDatabase(createInstanceFormData.name)
+            .recoverWith { t: Throwable => internalError(t.getMessage) }
+            .flatMap(_ => Future.successful(instance))
+        case instance if instance.engine == MongoDBSQLEngineType =>
+          mongoDBEngine
+            .createDatabase(createInstanceFormData.name)
+            .recoverWith { t: Throwable => internalError(t.getMessage) }
+            .flatMap(_ => Future.successful(instance))
+        // TODO: create related exception "engine not found"
+        case _ => Future.failed(Exceptions.NotFound())
       }
   }
 

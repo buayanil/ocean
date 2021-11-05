@@ -2,6 +2,7 @@ package com.htwhub.ocean.repositories
 
 import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.Instance
+import com.htwhub.ocean.models.Instance.EngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
@@ -29,7 +30,7 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
     def id = column[InstanceId]("id", O.PrimaryKey, O.AutoInc)
     def userId = column[UserId]("user_id")
     def name = column[String]("name")
-    def engine = column[String]("engine")
+    def engine = column[EngineType]("engine")
     def createdAt = column[Timestamp](
       "created_at",
       SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
