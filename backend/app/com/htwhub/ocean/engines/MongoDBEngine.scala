@@ -78,6 +78,11 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
     processCommand(databaseName, dropUserDoc)
   }
 
+  def deleteUsers(databaseName: String, usernames: List[String]): Future[List[Any]] = {
+    val jobs = usernames.map(username => deleteUser(databaseName, username))
+    Future.sequence(jobs)
+  }
+
   private def processCommand(databaseName: String, document: Document): Future[Any] = {
     // TODO: Type Document
     val database = mongoClient.getDatabase(databaseName)

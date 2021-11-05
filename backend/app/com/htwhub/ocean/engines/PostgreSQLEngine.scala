@@ -37,6 +37,20 @@ class PostgreSQLEngine @Inject() ()(implicit ec: ExecutionContext) {
     db.run(createRoleInGroupWithPasswordStatement.as[Int])
   }
 
+  def dropRolesComplete(roleNames: List[String]): Future[List[Vector[Int]]] = {
+    val jobs: List[Future[Vector[Int]]] = roleNames map { roleName =>
+      dropRoleComplete(roleName)
+    }
+    Future.sequence(jobs)
+  }
+
+  def dropRoleComplete(roleName: String): Future[Vector[Int]] =
+    for {
+      job1 <- reassignedOwnedBy(roleName)
+      job2 <- dropOwnedBy(roleName)
+      job3 <- dropRole(roleName)
+    } yield (job1 ++ job2 ++ job3)
+
   def dropRole(roleName: String): Future[Vector[Int]] = {
     val dropRoleStatement = sql"""REASSIGN OWNED BY #${roleName} TO postgres"""
     db.run(dropRoleStatement.as[Int])
@@ -60,6 +74,13 @@ class PostgreSQLEngine @Inject() ()(implicit ec: ExecutionContext) {
   def revokeDatabaseAccess(roleName: String, databaseName: String): Future[Vector[Int]] = {
     val revokeDatabaseAccessStatement = sql"""REVOKE ALL PRIVILEGES ON DATABASE #${databaseName} FROM #${roleName}"""
     db.run(revokeDatabaseAccessStatement.as[Int])
+  }
+
+  def revokeDatabaseAccessBulk(roleNames: List[String], databaseName: String): Future[List[Vector[Int]]] = {
+    val jobs: List[Future[Vector[Int]]] = roleNames map { roleName =>
+      revokeDatabaseAccess(roleName, databaseName)
+    }
+    Future.sequence(jobs)
   }
 
   def dropOwnedBy(roleName: String): Future[Vector[Int]] = {

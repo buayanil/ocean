@@ -44,6 +44,13 @@ class RoleService @Inject() (roleRepository: RoleRepository, instanceService: In
       .deleteRoleById(roleId)
       .recoverWith { case t: Throwable => internalError(t.getMessage) }
 
+  def deleteRolesByIds(roleIds: List[RoleId], userId: UserId): Future[List[Int]] = {
+    val jobs: List[Future[Int]] = roleIds map { roleId =>
+      deleteRoleById(roleId, userId)
+    }
+    Future.sequence(jobs)
+  }
+
   def deleteRolesByInstanceId(instanceId: InstanceId, userId: UserId): Future[Int] =
     instanceService
       .getUserInstanceById(instanceId, userId)

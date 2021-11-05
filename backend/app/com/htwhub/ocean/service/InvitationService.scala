@@ -49,6 +49,11 @@ class InvitationService @Inject() (invitationRepository: InvitationRepository, i
       .deleteInvitationById(invitationId)
       .recoverWith { case t: Throwable => internalError(t.getMessage) }
 
+  def deleteInvitationsByIds(invitationIds: List[InvitationId], userId: UserId): Future[List[Int]] = {
+    val jobs = invitationIds map { invitationId => deleteInvitationById(invitationId, userId) }
+    Future.sequence(jobs)
+  }
+
   private def serviceErrorMapper(exc: InstanceServiceException): Future[Nothing] =
     exc match {
       case _: InstanceService.Exceptions.AccessDenied  => Future.failed(Exceptions.AccessDenied())
@@ -73,7 +78,5 @@ object InvitationService {
     final case class AccessDenied(message: String = "Access denied. You are not the instance owner")
         extends InvitationServiceException(message)
     final case class InternalError(message: String = "Internal error") extends InvitationServiceException(message)
-    final case class ValidationError(message: String = "Unprocessable entity")
-        extends InvitationServiceException(message)
   }
 }
