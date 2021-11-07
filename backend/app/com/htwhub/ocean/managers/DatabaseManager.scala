@@ -2,6 +2,7 @@ package com.htwhub.ocean.managers
 
 import com.htwhub.ocean.engines.MongoDBEngine
 import com.htwhub.ocean.engines.PostgreSQLEngine
+import com.htwhub.ocean.managers.exceptions.ManagerException
 import com.htwhub.ocean.managers.DatabaseManager.Exceptions
 import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
@@ -153,7 +154,7 @@ class DatabaseManager @Inject() (
 
 object DatabaseManager {
   object Exceptions {
-    sealed abstract class DatabaseManagerException(message: String) extends ServiceException(message)
+    sealed abstract class DatabaseManagerException(message: String) extends ManagerException(message)
 
     final case class NotFound(message: String = "Database not found") extends DatabaseManagerException(message)
     final case class AccessDenied(message: String = "Access denied. You are not the database owner")
