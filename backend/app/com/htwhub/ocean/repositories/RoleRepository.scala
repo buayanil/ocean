@@ -53,6 +53,11 @@ class RoleRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, instan
       roles.filter(_.id === roleId).result.headOption
     )
 
+  def addRole(role: Role): Future[RoleId] =
+    dbConfig.db.run(
+      roles.returning(roles.map(_.id)) += role
+    )
+
   def deleteRoleById(roleId: RoleId): Future[Int] =
     dbConfig.db.run(
       roles.filter(_.id === roleId).delete

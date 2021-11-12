@@ -39,6 +39,12 @@ class RoleService @Inject() (roleRepository: RoleRepository, instanceService: In
         case Some(role) => Future.successful(role)
       }
 
+  def addRole(localRole: Role, userId: UserId): Future[Role] =
+    roleRepository
+      .addRole(localRole)
+      .recoverWith { case t: Throwable => internalError(t.getMessage) }
+      .flatMap(roleId => getRoleByById(roleId, userId))
+
   def deleteRoleById(roleId: RoleId, userId: UserId): Future[Int] =
     roleRepository
       .deleteRoleById(roleId)
@@ -86,6 +92,5 @@ object RoleService {
     final case class AccessDenied(message: String = "Access denied. You are not the instance owner")
         extends RoleServiceException(message)
     final case class InternalError(message: String = "Internal error") extends RoleServiceException(message)
-    final case class ValidationError(message: String = "Unprocessable entity") extends RoleServiceException(message)
   }
 }

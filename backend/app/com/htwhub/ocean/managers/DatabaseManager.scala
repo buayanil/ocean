@@ -10,7 +10,6 @@ import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.serializers.CreateInstanceFormData
-import com.htwhub.ocean.service
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.InvitationService
@@ -35,6 +34,16 @@ class DatabaseManager @Inject() (
 ) {
 
   val logger: Logger = Logger(this.getClass)
+
+  def getUserInstances(user: User): Future[Seq[Instance]] =
+    instanceService
+      .getUserInstances(user.id)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
+  def getUserInstanceById(instanceId: InstanceId, user: User): Future[Instance] =
+    instanceService
+      .getUserInstanceById(instanceId, user.id)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
   def addDatabase(createInstanceFormData: CreateInstanceFormData, user: User): Future[Instance] = {
     val localInstance = Instance(
@@ -133,16 +142,18 @@ class DatabaseManager @Inject() (
   /** Layer upstream transformation `ServiceException` to `ManagerException` */
   def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
     exception match {
-      case _: InstanceService.Exceptions.AccessDenied           => Future.failed(Exceptions.AccessDenied())
-      case _: InstanceService.Exceptions.NotFound               => Future.failed(Exceptions.NotFound())
-      case e: InstanceService.Exceptions.InternalError          => Future.failed(Exceptions.InternalError(e.getMessage))
-      case _: service.RoleService.Exceptions.AccessDenied       => Future.failed(Exceptions.AccessDenied())
-      case _: service.RoleService.Exceptions.NotFound           => Future.failed(Exceptions.NotFound())
-      case e: service.RoleService.Exceptions.InternalError      => Future.failed(Exceptions.InternalError(e.getMessage))
-      case _: service.InvitationService.Exceptions.AccessDenied => Future.failed(Exceptions.AccessDenied())
-      case _: service.InvitationService.Exceptions.NotFound     => Future.failed(Exceptions.NotFound())
-      case e: service.InvitationService.Exceptions.InternalError =>
+      case _: InstanceService.Exceptions.AccessDenied   => Future.failed(Exceptions.AccessDenied())
+      case _: InstanceService.Exceptions.NotFound       => Future.failed(Exceptions.NotFound())
+      case e: InstanceService.Exceptions.InternalError  => Future.failed(Exceptions.InternalError(e.getMessage))
+      case _: RoleService.Exceptions.AccessDenied       => Future.failed(Exceptions.AccessDenied())
+      case _: RoleService.Exceptions.NotFound           => Future.failed(Exceptions.NotFound())
+      case e: RoleService.Exceptions.InternalError      => Future.failed(Exceptions.InternalError(e.getMessage))
+      case _: InvitationService.Exceptions.AccessDenied => Future.failed(Exceptions.AccessDenied())
+      case _: InvitationService.Exceptions.NotFound     => Future.failed(Exceptions.NotFound())
+      case e: InvitationService.Exceptions.InternalError =>
         Future.failed(Exceptions.InternalError(e.getMessage))
+
+      case _: Throwable => internalError("Uncaught exception")
     }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
