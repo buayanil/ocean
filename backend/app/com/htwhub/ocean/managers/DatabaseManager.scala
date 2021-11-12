@@ -18,6 +18,7 @@ import com.htwhub.ocean.service.UserService
 import java.sql.Timestamp
 import java.time.Instant
 import javax.inject.Inject
+import org.mongodb.scala.Completed
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -57,16 +58,32 @@ class DatabaseManager @Inject() (
       instance <- instanceService
         .addInstance(localInstance, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- postgreSQLEngine
-        .createDatabase(instance.name)
-        .recoverWith { t: Throwable => internalError(t.getMessage) }
+      _ <- addDatabaseForPostgreSQL(instance, user)
       if instance.engine == PostgreSQLEngineType
-      _ <- mongoDBEngine
-        .createDatabase(instance.name)
-        .recoverWith { t: Throwable => internalError(t.getMessage) }
+      _ <- addDatabaseForMongoDB(instance)
       if instance.engine == MongoDBSQLEngineType
     } yield instance
   }
+
+  def addDatabaseForPostgreSQL(instance: Instance, user: User): Future[List[Int]] =
+    for {
+      job1 <- postgreSQLEngine
+        .createDatabase(instance.name)
+        .recoverWith { t: Throwable => internalError(t.getMessage) }
+      job2 <- postgreSQLEngine
+        .revokePublicAccess(instance.name)
+        .recoverWith { t: Throwable => internalError(t.getMessage) }
+      job3 <- postgreSQLEngine
+        .grantDatabaseAccess(instance.name, user.username)
+        .recoverWith { t: Throwable => internalError(t.getMessage) }
+    } yield job1.toList ++ job2.toList ++ job3.toList
+
+  def addDatabaseForMongoDB(instance: Instance): Future[Completed] =
+    for {
+      job1 <- mongoDBEngine
+        .createDatabase(instance.name)
+        .recoverWith { t: Throwable => internalError(t.getMessage) }
+    } yield job1
 
   def deleteDatabase(instanceId: InstanceId, user: User): Future[List[Int]] =
     for {
