@@ -12,7 +12,7 @@ import slick.jdbc.JdbcProfile
 @Singleton
 class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
 
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
+  protected val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
   import profile.api._
@@ -28,7 +28,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     def * = (id, username, firstName, lastName, mail, employeeType) <> ((User.apply _).tupled, User.unapply)
   }
 
-  val users = TableQuery[UserTable]
+  protected val users = TableQuery[UserTable]
 
   def getUsers(): Future[Seq[User]] = dbConfig.db.run(
     users.result

@@ -3,12 +3,11 @@ package repositories
 import java.sql.Timestamp
 import javax.inject.Inject
 import javax.inject.Singleton
+import models.Instance
+import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Try
-
-import models.Instance
-import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.sql.SqlProfile.ColumnOption.SqlType
 

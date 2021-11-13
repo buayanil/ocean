@@ -7,6 +7,8 @@ import play.api.libs.functional.syntax.toInvariantFunctorOps
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.annotation.meta.field
 import slick.lifted.MappedTo
 
@@ -19,6 +21,13 @@ final case class Invitation(
 )
 
 object Invitation {
+
+  implicit val timestampReads: Reads[Timestamp] =
+    implicitly[Reads[Long]].map(new Timestamp(_))
+
+  implicit val timestampWrites: Writes[Timestamp] =
+    implicitly[Writes[Long]].contramap(_.getTime)
+
   implicit lazy val invitationFormat: OFormat[Invitation] = Json.format[Invitation]
 }
 
