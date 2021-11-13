@@ -1,4 +1,4 @@
-package com.htwhub.ocean.serializers
+package com.htwhub.ocean.serializers.auth
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat

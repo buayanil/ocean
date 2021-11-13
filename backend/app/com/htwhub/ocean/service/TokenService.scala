@@ -2,8 +2,8 @@ package com.htwhub.ocean.service
 
 import com.htwhub.ocean.serializers.auth.AccessTokenContent
 import com.htwhub.ocean.serializers.auth.AuthContent
+import com.htwhub.ocean.serializers.auth.AuthResponse
 import com.htwhub.ocean.serializers.auth.RefreshTokenContent
-import com.htwhub.ocean.serializers.AuthResponse
 import javax.inject.Inject
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.Jwt

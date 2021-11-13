@@ -104,7 +104,7 @@ class LdapService @Inject() (config: Configuration)(implicit ec: ExecutionContex
       ldapConnection
 
     }.recoverWith {
-      case e: LdapException => Future.failed(AccessDenied(e.getMessage))
+      case _: LdapException => Future.failed(AccessDenied())
       case t: Throwable     => internalError(t.getMessage)
     }
 
@@ -149,8 +149,7 @@ object LdapService {
 
     final case class EnvironmentError(message: String = "Could not load ldap environment")
         extends LdapServiceException(message)
-    final case class AccessDenied(message: String = "Access denied. You are not the ldap owner")
-        extends LdapServiceException(message)
+    final case class AccessDenied(message: String = "Access denied") extends LdapServiceException(message)
     final case class InternalError(message: String = "Internal error") extends LdapServiceException(message)
   }
 }

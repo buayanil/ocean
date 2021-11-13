@@ -2,7 +2,10 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET           /                                 controllers.HomeController.index()
+
+->            /auth                             com.htwhub.ocean.routers.AuthRouter
+
+GET           /foo                              controllers.HomeController.index()
 
 # Users
 GET           /user                             controllers.UserController.index()

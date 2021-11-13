@@ -5,9 +5,9 @@ import com.htwhub.ocean.managers.exceptions.ManagerException
 import com.htwhub.ocean.managers.AuthManager.Exceptions
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.serializers.auth.AccessTokenContent
+import com.htwhub.ocean.serializers.auth.AuthResponse
 import com.htwhub.ocean.serializers.auth.RefreshTokenContent
-import com.htwhub.ocean.serializers.AuthResponse
-import com.htwhub.ocean.serializers.SignInRequest
+import com.htwhub.ocean.serializers.auth.SignInRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.LdapService
 import com.htwhub.ocean.service.TokenService
@@ -51,7 +51,7 @@ class AuthManager @Inject() (
       Instant.now.getEpochSecond
     )
 
-  def handleFirstSignIn(ldapUser: User): Future[User] =
+  private def handleFirstSignIn(ldapUser: User): Future[User] =
     for {
       user <- userService
         .addUser(ldapUser)
@@ -63,8 +63,8 @@ class AuthManager @Inject() (
 
   def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
     exception match {
-      case _: LdapService.Exceptions.EnvironmentError => Future.failed(Exceptions.NotFound())
-      case _: LdapService.Exceptions.AccessDenied     => Future.failed(Exceptions.AccessDenied())
+      case e: LdapService.Exceptions.AccessDenied     => Future.failed(Exceptions.AccessDenied(e.getMessage))
+      case e: LdapService.Exceptions.EnvironmentError => Future.failed(Exceptions.InternalError(e.getMessage))
       case e: LdapService.Exceptions.InternalError    => Future.failed(Exceptions.InternalError(e.getMessage))
 
       case _: Throwable => internalError("Uncaught exception")
@@ -80,8 +80,7 @@ object AuthManager {
   object Exceptions {
     sealed abstract class AuthManagerException(message: String) extends ManagerException(message)
 
-    final case class NotFound(message: String = "User not found") extends AuthManagerException(message)
-    final case class AccessDenied(message: String = "Access denied.") extends AuthManagerException(message)
+    final case class AccessDenied(message: String = "Access denied") extends AuthManagerException(message)
     final case class InternalError(message: String = "Internal error") extends AuthManagerException(message)
   }
 }
