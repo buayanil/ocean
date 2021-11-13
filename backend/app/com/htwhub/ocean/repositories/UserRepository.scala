@@ -1,8 +1,5 @@
 package com.htwhub.ocean.repositories
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.DbWriteOperationsContext
-import com.htwhub.ocean.concurrent.DatabaseContexts.ExpensiveDbLookupsContext
-import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
 import javax.inject.Inject
@@ -33,27 +30,21 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   val users = TableQuery[UserTable]
 
-  def getUsers()(implicit
-    expensiveDbLookupsContext: ExpensiveDbLookupsContext
-  ): Future[Seq[User]] = dbConfig.db.run(
+  def getUsers(): Future[Seq[User]] = dbConfig.db.run(
     users.result
   )
 
-  def getUserById(userId: UserId)(implicit
-    simpleDbLookupsContext: SimpleDbLookupsContext
-  ): Future[Option[User]] =
+  def getUserById(userId: UserId): Future[Option[User]] =
     dbConfig.db.run(
       users.filter(_.id === userId).result.headOption
     )
 
-  def getUserByUsername(username: String)(implicit
-    simpleDbLookupsContext: SimpleDbLookupsContext
-  ): Future[Option[User]] =
+  def getUserByUsername(username: String): Future[Option[User]] =
     dbConfig.db.run(
       users.filter(_.username === username).result.headOption
     )
 
-  def addUser(user: User)(implicit dbWriteOperationsContext: DbWriteOperationsContext): Future[UserId] =
+  def addUser(user: User): Future[UserId] =
     dbConfig.db.run(
       users.returning(users.map(_.id)) += user
     )

@@ -133,7 +133,7 @@ class RoleManager @Inject() (
   }
 }
 
-object DatabaseManager {
+object RoleManager {
   object Exceptions {
     sealed abstract class RoleManagerException(message: String) extends ManagerException(message)
 

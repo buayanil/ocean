@@ -1,6 +1,5 @@
 package com.htwhub.ocean.service
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.repositories.UserRepository
@@ -9,14 +8,13 @@ import com.htwhub.ocean.service.UserService.Exceptions
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.Logger
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class UserService @Inject() (
   userRepository: UserRepository,
-)(implicit
-  simpleDbLookupsContext: SimpleDbLookupsContext,
-) {
+)(implicit ec: ExecutionContext) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -25,7 +23,16 @@ class UserService @Inject() (
       .getUserById(userId)
       .recoverWith { case t: Throwable => internalError(t.getMessage) }
       .flatMap {
-        case None       => notFoundUserError(userId)
+        case None       => notFoundUserIdError(userId)
+        case Some(user) => Future.successful(user)
+      }
+
+  def getUserByUsername(username: String): Future[User] =
+    userRepository
+      .getUserByUsername(username)
+      .recoverWith { case t: Throwable => internalError(t.getMessage) }
+      .flatMap {
+        case None       => notFoundUserNameError(username)
         case Some(user) => Future.successful(user)
       }
 
@@ -34,13 +41,22 @@ class UserService @Inject() (
     Future.sequence(jobs)
   }
 
+  def addUser(localUser: User): Future[User] =
+    userRepository
+      .addUser(localUser)
+      .recoverWith { case t: Throwable => internalError(t.getMessage) }
+      .flatMap(userId => getUserById(userId))
+
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)
     Future.failed(Exceptions.InternalError(errorMessage))
   }
 
-  private def notFoundUserError(userId: UserId) =
+  private def notFoundUserIdError(userId: UserId) =
     Future.failed(Exceptions.NotFound(s"There is no user with user_id: ${userId.value}"))
+
+  private def notFoundUserNameError(username: String) =
+    Future.failed(Exceptions.NotFound(s"There is no user with username: ${username}"))
 
 }
 
