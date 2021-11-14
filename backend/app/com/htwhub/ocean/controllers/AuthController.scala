@@ -40,14 +40,14 @@ class AuthController @Inject() (cc: ControllerComponents, authManager: AuthManag
       authManager
         .signIn(signInRequest)
         .map(response => Ok(Json.toJson(response)))
-        .recoverWith { case e: AuthManagerException => AuthController.exceptionToStatus(e) }
+        .recoverWith { case e: AuthManagerException => AuthController.exceptionToResult(e) }
     SignInSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
 }
 
 object AuthController {
-  def exceptionToStatus(e: AuthManagerException): Future[Result] = e match {
+  def exceptionToResult(e: AuthManagerException): Future[Result] = e match {
     case _: AuthManager.Exceptions.AccessDenied  => Future.successful(Forbidden(e.getMessage))
     case _: AuthManager.Exceptions.InternalError => Future.successful(BadRequest(e.getMessage))
   }
