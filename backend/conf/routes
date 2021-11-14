@@ -4,6 +4,7 @@
 # ~~~~
 
 ->            /auth                             com.htwhub.ocean.routers.AuthRouter
+->            /v1/databases                     com.htwhub.ocean.routers.DatabaseRouter
 
 GET           /foo                              controllers.HomeController.index()
 

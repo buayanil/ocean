@@ -39,11 +39,11 @@ class TokenService @Inject() (configuration: Configuration) {
     Jwt.encode(claims, SECRET_KEY, ALGO_TYPE)
   }
 
-  def getClaims(jwt: String): Option[AuthContent] =
+  def getClaims(jwt: String): Option[AccessTokenContent] =
     Jwt.decode(jwt, SECRET_KEY, Seq(ALGO_TYPE)).toOption match {
       case None => None
       // TODO: validate json parse for AuthContent
-      case Some(claim) => Some(Json.parse(claim.content).as[AuthContent])
+      case Some(claim) => Some(Json.parse(claim.content).as[AccessTokenContent])
     }
 
 }
