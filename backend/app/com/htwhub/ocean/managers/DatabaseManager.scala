@@ -9,7 +9,7 @@ import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
 import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.User
-import com.htwhub.ocean.serializers.CreateInstanceFormData
+import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.InvitationService
@@ -46,22 +46,22 @@ class DatabaseManager @Inject() (
       .getUserInstanceById(instanceId, user.id)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
-  def addDatabase(createInstanceFormData: CreateInstanceFormData, user: User): Future[Instance] = {
+  def addDatabase(createDatabaseRequest: CreateDatabaseRequest, user: User): Future[Instance] = {
     val localInstance = Instance(
       InstanceId(0),
       user.id,
-      createInstanceFormData.name,
-      createInstanceFormData.engine,
+      createDatabaseRequest.name,
+      createDatabaseRequest.engine,
       Timestamp.from(Instant.now)
     )
     for {
       instance <- instanceService
         .addInstance(localInstance, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- addDatabaseForPostgreSQL(instance, user)
-      if instance.engine == PostgreSQLEngineType
-      _ <- addDatabaseForMongoDB(instance)
-      if instance.engine == MongoDBSQLEngineType
+      _ <- instance match {
+        case value: Instance if value.engine == PostgreSQLEngineType => addDatabaseForPostgreSQL(value, user)
+        case value: Instance if value.engine == MongoDBSQLEngineType => addDatabaseForMongoDB(value)
+      }
     } yield instance
   }
 
@@ -157,7 +157,8 @@ class DatabaseManager @Inject() (
     } yield job1
 
   /** Layer upstream transformation `ServiceException` to `ManagerException` */
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    print("here", exception, exception.getMessage)
     exception match {
       case _: InstanceService.Exceptions.AccessDenied   => Future.failed(Exceptions.AccessDenied())
       case _: InstanceService.Exceptions.NotFound       => Future.failed(Exceptions.NotFound())
@@ -172,6 +173,7 @@ class DatabaseManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)

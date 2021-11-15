@@ -15,8 +15,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
 import play.api.mvc.Result
-import play.api.mvc.Results.BadRequest
-import play.api.mvc.Results.Forbidden
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -34,19 +32,19 @@ class AuthController @Inject() (cc: ControllerComponents, authManager: AuthManag
   }
 
   private def processSignInRequest[A]()(implicit request: Request[A]): Future[Result] = {
+
     def failure(badForm: Form[SignInRequest]): Future[Result] =
       Future.successful(BadRequest(badForm.errorsAsJson))
+
     def success(signInRequest: SignInRequest): Future[Result] =
       authManager
         .signIn(signInRequest)
         .map(response => Ok(Json.toJson(response)))
-        .recoverWith { case e: AuthManagerException => AuthController.exceptionToResult(e) }
+        .recoverWith { case e: AuthManagerException => exceptionToResult(e) }
+
     SignInSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
-}
-
-object AuthController {
   def exceptionToResult(e: AuthManagerException): Future[Result] = e match {
     case _: AuthManager.Exceptions.AccessDenied  => Future.successful(Forbidden(e.getMessage))
     case _: AuthManager.Exceptions.InternalError => Future.successful(BadRequest(e.getMessage))

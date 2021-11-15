@@ -4,8 +4,10 @@
 # ~~~~
 
 POST          /v1/auth/signin                   com.htwhub.ocean.controllers.AuthController.signIn
-GET           /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.getDatabases
 
+GET           /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.getDatabases
+GET           /v1/databases/:id                 com.htwhub.ocean.controllers.DatabaseController.getDatabaseById(id: Long)
+POST          /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.addDatabase()
 
 GET           /foo                              controllers.HomeController.index()
 

@@ -36,12 +36,11 @@ class UserAction @Inject() (
 
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] =
     processRequest(request)
+      .flatMap { user: User =>
+        block(UserRequest(user, request))
+      }
       .recoverWith { case e: UserActionException =>
         exceptionToResult(e)
-      }
-      .flatMap {
-        case request: Result => Future.successful(request)
-        case user: User      => block(UserRequest(user, request))
       }
 
   def processRequest[A](request: Request[A]): Future[User] =
