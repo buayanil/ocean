@@ -3,8 +3,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-->            /auth                             com.htwhub.ocean.routers.AuthRouter
-->            /v1/databases                     com.htwhub.ocean.routers.DatabaseRouter
+POST          /v1/auth/signin                   com.htwhub.ocean.controllers.AuthController.signIn
+GET           /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.getDatabases
+
 
 GET           /foo                              controllers.HomeController.index()
 

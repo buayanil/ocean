@@ -30,7 +30,5 @@ libraryDependencies ++= Seq(
   "org.webjars" % "swagger-ui" % "3.52.5",
 )
 
-routesGenerator := InjectedRoutesGenerator
-
 addCommandAlias("format", "scalafmt; test:scalafmt")
 addCommandAlias("formatCheck", "scalafmtCheck; test:scalafmtCheck")
