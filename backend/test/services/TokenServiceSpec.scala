@@ -6,6 +6,7 @@ import java.io.File
 import org.specs2.mutable._
 import play.api.Configuration
 
+@deprecated(message = "Only exists for demo purpose according to configuration files.")
 class TokenServiceSpec extends Specification {
 
   val myConfigFile = new File("conf/application.test.conf")

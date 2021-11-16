@@ -13,6 +13,8 @@ scalaVersion := "2.13.5"
 libraryDependencies ++= Seq(
   specs2 % Test,
   guice,
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+  "org.mockito" % "mockito-core" % "3.12.4" % Test,
   "org.apache.directory.api" % "api-all" % "2.0.2",
   "com.typesafe.play" %% "play-slick" % "5.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
