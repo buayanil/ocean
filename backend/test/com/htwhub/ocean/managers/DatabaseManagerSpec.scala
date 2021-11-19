@@ -6,6 +6,10 @@ import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
 import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
+import com.htwhub.ocean.models.Invitation
+import com.htwhub.ocean.models.InvitationId
+import com.htwhub.ocean.models.Role
+import com.htwhub.ocean.models.RoleId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
@@ -16,6 +20,7 @@ import com.htwhub.ocean.service.UserService
 import java.sql.Timestamp
 import java.time.Instant
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
@@ -122,7 +127,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
           verify(postgreSQLEngine, times(1)).createDatabase(instance.name)
           verify(postgreSQLEngine, times(1)).revokePublicAccess(instance.name)
           verify(postgreSQLEngine, times(1)).grantDatabaseAccess(instance.name, user.username)
-          verify(mongoDBEngine, times(0)).createDatabase(any[String])
+          verify(mongoDBEngine, never()).createDatabase(any[String])
           actual shouldBe instance
         }
       }
@@ -152,8 +157,75 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         // Assert
         futureInstance.map { actual =>
           verify(mongoDBEngine, times(1)).createDatabase(instance.name)
-          verify(postgreSQLEngine, times(0)).createDatabase(any[String])
+          verify(postgreSQLEngine, never()).createDatabase(any[String])
           actual shouldBe instance
+        }
+      }
+    }
+    "deleteDatabase" should {
+      "delete a database with engine type postgresql" in {
+        // Arrange
+
+        // Entities
+        val user = User(UserId(1), "user", "firstName", "lastName", "mail", "unknown")
+        val invitedUser = User(UserId(2), "invitedUser", "firstName", "lastName", "mail", "unknown")
+        val instance = Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
+        val roles: List[Role] = List(
+          Role(RoleId(1), instance.id, "alice", "password"),
+          Role(RoleId(2), instance.id, "bob", "password"),
+          Role(RoleId(3), instance.id, "eve", "password")
+        )
+        val invitations: List[Invitation] = List(
+          Invitation(InvitationId(1), instance.id, invitedUser.id, Timestamp.from(Instant.now))
+        )
+
+        // Collect instance data
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceById(any[InstanceId], any[UserId])).thenReturn(Future(instance))
+        when(instanceService.deleteInstance(any[InstanceId], any[UserId])).thenReturn(Future(1))
+
+        // roles delete process
+        val roleService = mock[RoleService]
+        when(roleService.getRolesByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(roles))
+        when(roleService.deleteRolesByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(1))
+
+        // invitation delete process
+        val invitationService = mock[InvitationService]
+        when(invitationService.getInvitationsByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(invitations))
+        val userService = mock[UserService]
+        when(userService.getUsersByIds(any[List[UserId]])).thenReturn(Future(List(invitedUser)))
+        when(invitationService.deleteInvitationsByIds(any[List[InvitationId]], any[UserId])).thenReturn(Future(List(1)))
+
+        // PostgreSQL engine process
+        val postgreSQLEngine = mock[PostgreSQLEngine]
+        when(postgreSQLEngine.deleteDatabase(any[String])).thenReturn(Future(Vector(1)))
+        when(postgreSQLEngine.dropRolesComplete(any[List[String]])).thenReturn(Future(List(Vector(1))))
+        when(postgreSQLEngine.revokeDatabaseAccessBulk(any[List[String]], any[String]))
+          .thenReturn(Future(List(Vector(1))))
+
+        val mongoDBEngine = mock[MongoDBEngine]
+        when(mongoDBEngine.deleteDatabase(any[String])).thenReturn(Future(Completed()))
+
+        val databaseManager =
+          createDatabaseManager(
+            instanceService = instanceService,
+            userService = userService,
+            roleService = roleService,
+            invitationService = invitationService,
+            postgreSQLEngine = postgreSQLEngine,
+            mongoDBEngine = mongoDBEngine,
+          )
+
+        // Act
+        val futureReturn = databaseManager.deleteDatabase(instance.id, user)
+
+        // Assert
+        futureReturn.map { actual =>
+          verify(postgreSQLEngine, times(1)).deleteDatabase(instance.name)
+          verify(postgreSQLEngine, times(1)).dropRolesComplete(List("alice", "bob", "eve"))
+          verify(postgreSQLEngine, times(1)).revokeDatabaseAccessBulk(any[List[String]], any[String])
+          verify(mongoDBEngine, never()).createDatabase(any[String])
+          actual.isEmpty shouldBe false
         }
       }
     }

@@ -90,9 +90,11 @@ class DatabaseManager @Inject() (
       instance <- instanceService
         .getUserInstanceById(instanceId, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      job1 <- deleteDatabaseForPostgreSQL(instance, user) if instance.engine == PostgreSQLEngineType
-      job2 <- deleteDatabaseForMongoDB(instance, user) if instance.engine == MongoDBSQLEngineType
-    } yield job1 ++ job2
+      job1 <- instance match {
+        case value: Instance if instance.engine == PostgreSQLEngineType => deleteDatabaseForPostgreSQL(value, user)
+        case value: Instance if instance.engine == MongoDBSQLEngineType => deleteDatabaseForMongoDB(value, user)
+      }
+    } yield job1
 
   def deleteDatabaseForPostgreSQL(instance: Instance, user: User): Future[List[Int]] =
     for {
@@ -112,12 +114,12 @@ class DatabaseManager @Inject() (
         .getRolesByInstanceId(instance.id, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       job1 <- roleService
-        .deleteRolesByIds(roles.map(_.id).toList, user.id)
+        .deleteRolesByInstanceId(instance.id, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       job2 <- postgreSQLEngine
         .dropRolesComplete(roles.map(_.name).toList)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
-    } yield job1 ++ job2.map(_.sum)
+    } yield List(job1) ++ job2.map(_.sum)
 
   def deleteInvitationsForPostgreSQL(instance: Instance, user: User): Future[List[Int]] =
     for {
