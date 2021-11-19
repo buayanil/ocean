@@ -8,6 +8,7 @@ POST          /v1/auth/signin                   com.htwhub.ocean.controllers.Aut
 GET           /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.getDatabases
 GET           /v1/databases/:id                 com.htwhub.ocean.controllers.DatabaseController.getDatabaseById(id: Long)
 POST          /v1/databases                     com.htwhub.ocean.controllers.DatabaseController.addDatabase()
+DELETE        /v1/databases/:id                 com.htwhub.ocean.controllers.DatabaseController.deleteDatabase(id: Long)
 
 GET           /foo                              controllers.HomeController.index()
 

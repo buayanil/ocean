@@ -61,6 +61,13 @@ class DatabaseController @Inject() (cc: ControllerComponents, userAction: UserAc
     CreateDatabaseSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
+  def deleteDatabase(id: Long): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    databaseManager
+      .deleteDatabase(InstanceId(id), request.user)
+      .map(_ => Ok(""))
+      .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+  }
+
   def exceptionToResult(e: DatabaseManagerException): Future[Result] = e match {
     case _: DatabaseManager.Exceptions.NotFound      => Future.successful(NotFound(e.getMessage))
     case _: DatabaseManager.Exceptions.AccessDenied  => Future.successful(Forbidden(e.getMessage))
