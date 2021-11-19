@@ -32,6 +32,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "swagger-ui" % "3.52.5",
 )
 
+coverageEnabled in Test := true
+
 addCommandAlias("format", "scalafmt; test:scalafmt")
 addCommandAlias("formatCheck", "scalafmtCheck; test:scalafmtCheck")
 addCommandAlias("cov", "clean; coverage; test; coverageReport;")
