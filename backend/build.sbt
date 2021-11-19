@@ -34,3 +34,4 @@ libraryDependencies ++= Seq(
 
 addCommandAlias("format", "scalafmt; test:scalafmt")
 addCommandAlias("formatCheck", "scalafmtCheck; test:scalafmtCheck")
+addCommandAlias("cov", "clean; coverage; test; coverageReport;")
