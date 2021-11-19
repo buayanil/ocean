@@ -13,9 +13,20 @@ Runs the app in the staging mode.
 ### `sbt test`
 Launches the test runner
 
+### `sbt cov`
+Generates coverage reports.
+
+### `sbt format`
+Runs the formatter.
+
+
 ### `sbt dist`
 Builds the app for production
 
-## Learn More
+## Build With
 
-You can learn more in the [Play documentation](https://www.playframework.com/documentation/2.8.x/Home).
+* [SBT](https://www.scala-sbt.org/) Build and dependency management
+* [Play](https://www.playframework.com/)  Web Framework
+* [Slick](http://slick.lightbend.com/) Database query and access library
+* [ScalaTest](http://www.scalatest.org/) Unit-testing framework
+* [ScalaMock](https://scalamock.org/) Unit-testing framework
