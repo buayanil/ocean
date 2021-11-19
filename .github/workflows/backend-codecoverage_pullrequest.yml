@@ -1,0 +1,36 @@
+name: Backend Codecoverage for Pullrequest
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: backend
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v2
+
+      - name: Setup Java and Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.11
+
+      - name: Check dependencies
+        working-directory: ${{env.working-directory}}
+        run: sbt clean compile
+
+      - name: Run tests
+          working-directory: ${{env.working-directory}}
+          run: sbt cov
+
+      - name: Upload coverage data to Codecov
+          uses: codecov/codecov-action@v1
+          working-directory: ${{env.working-directory}}
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            verbose: True
