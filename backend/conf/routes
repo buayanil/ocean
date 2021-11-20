@@ -14,6 +14,8 @@ DELETE        /v1/databases/:id                      com.htwhub.ocean.controller
 
 # Roles
 POST          /v1/roles                              com.htwhub.ocean.controllers.RoleController.addRole()
+DELETE        /v1/roles/:id                          com.htwhub.ocean.controllers.RoleController.deleteRole(id: Long)
+
 
 GET           /foo                                   controllers.HomeController.index()
 

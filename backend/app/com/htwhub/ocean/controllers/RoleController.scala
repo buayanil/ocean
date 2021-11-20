@@ -5,6 +5,7 @@ import com.htwhub.ocean.actions.UserRequest
 import com.htwhub.ocean.managers.RoleManager
 import com.htwhub.ocean.managers.RoleManager.Exceptions.RoleManagerException
 import com.htwhub.ocean.models.InstanceId
+import com.htwhub.ocean.models.RoleId
 import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.serializers.role.CreateRoleSerializer
 import javax.inject.Inject
@@ -53,6 +54,13 @@ class RoleController @Inject() (cc: ControllerComponents, userAction: UserAction
         .recoverWith { case e: RoleManagerException => exceptionToResult(e) }
 
     CreateRoleSerializer.constraints.bindFromRequest().fold(failure, success)
+  }
+
+  def deleteRole(id: Long): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    roleManager
+      .deleteRoleById(RoleId(id), request.user)
+      .map(_ => Ok(""))
+      .recoverWith { case e: RoleManagerException => exceptionToResult(e) }
   }
 
   def exceptionToResult(e: RoleManagerException): Future[Result] = e match {

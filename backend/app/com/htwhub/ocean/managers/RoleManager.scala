@@ -85,9 +85,12 @@ class RoleManager @Inject() (
       instance <- instanceService
         .getUserInstanceById(role.instanceId, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      job1 <- deleteRoleForPostgreSQL(role, user) if instance.engine == PostgreSQLEngineType
-      job2 <- deleteRoleForMongoDB(role, instance, user) if instance.engine == MongoDBSQLEngineType
-    } yield job1 ++ job2
+      job1 <- instance match {
+        case _ if instance.engine == PostgreSQLEngineType => deleteRoleForPostgreSQL(role, user)
+        case _ if instance.engine == MongoDBSQLEngineType => deleteRoleForMongoDB(role, instance, user)
+        case _                                            => internalError("Wrong engine type")
+      }
+    } yield job1
 
   def deleteRoleForPostgreSQL(role: Role, user: User): Future[List[Int]] =
     for {
