@@ -52,7 +52,7 @@ class PostgreSQLEngine @Inject() ()(implicit ec: ExecutionContext) {
     } yield (job1 ++ job2 ++ job3)
 
   def dropRole(roleName: String): Future[Vector[Int]] = {
-    val dropRoleStatement = sql"""REASSIGN OWNED BY #${roleName} TO postgres"""
+    val dropRoleStatement = sql"""DROP ROLE #${roleName}"""
     db.run(dropRoleStatement.as[Int])
   }
 
