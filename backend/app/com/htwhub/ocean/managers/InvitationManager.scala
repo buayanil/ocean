@@ -37,7 +37,27 @@ class InvitationManager @Inject() (
       .getInvitationsByInstanceId(instanceId, user.id)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
-  def addInvitation(createRoleRequest: CreateInvitationRequest, user: User): Future[Invitation] = {
+  def addInvitation(createRoleRequest: CreateInvitationRequest, user: User): Future[Invitation] =
+    for {
+      instance <- instanceService
+        .getUserInstanceById(InstanceId(createRoleRequest.instanceId), user.id)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+      invitedUser <- userService
+        .getUserById(UserId(createRoleRequest.userId))
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+      invitation <- instance match {
+        case _ if instance.engine == Instance.PostgreSQLEngineType =>
+          addInvitationForPostgreSQL(createRoleRequest, instance, user, invitedUser)
+        case _ => internalError("Wrong engine type")
+      }
+    } yield invitation
+
+  def addInvitationForPostgreSQL(
+    createRoleRequest: CreateInvitationRequest,
+    instance: Instance,
+    user: User,
+    invitedUser: User
+  ): Future[Invitation] = {
     val localInvitation = Invitation(
       InvitationId(0),
       InstanceId(createRoleRequest.instanceId),
@@ -48,22 +68,11 @@ class InvitationManager @Inject() (
       invitation <- invitationService
         .addInvitation(localInvitation, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      instance <- instanceService
-        .getUserInstanceById(invitation.instanceId, user.id)
-        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      invitedUser <- userService
-        .getUserById(invitation.userId)
-        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- addInvitationForPostgreSQL(instance, invitedUser) if instance.engine == Instance.PostgreSQLEngineType
-    } yield invitation
-  }
-
-  def addInvitationForPostgreSQL(instance: Instance, invitedUser: User): Future[List[Int]] =
-    for {
-      job1 <- postgreSQLEngine
+      _ <- postgreSQLEngine
         .grantDatabaseAccess(instance.name, invitedUser.username)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
-    } yield job1.toList
+    } yield invitation
+  }
 
   def deleteInvitationById(invitationId: InvitationId, user: User): Future[List[Int]] =
     for {
@@ -76,16 +85,21 @@ class InvitationManager @Inject() (
       invitedUser <- userService
         .getUserById(invitation.userId)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      job1 <- deleteInvitationForPostgreSQL(instance, invitedUser, user)
+      job1 <- deleteInvitationForPostgreSQL(instance, invitation, invitedUser, user)
     } yield job1
 
-  def deleteInvitationForPostgreSQL(instance: Instance, invitedUser: User, user: User): Future[List[Int]] =
+  def deleteInvitationForPostgreSQL(
+    instance: Instance,
+    invitation: Invitation,
+    invitedUser: User,
+    user: User
+  ): Future[List[Int]] =
     for {
       job1 <- postgreSQLEngine
         .revokeDatabaseAccess(invitedUser.username, instance.name)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
-      job2 <- instanceService
-        .deleteInstance(instance.id, user.id)
+      job2 <- invitationService
+        .deleteInvitationById(invitation.id, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
     } yield job1.toList ++ List(job2)
 
