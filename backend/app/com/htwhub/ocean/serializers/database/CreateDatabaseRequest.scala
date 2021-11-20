@@ -2,7 +2,8 @@ package com.htwhub.ocean.serializers.database
 
 import com.htwhub.ocean.models.Instance.EngineType
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.mapping
+import play.api.data.Forms.text
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 

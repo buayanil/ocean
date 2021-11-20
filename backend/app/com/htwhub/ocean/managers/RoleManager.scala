@@ -3,7 +3,7 @@ package com.htwhub.ocean.managers
 import com.htwhub.ocean.engines.MongoDBEngine
 import com.htwhub.ocean.engines.PostgreSQLEngine
 import com.htwhub.ocean.managers.exceptions.ManagerException
-import com.htwhub.ocean.managers.DatabaseManager.Exceptions
+import com.htwhub.ocean.managers.RoleManager.Exceptions
 import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
 import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
@@ -11,7 +11,7 @@ import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.Role
 import com.htwhub.ocean.models.RoleId
 import com.htwhub.ocean.models.User
-import com.htwhub.ocean.serializers.CreateRoleFormData
+import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.RoleService
@@ -42,18 +42,21 @@ class RoleManager @Inject() (
       .getRolesByInstanceId(instanceId, user.id)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
-  def addRole(createRoleFormData: CreateRoleFormData, user: User): Future[Role] = {
+  def addRole(createRoleRequest: CreateRoleRequest, user: User): Future[Role] = {
     val rolePassword = generateRolePassword()
-    val localRole = Role(RoleId(0), createRoleFormData.instanceId, createRoleFormData.roleName, rolePassword)
+    val localRole = Role(RoleId(0), InstanceId(createRoleRequest.instanceId), createRoleRequest.roleName, rolePassword)
     for {
       instance <- instanceService
-        .getUserInstanceById(createRoleFormData.instanceId, user.id)
+        .getUserInstanceById(InstanceId(createRoleRequest.instanceId), user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       role <- roleService
         .addRole(localRole, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      job2 <- addRoleForPostgreSQL(role, instance) if instance.engine == Instance.PostgreSQLEngineType
-      job3 <- addRoleForMongoDB(role, instance) if instance.engine == Instance.MongoDBSQLEngineType
+      _ <- role match {
+        case _ if instance.engine == Instance.PostgreSQLEngineType => addRoleForPostgreSQL(role, instance)
+        case _ if instance.engine == Instance.MongoDBSQLEngineType => addRoleForMongoDB(role, instance)
+        case _                                                     => internalError("Wrong engine type")
+      }
     } yield role
   }
 
@@ -98,7 +101,7 @@ class RoleManager @Inject() (
 
   def deleteRoleForMongoDB(role: Role, instance: Instance, user: User): Future[List[Int]] =
     for {
-      job1 <- mongoDBEngine
+      _ <- mongoDBEngine
         .deleteUser(instance.name, role.name)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
       job2 <- roleService
@@ -118,10 +121,8 @@ class RoleManager @Inject() (
       case _: Throwable => internalError("Uncaught exception")
     }
 
-  private def internalError(errorMessage: String): Future[Nothing] = {
-    logger.error(errorMessage)
+  private def internalError(errorMessage: String): Future[Nothing] =
     Future.failed(Exceptions.InternalError(errorMessage))
-  }
 
   private def generateRolePassword(length: Int = 8): String = {
     val algorithm = new SecureRandom
