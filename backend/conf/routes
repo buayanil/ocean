@@ -3,7 +3,11 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# Authentication
 POST          /v1/auth/signin                              com.htwhub.ocean.controllers.AuthController.signIn
+
+# User
+GET           /v1/user                                     com.htwhub.ocean.controllers.UserController.getUser
 
 # Database
 GET           /v1/databases                                com.htwhub.ocean.controllers.DatabaseController.getDatabases
