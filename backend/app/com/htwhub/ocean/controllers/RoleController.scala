@@ -6,6 +6,9 @@ import com.htwhub.ocean.managers.RoleManager
 import com.htwhub.ocean.managers.RoleManager.Exceptions.RoleManagerException
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.RoleId
+import com.htwhub.ocean.serializers.role.AvailabilityRoleRequest
+import com.htwhub.ocean.serializers.role.AvailabilityRoleResponse
+import com.htwhub.ocean.serializers.role.AvailabilityRoleSerializer
 import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.serializers.role.CreateRoleSerializer
 import javax.inject.Inject
@@ -36,6 +39,24 @@ class RoleController @Inject() (cc: ControllerComponents, userAction: UserAction
         .getRolesByInstanceId(InstanceId(instanceId), request.user)
         .map(roles => Ok(Json.toJson(roles)))
         .recoverWith { case e: RoleManagerException => exceptionToResult(e) }
+  }
+
+  def getRoleAvailability: Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    processAvailabilityRoleRequest()
+  }
+
+  def processAvailabilityRoleRequest[A]()(implicit request: UserRequest[A]): Future[Result] = {
+
+    def failure(badForm: Form[AvailabilityRoleRequest]): Future[Result] =
+      Future.successful(BadRequest(badForm.errorsAsJson))
+
+    def success(availableRoleRequest: AvailabilityRoleRequest): Future[Result] =
+      roleManager
+        .getRoleAvailability(availableRoleRequest)
+        .map(response => Ok(Json.toJson(AvailabilityRoleResponse(response))))
+        .recoverWith { case e: RoleManagerException => exceptionToResult(e) }
+
+    AvailabilityRoleSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
   def addRole(): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>

@@ -43,7 +43,7 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
         internalError(t.getMessage)
       }
       .flatMap(instances =>
-        instances.find(instance => instance.engine == engine) match {
+        instances.find(_.engine == engine) match {
           case Some(_) => Future.successful(false)
           case None    => Future.successful(true)
         }

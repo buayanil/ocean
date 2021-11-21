@@ -39,6 +39,19 @@ class RoleService @Inject() (roleRepository: RoleRepository, instanceService: In
         case Some(role) => Future.successful(role)
       }
 
+  def getRoleAvailability(instanceId: InstanceId, roleName: String): Future[Boolean] =
+    roleRepository
+      .getRolesByInstanceId(instanceId)
+      .recoverWith { case t: Throwable =>
+        internalError(t.getMessage)
+      }
+      .flatMap(roles =>
+        roles.find(_.name == roleName) match {
+          case Some(_) => Future.successful(false)
+          case None    => Future.successful(true)
+        }
+      )
+
   def addRole(localRole: Role, userId: UserId): Future[Role] =
     roleRepository
       .addRole(localRole)

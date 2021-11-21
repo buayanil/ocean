@@ -21,6 +21,7 @@ DELETE        /v1/databases/:id                            com.htwhub.ocean.cont
 
 # Roles
 POST          /v1/roles                                    com.htwhub.ocean.controllers.RoleController.addRole()
+POST          /v1/roles/_availability_                     com.htwhub.ocean.controllers.RoleController.getRoleAvailability
 DELETE        /v1/roles/:id                                com.htwhub.ocean.controllers.RoleController.deleteRole(id: Long)
 
 # Invitations

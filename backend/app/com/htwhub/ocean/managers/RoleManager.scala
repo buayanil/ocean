@@ -11,6 +11,7 @@ import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.Role
 import com.htwhub.ocean.models.RoleId
 import com.htwhub.ocean.models.User
+import com.htwhub.ocean.serializers.role.AvailabilityRoleRequest
 import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
@@ -40,6 +41,11 @@ class RoleManager @Inject() (
   def getRolesByInstanceId(instanceId: InstanceId, user: User): Future[Seq[Role]] =
     roleService
       .getRolesByInstanceId(instanceId, user.id)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
+  def getRoleAvailability(availabilityRoleRequest: AvailabilityRoleRequest): Future[Boolean] =
+    roleService
+      .getRoleAvailability(InstanceId(availabilityRoleRequest.instanceId), availabilityRoleRequest.roleName)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
   def addRole(createRoleRequest: CreateRoleRequest, user: User): Future[Role] = {
