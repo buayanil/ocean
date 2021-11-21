@@ -2,8 +2,15 @@ package com.htwhub.ocean.controllers
 
 import com.htwhub.ocean.managers.AuthManager
 import com.htwhub.ocean.managers.AuthManager.Exceptions.AuthManagerException
+import com.htwhub.ocean.serializers.auth.AuthResponse
 import com.htwhub.ocean.serializers.auth.SignInRequest
 import com.htwhub.ocean.serializers.auth.SignInSerializer
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.i18n.Lang
@@ -19,6 +26,7 @@ import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+@Api(value = "Authorization")
 class AuthController @Inject() (cc: ControllerComponents, authManager: AuthManager)(implicit
   ec: ExecutionContext
 ) extends AbstractController(cc) {
@@ -27,6 +35,28 @@ class AuthController @Inject() (cc: ControllerComponents, authManager: AuthManag
 
   implicit val messages: Messages = messagesApi.preferred(Seq(Lang.defaultLang))
 
+  @ApiOperation(
+    value = "Sign In",
+    notes = "Sign in and retrieve an access token.",
+    httpMethod = "POST",
+    response = classOf[AuthResponse]
+  )
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        value = "Sign in request",
+        required = true,
+        dataTypeClass = classOf[SignInRequest],
+        paramType = "body"
+      )
+    )
+  )
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "InternalError", response = classOf[String]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[String])
+    )
+  )
   def signIn: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     processSignInRequest()
   }
