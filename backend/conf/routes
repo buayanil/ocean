@@ -28,33 +28,6 @@ DELETE        /v1/roles/:id                                com.htwhub.ocean.cont
 POST          /v1/invitations                              com.htwhub.ocean.controllers.InvitationController.addInvitation()
 DELETE        /v1/invitations/:id                          com.htwhub.ocean.controllers.InvitationController.deleteInvitation(id: Long)
 
-
-GET           /foo                                         controllers.HomeController.index()
-
-# Users
-GET           /user                                        controllers.UserController.index()
-GET           /users                                       controllers.UserController.getAll
-POST          /users                                       controllers.UserController.getAllForPattern()
-POST          /login                                       controllers.UserController.login()
-
-# Databases
-GET           /databases                                   controllers.InstanceController.getDatabases
-GET           /databases/:id                               controllers.InstanceController.getDatabaseById(id: Long)
-GET           /databases/:id/roles                         controllers.RoleController.getRolesByDatabaseId(id: Long)
-GET           /databases/:id/invitations                   controllers.InvitationController.getInvitationsByDatabaseId(id: Long)
-POST          /databases                                   controllers.InstanceController.addDatabase()
-POST          /databases/_exists_                          controllers.InstanceController.existsDatabase()
-DELETE        /databases/:id                               controllers.InstanceController.deleteDatabase(id: Long)
-
-# Database roles
-POST          /roles                                       controllers.RoleController.addRole()
-POST          /roles/_exists_                              controllers.RoleController.existsRole()
-DELETE        /roles/:id                                   controllers.RoleController.deleteRole(id: Long)
-
-# Database invitations
-POST          /invitations                                 controllers.InvitationController.addInvitation()
-DELETE        /invitations/:id                             controllers.InvitationController.deleteInvitation(id: Long)
-
 # Swagger
 GET           /swagger.json                                controllers.Assets.at(path="/public", file="swagger.json")
 GET           /docs/swagger-ui/*file                       controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
