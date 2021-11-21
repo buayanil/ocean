@@ -6,8 +6,8 @@ import com.htwhub.ocean.managers.InvitationManager
 import com.htwhub.ocean.managers.InvitationManager.Exceptions.InvitationManagerException
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.InvitationId
-import com.htwhub.ocean.serializers.CreateInvitationRequest
-import com.htwhub.ocean.serializers.CreateInvitationSerializer
+import com.htwhub.ocean.serializers.invitation.CreateInvitationRequest
+import com.htwhub.ocean.serializers.invitation.CreateInvitationSerializer
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.i18n.Lang

@@ -1,8 +1,7 @@
-package com.htwhub.ocean.serializers
+package com.htwhub.ocean.serializers.invitation
 
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data.Forms.mapping
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 

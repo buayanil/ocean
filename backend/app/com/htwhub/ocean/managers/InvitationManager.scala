@@ -9,7 +9,7 @@ import com.htwhub.ocean.models.Invitation
 import com.htwhub.ocean.models.InvitationId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
-import com.htwhub.ocean.serializers.CreateInvitationRequest
+import com.htwhub.ocean.serializers.invitation.CreateInvitationRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.InvitationService
