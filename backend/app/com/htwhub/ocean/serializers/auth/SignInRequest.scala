@@ -14,8 +14,8 @@ object SignInRequest {
 object SignInSerializer {
   val constraints: Form[SignInRequest] = Form(
     mapping(
-      "username" -> text,
-      "password" -> text
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
     )(SignInRequest.apply)(SignInRequest.unapply)
   )
 }

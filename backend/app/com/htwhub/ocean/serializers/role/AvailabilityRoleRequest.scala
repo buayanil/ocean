@@ -1,5 +1,6 @@
 package com.htwhub.ocean.serializers.role
 
+import com.htwhub.ocean.serializers.CustomConstraints
 import play.api.data.Form
 import play.api.data.Forms.longNumber
 import play.api.data.Forms.mapping
@@ -18,7 +19,7 @@ object AvailabilityRoleSerializer {
   val constraints: Form[AvailabilityRoleRequest] = Form(
     mapping(
       "instanceId" -> longNumber,
-      "roleName" -> nonEmptyText
+      "roleName" -> nonEmptyText.verifying(CustomConstraints.nameCheckConstraint),
     )(AvailabilityRoleRequest.apply)(AvailabilityRoleRequest.unapply)
   )
 }
