@@ -24,6 +24,10 @@ class UserManager @Inject() (
       .getUserById(userId)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
+  def getUsers: Future[Seq[User]] =
+    userService.getUsers
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
   def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
     exception match {
       case _: UserService.Exceptions.AccessDenied => Future.failed(Exceptions.AccessDenied())

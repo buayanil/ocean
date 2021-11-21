@@ -30,7 +30,7 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   protected val users = TableQuery[UserTable]
 
-  def getUsers(): Future[Seq[User]] = dbConfig.db.run(
+  def getUsers: Future[Seq[User]] = dbConfig.db.run(
     users.result
   )
 

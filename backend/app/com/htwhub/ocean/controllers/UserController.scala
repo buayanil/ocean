@@ -28,7 +28,13 @@ class UserController @Inject() (cc: ControllerComponents, userAction: UserAction
   def getUser: Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
     userManager
       .getUserById(request.user.id)
-      .map(instances => Ok(Json.toJson(instances)))
+      .map(user => Ok(Json.toJson(user)))
+      .recoverWith { case e: UserManagerException => exceptionToResult(e) }
+  }
+
+  def getUsers: Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    userManager.getUsers
+      .map(users => Ok(Json.toJson(users)))
       .recoverWith { case e: UserManagerException => exceptionToResult(e) }
   }
 

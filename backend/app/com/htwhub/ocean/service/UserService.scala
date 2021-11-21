@@ -36,6 +36,10 @@ class UserService @Inject() (
         case Some(user) => Future.successful(user)
       }
 
+  def getUsers: Future[Seq[User]] =
+    userRepository.getUsers
+      .recoverWith { case t: Throwable => internalError(t.getMessage) }
+
   def getUsersByIds(userIds: List[UserId]): Future[List[User]] = {
     val jobs = userIds map { userId => getUserById(userId) }
     Future.sequence(jobs)
