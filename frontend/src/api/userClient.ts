@@ -9,7 +9,7 @@ export class UserClient {
    * Login with credentials
    */
   public static login = (credentials: CredentialProperties) =>
-    axiosInstance.post<any>("/login", credentials);
+    axiosInstance.post<any>("/auth/signin", credentials);
 
   /**
    * Get user data
@@ -30,7 +30,7 @@ export class UserClient {
 
 export class UserValidation {
   public static tokenSchema = yup.object().shape({
-    token: yup.string().required(),
+    accessToken: yup.string().required(),
   });
 
   public static loginSchema = yup.object().shape({
