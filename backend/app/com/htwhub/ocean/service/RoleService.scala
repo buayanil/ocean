@@ -1,6 +1,5 @@
 package com.htwhub.ocean.service
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.Role
 import com.htwhub.ocean.models.RoleId
@@ -11,11 +10,12 @@ import com.htwhub.ocean.service.InstanceService.Exceptions.InstanceServiceExcept
 import com.htwhub.ocean.service.RoleService.Exceptions
 import javax.inject.Inject
 import play.api.Logger
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 // TODO: user permission check
 class RoleService @Inject() (roleRepository: RoleRepository, instanceService: InstanceService)(implicit
-  simpleDbLookupsContext: SimpleDbLookupsContext,
+  ec: ExecutionContext,
 ) {
 
   val logger: Logger = Logger(this.getClass)

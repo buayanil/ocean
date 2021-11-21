@@ -1,6 +1,5 @@
 package com.htwhub.ocean.service
 
-import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.Instance.EngineType
 import com.htwhub.ocean.models.InstanceId
@@ -12,11 +11,12 @@ import com.htwhub.ocean.service.InstanceService.Exceptions.InternalError
 import com.htwhub.ocean.service.InstanceService.Exceptions.NotFound
 import javax.inject.Inject
 import play.api.Logger
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 // TODO: permission check
 class InstanceService @Inject() (instanceRepository: InstanceRepository)(implicit
-  simpleDbLookupsContext: SimpleDbLookupsContext,
+  ec: ExecutionContext
 ) {
 
   val logger: Logger = Logger(this.getClass)
