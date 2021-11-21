@@ -50,12 +50,12 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         name: name,
         engine: engine as EngineType,
       };
-      const response = await DatabaseClient.existsDatabase(payload);
+      const response = await DatabaseClient.availabilityDatabase(payload);
       try {
-        const { exists } = DatabaseValidation.existsDatabaseSchema.validateSync(
+        const { availability } = DatabaseValidation.availabilityDatabaseSchema.validateSync(
           response.data
         );
-        if (!exists) {
+        if (availability) {
           return true;
         }
       } catch (parseError) {
