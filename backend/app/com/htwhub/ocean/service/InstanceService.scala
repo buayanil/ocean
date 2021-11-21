@@ -2,6 +2,7 @@ package com.htwhub.ocean.service
 
 import com.htwhub.ocean.concurrent.DatabaseContexts.SimpleDbLookupsContext
 import com.htwhub.ocean.models.Instance
+import com.htwhub.ocean.models.Instance.EngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.repositories.InstanceRepository
@@ -35,9 +36,22 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
         internalError(t.getMessage)
       }
 
+  def getInstanceAvailability(name: String, engine: EngineType): Future[Boolean] =
+    instanceRepository
+      .getInstancesByName(name)
+      .recoverWith { case t: Throwable =>
+        internalError(t.getMessage)
+      }
+      .flatMap(instances =>
+        instances.find(instance => instance.engine == engine) match {
+          case Some(_) => Future.successful(false)
+          case None    => Future.successful(true)
+        }
+      )
+
   private def getForUserOrFail(instances: Seq[Instance], userId: UserId): Future[Instance] =
     instances.find(_.userId == userId) match {
-      case Some(project)              => Future.successful(project)
+      case Some(instance)             => Future.successful(instance)
       case None if instances.nonEmpty => Future.failed(AccessDenied())
       case _                          => Future.failed(NotFound())
     }

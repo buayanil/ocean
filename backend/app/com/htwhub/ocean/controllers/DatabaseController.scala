@@ -5,6 +5,9 @@ import com.htwhub.ocean.actions.UserRequest
 import com.htwhub.ocean.managers.DatabaseManager
 import com.htwhub.ocean.managers.DatabaseManager.Exceptions.DatabaseManagerException
 import com.htwhub.ocean.models.InstanceId
+import com.htwhub.ocean.serializers.database.AvailabilityDatabaseRequest
+import com.htwhub.ocean.serializers.database.AvailabilityDatabaseResponse
+import com.htwhub.ocean.serializers.database.AvailabilityDatabaseSerializer
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
 import com.htwhub.ocean.serializers.database.CreateDatabaseSerializer
 import javax.inject.Inject
@@ -41,6 +44,24 @@ class DatabaseController @Inject() (cc: ControllerComponents, userAction: UserAc
       .getUserInstanceById(InstanceId(id), request.user)
       .map(instance => Ok(Json.toJson(instance)))
       .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+  }
+
+  def getDatabaseAvailability: Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    processAvailabilityDatabaseRequest()
+  }
+
+  def processAvailabilityDatabaseRequest[A]()(implicit request: UserRequest[A]): Future[Result] = {
+
+    def failure(badForm: Form[AvailabilityDatabaseRequest]): Future[Result] =
+      Future.successful(BadRequest(badForm.errorsAsJson))
+
+    def success(availability: AvailabilityDatabaseRequest): Future[Result] =
+      databaseManager
+        .getInstanceAvailability(availability)
+        .map(response => Ok(Json.toJson(AvailabilityDatabaseResponse(response))))
+        .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+
+    AvailabilityDatabaseSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
   def addDatabase(): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>

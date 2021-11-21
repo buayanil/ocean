@@ -9,6 +9,7 @@ import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
 import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
 import com.htwhub.ocean.models.User
+import com.htwhub.ocean.serializers.database.AvailabilityDatabaseRequest
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
@@ -44,6 +45,11 @@ class DatabaseManager @Inject() (
   def getUserInstanceById(instanceId: InstanceId, user: User): Future[Instance] =
     instanceService
       .getUserInstanceById(instanceId, user.id)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
+  def getInstanceAvailability(availabilityDatabaseRequest: AvailabilityDatabaseRequest): Future[Boolean] =
+    instanceService
+      .getInstanceAvailability(availabilityDatabaseRequest.name, availabilityDatabaseRequest.engine)
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
   def addDatabase(createDatabaseRequest: CreateDatabaseRequest, user: User): Future[Instance] = {
