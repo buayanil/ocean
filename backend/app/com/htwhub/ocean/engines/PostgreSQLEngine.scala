@@ -1,9 +1,11 @@
 package com.htwhub.ocean.engines
 
 import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+@Singleton
 class PostgreSQLEngine @Inject() ()(implicit ec: ExecutionContext) {
 
   import slick.jdbc.PostgresProfile.api._
