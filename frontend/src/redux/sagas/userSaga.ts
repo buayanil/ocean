@@ -16,8 +16,10 @@ export function* loginAsync({ payload }: PayloadAction<CredentialProperties>) {
   );
   if (response.status === 200) {
     try {
-      const { token } = UserValidation.tokenSchema.validateSync(response.data);
-      yield put(loginSuccess(token));
+      const { accessToken } = UserValidation.tokenSchema.validateSync(
+        response.data
+      );
+      yield put(loginSuccess(accessToken));
     } catch (parseError) {
       yield put(loginFailed((parseError as Error).toString()));
     }

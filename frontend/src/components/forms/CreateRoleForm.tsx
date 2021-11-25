@@ -35,12 +35,12 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
                 roleName: `${database.name}_${roleName}`,
                 instanceId: database.id
             };
-            const response = await RoleClient.existsRoleForDatabase(payload);
+            const response = await RoleClient.availabilityRoleForDatabase(payload);
             try {
-                const { exists } = RoleValidation.existsRoleForDatabaseSchema.validateSync(
+                const { availability } = RoleValidation.existsRoleForDatabaseSchema.validateSync(
                     response.data
                 );
-                if (!exists) {
+                if (availability) {
                     return true;
                 }
             } catch (parseError) {

@@ -45,8 +45,8 @@ export class DatabaseClient {
   /**
    * Checkfs if a database already exists
    */
-  public static existsDatabase = (database: UpstreamDatabaseProperties) =>
-    axiosInstance.post<any>("/databases/_exists_", database);
+  public static availabilityDatabase = (database: UpstreamDatabaseProperties) =>
+    axiosInstance.post<any>("/databases/_availability_", database);
 
   /**
    * Deletes a database by id
@@ -60,7 +60,7 @@ export class DatabaseClient {
 }
 
 export class DatabaseValidation {
-  public static existsDatabaseSchema = yup.object().shape({
-    exists: yup.boolean().required(),
+  public static availabilityDatabaseSchema = yup.object().shape({
+    availability: yup.boolean().required(),
   });
 }
