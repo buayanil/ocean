@@ -30,3 +30,4 @@ Builds the app for production
 * [Slick](http://slick.lightbend.com/) Database query and access library
 * [ScalaTest](http://www.scalatest.org/) Unit-testing framework
 * [ScalaMock](https://scalamock.org/) Unit-testing framework
+* [Swagger](https://github.com/swagger-api/swagger-play)  Interface Description Language for describing RESTful APIs
