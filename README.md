@@ -1,10 +1,15 @@
 # Ocean
 
+[![Build Status Backend](https://github.com/HTWHub/ocean/actions/workflows/backend-deploy_production.yml/badge.svg)](https://github.com/HTWHub/ocean/actions)
+
+[![Build Status Frontend](https://github.com/HTWHub/ocean/actions/workflows/frontend-deploy_production.yml/badge.svg)](https://github.com/HTWHub/ocean/actions)
+
+[![codecov](https://codecov.io/gh/htwhub/ocean/branch/production/graph/badge.svg)](https://codecov.io/gh/htwhub/ocean)
+
 Ocean is platform for fully managed database service that makes it easy to setup, manage and administer databases.
 
 * Launch a database with just a few clicks and then access it via our simplified UI or an API.
 * We support **PostgreSQL** and **MongoDB**
-* Authenticate via an LDAP service
 
 ## Structure
 
