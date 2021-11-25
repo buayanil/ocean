@@ -80,12 +80,14 @@ class RoleService @Inject() (roleRepository: RoleRepository, instanceService: In
           .recoverWith { case t: Throwable => internalError(t.getMessage) }
       )
 
-  private def serviceErrorMapper(exc: InstanceServiceException): Future[Nothing] =
-    exc match {
+  private def serviceErrorMapper(exception: InstanceServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
+    exception match {
       case _: InstanceService.Exceptions.AccessDenied  => Future.failed(Exceptions.AccessDenied())
       case _: InstanceService.Exceptions.NotFound      => Future.failed(Exceptions.NotFound())
       case e: InstanceService.Exceptions.InternalError => Future.failed(Exceptions.InternalError(e.getMessage))
     }
+  }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)

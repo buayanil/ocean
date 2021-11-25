@@ -103,7 +103,8 @@ class InvitationManager @Inject() (
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
     } yield job1.toList ++ List(job2)
 
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
     exception match {
       case _: InvitationService.Exceptions.AccessDenied  => Future.failed(Exceptions.AccessDenied())
       case _: InvitationService.Exceptions.NotFound      => Future.failed(Exceptions.NotFound())
@@ -117,6 +118,7 @@ class InvitationManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)

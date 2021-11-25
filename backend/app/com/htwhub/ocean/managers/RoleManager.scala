@@ -118,7 +118,8 @@ class RoleManager @Inject() (
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
     } yield List(job2)
 
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
     exception match {
       case _: RoleService.Exceptions.AccessDenied      => Future.failed(Exceptions.AccessDenied())
       case _: RoleService.Exceptions.NotFound          => Future.failed(Exceptions.NotFound())
@@ -129,9 +130,12 @@ class RoleManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
-  private def internalError(errorMessage: String): Future[Nothing] =
+  private def internalError(errorMessage: String): Future[Nothing] = {
+    logger.error(errorMessage)
     Future.failed(Exceptions.InternalError(errorMessage))
+  }
 
   private def generateRolePassword(length: Int = 8): String = {
     val algorithm = new SecureRandom

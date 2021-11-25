@@ -164,8 +164,8 @@ class DatabaseManager @Inject() (
         .recoverWith { t: Throwable => internalError(t.getMessage) }
     } yield job1
 
-  /** Layer upstream transformation `ServiceException` to `ManagerException` */
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
     exception match {
       case _: InstanceService.Exceptions.AccessDenied   => Future.failed(Exceptions.AccessDenied())
       case _: InstanceService.Exceptions.NotFound       => Future.failed(Exceptions.NotFound())
@@ -180,6 +180,7 @@ class DatabaseManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)

@@ -61,7 +61,8 @@ class AuthManager @Inject() (
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
     } yield user
 
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
     exception match {
       case e: LdapService.Exceptions.AccessDenied     => Future.failed(Exceptions.AccessDenied(e.getMessage))
       case e: LdapService.Exceptions.EnvironmentError => Future.failed(Exceptions.InternalError(e.getMessage))
@@ -69,6 +70,7 @@ class AuthManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
   private def internalError(errorMessage: String): Future[Nothing] = {
     logger.error(errorMessage)

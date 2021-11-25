@@ -28,7 +28,8 @@ class UserManager @Inject() (
     userService.getUsers
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
-  def serviceErrorMapper(exception: ServiceException): Future[Nothing] =
+  def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
+    logger.error(exception.getMessage)
     exception match {
       case _: UserService.Exceptions.AccessDenied => Future.failed(Exceptions.AccessDenied())
       case _: UserService.Exceptions.NotFound     => Future.failed(Exceptions.NotFound())
@@ -38,9 +39,12 @@ class UserManager @Inject() (
 
       case _: Throwable => internalError("Uncaught exception")
     }
+  }
 
-  private def internalError(errorMessage: String): Future[Nothing] =
+  private def internalError(errorMessage: String): Future[Nothing] = {
+    logger.error(errorMessage)
     Future.failed(Exceptions.InternalError(errorMessage))
+  }
 }
 
 object UserManager {
