@@ -5,6 +5,8 @@
 
 # Authentication
 POST          /v1/auth/signin                              com.htwhub.ocean.controllers.AuthController.signIn
+POST          /v1/auth/refresh-token                       com.htwhub.ocean.controllers.AuthController.refreshToken
+
 
 # User
 GET           /v1/user                                     com.htwhub.ocean.controllers.UserController.getUser

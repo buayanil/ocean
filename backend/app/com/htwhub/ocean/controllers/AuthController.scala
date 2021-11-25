@@ -3,6 +3,8 @@ package com.htwhub.ocean.controllers
 import com.htwhub.ocean.managers.AuthManager
 import com.htwhub.ocean.managers.AuthManager.Exceptions.AuthManagerException
 import com.htwhub.ocean.serializers.auth.AuthResponse
+import com.htwhub.ocean.serializers.auth.RefreshTokenRequest
+import com.htwhub.ocean.serializers.auth.RefreshTokenSerializer
 import com.htwhub.ocean.serializers.auth.SignInRequest
 import com.htwhub.ocean.serializers.auth.SignInSerializer
 import io.swagger.annotations.Api
@@ -73,6 +75,46 @@ class AuthController @Inject() (cc: ControllerComponents, authManager: AuthManag
         .recoverWith { case e: AuthManagerException => exceptionToResult(e) }
 
     SignInSerializer.constraints.bindFromRequest().fold(failure, success)
+  }
+
+  @ApiOperation(
+    value = "Refresh Token",
+    notes = "Retrieve an updated access token.",
+    httpMethod = "POST",
+    response = classOf[AuthResponse]
+  )
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        value = "Refresh token request",
+        required = true,
+        dataTypeClass = classOf[RefreshTokenRequest],
+        paramType = "body"
+      )
+    )
+  )
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "InternalError", response = classOf[String]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[String])
+    )
+  )
+  def refreshToken: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    processRefreshTokenRequest()
+  }
+
+  private def processRefreshTokenRequest[A]()(implicit request: Request[A]): Future[Result] = {
+
+    def failure(badForm: Form[RefreshTokenRequest]): Future[Result] =
+      Future.successful(BadRequest(badForm.errorsAsJson))
+
+    def success(refreshTokenRequest: RefreshTokenRequest): Future[Result] =
+      authManager
+        .refreshToken(refreshTokenRequest)
+        .map(response => Ok(Json.toJson(response)))
+        .recoverWith { case e: AuthManagerException => exceptionToResult(e) }
+
+    RefreshTokenSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
   def exceptionToResult(e: AuthManagerException): Future[Result] = e match {
