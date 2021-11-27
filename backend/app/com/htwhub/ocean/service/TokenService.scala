@@ -1,11 +1,9 @@
 package com.htwhub.ocean.service
 
-import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.serializers.auth.AccessTokenContent
 import com.htwhub.ocean.serializers.auth.AuthContent
 import com.htwhub.ocean.serializers.auth.AuthResponse
 import com.htwhub.ocean.serializers.auth.RefreshTokenContent
-import java.time.Instant
 import javax.inject.Inject
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.Jwt
@@ -19,11 +17,19 @@ class TokenService @Inject() (configuration: Configuration) {
 
   val logger: Logger = Logger(this.getClass)
 
+  /** The signing key that is used to sign the content of generated tokens. */
   val SECRET_KEY: String = configuration.get[String]("jwt.secret_key")
-  val hmacAlgorithm: JwtHmacAlgorithm = JwtAlgorithm.HS256
-  val accessExpirationTimeInSeconds = 3600
-  val refreshExpirationTimeInSeconds = 86400
 
+  /** The algorithm which will be used to perform signing/verification operations on tokens. */
+  val hmacAlgorithm: JwtHmacAlgorithm = JwtAlgorithm.HS256
+
+  /** Specifies how long access tokens are valid. */
+  val accessExpirationTimeInSeconds: Long = configuration.get[Long]("jwt.access_expiration_time")
+
+  /** Specifies how long refresh tokens are valid. */
+  val refreshExpirationTimeInSeconds: Long = configuration.get[Long]("jwt.refresh_expiration_time")
+
+  /** Returns an access and refresh token. */
   def obtainTokens(
     accessTokenContent: AccessTokenContent,
     refreshTokenContent: RefreshTokenContent,
@@ -34,6 +40,7 @@ class TokenService @Inject() (configuration: Configuration) {
     AuthResponse(newAccessToken, newRefreshToken)
   }
 
+  /** Returns an access token created from this refresh token. */
   def refreshTokens(refreshToken: String, currentTimestamp: Long): Option[AuthResponse] =
     getOptJwtClaims(refreshToken)
       .filter(_.expiration.exists(_ > currentTimestamp))
@@ -55,5 +62,4 @@ class TokenService @Inject() (configuration: Configuration) {
 
   def getOptJwtClaims(jwt: String): Option[JwtClaim] =
     Jwt.decode(jwt, SECRET_KEY, Seq(hmacAlgorithm)).toOption
-
 }
