@@ -9,22 +9,22 @@ import { loginStart } from "../redux/slices/session/sessionSlice";
 import UserLayout from "../layouts/UserLayout";
 import SignInForm from "../components/SignInForm";
 
-interface SignInViewProps {}
+interface SignInViewProps { }
 
 const SignInView: React.FC<SignInViewProps> = () => {
   const history = useHistory();
-  const { loading, error, token } = useAppSelector(
+  const { loading, error, isLoggedIn } = useAppSelector(
     (state) => state.session.session
   );
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (token) {
+    if (isLoggedIn === true) {
       // HINT: Already signed in
       history.push(OverviewNavigation.to);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [isLoggedIn]);
 
   const onSubmit = (credentials: CredentialProperties) => {
     dispatch(loginStart(credentials));
