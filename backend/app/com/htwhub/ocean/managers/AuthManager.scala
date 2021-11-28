@@ -7,6 +7,7 @@ import com.htwhub.ocean.models.User
 import com.htwhub.ocean.serializers.auth.AccessTokenContent
 import com.htwhub.ocean.serializers.auth.AuthResponse
 import com.htwhub.ocean.serializers.auth.RefreshTokenContent
+import com.htwhub.ocean.serializers.auth.RefreshTokenRequest
 import com.htwhub.ocean.serializers.auth.SignInRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.LdapService
@@ -45,11 +46,12 @@ class AuthManager @Inject() (
           case _: UserService.Exceptions.NotFound => handleFirstSignIn(ldapUser)
           case e: ServiceException                => serviceErrorMapper(e)
         }
-    } yield tokenService.getAuthResponse(
-      AccessTokenContent(user.id),
-      RefreshTokenContent(user.id, None),
-      Instant.now.getEpochSecond
-    )
+    } yield tokenService
+      .obtainTokens(
+        AccessTokenContent(user.id),
+        RefreshTokenContent(user.id, None),
+        Instant.now.getEpochSecond
+      )
 
   private def handleFirstSignIn(ldapUser: User): Future[User] =
     for {
@@ -60,6 +62,14 @@ class AuthManager @Inject() (
         .createRoleInGroup(user.username, LDAP_GROUP_NAME)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
     } yield user
+
+  def refreshToken(refreshTokenRequest: RefreshTokenRequest): Future[AuthResponse] = {
+    val currentTimestamp = Instant.now.getEpochSecond
+    tokenService.refreshTokens(refreshTokenRequest.refreshToken, currentTimestamp) match {
+      case Some(authResponse) => Future.successful(authResponse)
+      case None               => Future.failed(Exceptions.AccessDenied("Refresh token expired"))
+    }
+  }
 
   def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {
     logger.error(exception.getMessage)

@@ -62,8 +62,8 @@ class AuthManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar {
         when(userService.getUserByUsername(any[String])).thenReturn(Future(user))
         when(userService.addUser(any[User])).thenReturn(Future(user))
         val tokenService = mock[TokenService]
-        val mockAuthResponse = AuthResponse("accessToken", "refreshToken", 0L)
-        when(tokenService.getAuthResponse(any[AccessTokenContent], any[RefreshTokenContent], any[Long]))
+        val mockAuthResponse = AuthResponse("accessToken", "refreshToken")
+        when(tokenService.obtainTokens(any[AccessTokenContent], any[RefreshTokenContent], any[Long]))
           .thenReturn(mockAuthResponse)
 
         val authManager =
@@ -76,11 +76,12 @@ class AuthManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar {
         futureAuthResponse.map { actual =>
           verify(ldapService, times(1)).authenticate(any[String], any[String])
           verify(userService, times(1)).getUserByUsername(any[String])
-          verify(tokenService, times(1)).getAuthResponse(any[AccessTokenContent], any[RefreshTokenContent], any[Long])
+          verify(tokenService, times(1)).obtainTokens(any[AccessTokenContent], any[RefreshTokenContent], any[Long])
           verify(userService, never()).addUser(any[User])
           actual shouldBe mockAuthResponse
         }
 
+        true shouldBe true
       }
     }
   }

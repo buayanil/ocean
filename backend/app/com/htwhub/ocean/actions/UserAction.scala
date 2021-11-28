@@ -5,10 +5,13 @@ import com.htwhub.ocean.actions.UserAction.Exceptions.InvalidAuthContentRejectio
 import com.htwhub.ocean.actions.UserAction.Exceptions.MissingAccessTokenRejection
 import com.htwhub.ocean.actions.UserAction.Exceptions.UserActionException
 import com.htwhub.ocean.models.User
+import com.htwhub.ocean.serializers.auth.AccessTokenContent
+import com.htwhub.ocean.serializers.auth.AuthContent
 import com.htwhub.ocean.service.TokenService
 import com.htwhub.ocean.service.UserService
 import javax.inject.Inject
 import play.api.http.HeaderNames
+import play.api.libs.json.Json
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.BodyParser
@@ -18,6 +21,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc.WrappedRequest
+import play.api.Logger
 import play.api.Logging
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -47,9 +51,11 @@ class UserAction @Inject() (
     extractBearerToken(request) match {
       case None => Future.failed(MissingAccessTokenRejection())
       case Some(token) =>
-        tokenService.getClaims(token) match {
+        tokenService
+          .getOptJwtClaims(token)
+          .map(claims => Json.parse(claims.content).as[AuthContent]) match {
           case None => Future.failed(InvalidAccessTokenRejection())
-          case Some(accessTokenContent) =>
+          case Some(accessTokenContent: AccessTokenContent) =>
             userService
               .getUserById(accessTokenContent.userId)
               .recoverWith { case _: Throwable => Future.failed(InvalidAuthContentRejection()) }
@@ -63,11 +69,14 @@ class UserAction @Inject() (
     }
   }
 
-  def exceptionToResult(e: UserActionException): Future[Result] = e match {
-    case _: UserAction.Exceptions.MissingAccessTokenRejection => Future.successful(Unauthorized(e.getMessage))
-    case _: UserAction.Exceptions.InvalidAccessTokenRejection => Future.successful(Unauthorized(e.getMessage))
-    case _: UserAction.Exceptions.InvalidAuthContentRejection => Future.successful(Unauthorized(e.getMessage))
-    case _: UserAction.Exceptions.InternalError               => Future.successful(BadRequest(e.getMessage))
+  def exceptionToResult(error: UserActionException): Future[Result] = {
+    logger.warn(error.getMessage)
+    error match {
+      case _: UserAction.Exceptions.MissingAccessTokenRejection => Future.successful(Unauthorized(error.getMessage))
+      case _: UserAction.Exceptions.InvalidAccessTokenRejection => Future.successful(Unauthorized(error.getMessage))
+      case _: UserAction.Exceptions.InvalidAuthContentRejection => Future.successful(Unauthorized(error.getMessage))
+      case _: UserAction.Exceptions.InternalError               => Future.successful(BadRequest(error.getMessage))
+    }
   }
 
   protected override def executionContext: ExecutionContext = ec

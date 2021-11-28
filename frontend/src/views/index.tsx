@@ -23,14 +23,14 @@ const FAQView = React.lazy(() => import("./FAQView"));
 const PageNotFoundView = React.lazy(() => import("./PageNotFoundView"));
 
 const RootView: React.FC = () => {
-  const { token } = useAppSelector((state) => state.session.session);
+  const { isLoggedIn } = useAppSelector((state) => state.session.session);
 
 
   return (
     <Router>
       <Suspense fallback={<LoadingView />}>
         <Switch>
-          <Redirect exact from="/" to={token ? "/overview" : "/login"} />
+          <Redirect exact from="/" to={isLoggedIn ? "/overview" : "/login"} />
           <Route
             exact
             path="/login"
@@ -75,8 +75,8 @@ const RootView: React.FC = () => {
 };
 
 const ProtectedRoute = (props: any) => {
-  const token = useAppSelector((state) => state.session.session.token);
-  return token !== undefined ? (
+  const { isLoggedIn } = useAppSelector((state) => state.session.session);
+  return isLoggedIn ? (
     <Route {...props} />
   ) : (
     <Redirect

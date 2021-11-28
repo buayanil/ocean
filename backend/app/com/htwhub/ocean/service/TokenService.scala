@@ -17,33 +17,49 @@ class TokenService @Inject() (configuration: Configuration) {
 
   val logger: Logger = Logger(this.getClass)
 
+  /** The signing key that is used to sign the content of generated tokens. */
   val SECRET_KEY: String = configuration.get[String]("jwt.secret_key")
-  val ALGO_TYPE: JwtHmacAlgorithm = JwtAlgorithm.HS256
 
-  def getAuthResponse(
+  /** The algorithm which will be used to perform signing/verification operations on tokens. */
+  val hmacAlgorithm: JwtHmacAlgorithm = JwtAlgorithm.HS256
+
+  /** Specifies how long access tokens are valid. */
+  val accessExpirationTimeInSeconds: Long = configuration.get[Long]("jwt.access_expiration_time")
+
+  /** Specifies how long refresh tokens are valid. */
+  val refreshExpirationTimeInSeconds: Long = configuration.get[Long]("jwt.refresh_expiration_time")
+
+  /** Returns an access and refresh token. */
+  def obtainTokens(
     accessTokenContent: AccessTokenContent,
     refreshTokenContent: RefreshTokenContent,
     currentTimestamp: Long
   ): AuthResponse = {
-    val newAccessToken = getAuthToken(accessTokenContent, currentTimestamp)
-    val newRefreshToken = getAuthToken(refreshTokenContent, currentTimestamp)
-    AuthResponse(newAccessToken, newRefreshToken, currentTimestamp)
+    val newAccessToken = getAuthToken(accessTokenContent, currentTimestamp, accessExpirationTimeInSeconds)
+    val newRefreshToken = getAuthToken(refreshTokenContent, currentTimestamp, refreshExpirationTimeInSeconds)
+    AuthResponse(newAccessToken, newRefreshToken)
   }
 
-  private def getAuthToken(authContent: AuthContent, currentTimestamp: Long, lifetime: Long = 172800): String = {
+  /** Returns an access token created from this refresh token. */
+  def refreshTokens(refreshToken: String, currentTimestamp: Long): Option[AuthResponse] =
+    getOptJwtClaims(refreshToken)
+      .filter(_.expiration.exists(_ > currentTimestamp))
+      .map(claims => Json.parse(claims.content).as[AuthContent])
+      .collect { case refreshTokenContent: RefreshTokenContent =>
+        val accessTokenContent = AccessTokenContent(refreshTokenContent.userId)
+        val newAccessToken = getAuthToken(accessTokenContent, currentTimestamp, accessExpirationTimeInSeconds)
+        AuthResponse(newAccessToken, refreshToken)
+      }
+
+  def getAuthToken(authContent: AuthContent, currentTimestamp: Long, lifetime: Long): String = {
     val claims = JwtClaim(
       content = Json.stringify(Json.toJson(authContent)),
       expiration = Some(currentTimestamp + lifetime),
       issuedAt = Some(currentTimestamp)
     )
-    Jwt.encode(claims, SECRET_KEY, ALGO_TYPE)
+    Jwt.encode(claims, SECRET_KEY, hmacAlgorithm)
   }
 
-  def getClaims(jwt: String): Option[AccessTokenContent] =
-    Jwt.decode(jwt, SECRET_KEY, Seq(ALGO_TYPE)).toOption match {
-      case None => None
-      // TODO: validate json parse for AuthContent
-      case Some(claim) => Some(Json.parse(claim.content).as[AccessTokenContent])
-    }
-
+  def getOptJwtClaims(jwt: String): Option[JwtClaim] =
+    Jwt.decode(jwt, SECRET_KEY, Seq(hmacAlgorithm)).toOption
 }
