@@ -2,7 +2,7 @@ import React from "react";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import { LockClosedIcon } from "@heroicons/react/solid";
 
-import Alert from "./Alert";
+import { Alert } from "./Feedback/Alert/Alert";
 import { CredentialProperties } from "../types/models";
 import { UserValidation } from "../api/userClient";
 
@@ -31,7 +31,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
         <div className="mb-4">
-          {errorMessage && <Alert errorMessage={errorMessage} />}
+          {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
         </div>
         <Formik
           initialValues={{
@@ -65,7 +65,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     placeholder=""
                     className={getFieldClassNames(
                       errors.username !== undefined &&
-                        touched.username !== undefined
+                      touched.username !== undefined
                     )}
                   />
                   {errors.username && touched.username && (
@@ -94,7 +94,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     placeholder=""
                     className={getFieldClassNames(
                       errors.password !== undefined &&
-                        touched.password !== undefined
+                      touched.password !== undefined
                     )}
                   />
                   {errors.password && touched.password && (

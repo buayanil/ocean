@@ -10,7 +10,7 @@ import {
 import { engineOptions } from "../../constants/engines";
 import { EngineType, UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
-import Alert from "../Alert";
+import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
 import EngineSelector from "../EngineSelector/EngineSelector";
 
@@ -165,7 +165,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                   </div>
                 </div>
               </div>
-              <Alert errorMessage={errorMessage} />
+              {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
               <button
                 type="submit"
                 disabled={values.name === "" || !isValid || processing || isValidating}

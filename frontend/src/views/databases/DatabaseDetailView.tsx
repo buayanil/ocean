@@ -18,7 +18,6 @@ import { DatabaseClient } from "../../api/databaseClient";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
 import AppLayout from "../../layouts/AppLayout";
 import ActionDropdown from "../../components/ActionDropdown";
-import Alert from "../../components/Alert";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
 import DeleteModal from "../../components/DeleteModal";
 import Headline from "../../components/Headline";
@@ -273,7 +272,6 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
           <ActionDropdown onDelete={() => setDeleteDatabaseOpenModal(true)} />
         </div>
       </div>
-      <Alert errorMessage={undefined} />
       <TabList
         tabs={getDetailViewTabsFor(database?.engine)}
         selectedId={selectedId}
