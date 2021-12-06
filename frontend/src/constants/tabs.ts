@@ -1,7 +1,7 @@
-import { TabProperties } from "../components/TabList";
+import { ITab } from "../components/Navigation/Tabs/Tab";
 import { EngineType } from "../types/database";
 
-const databaseDetailTabs: TabProperties[] = [
+const databaseDetailTabs: ITab[] = [
   { id: 1, name: "Overview" },
   { id: 2, name: "Users" },
   { id: 3, name: "Invitations" },
@@ -9,7 +9,7 @@ const databaseDetailTabs: TabProperties[] = [
 
 export const getDetailViewTabsFor = (
   engineType: EngineType | undefined
-): TabProperties[] => {
+): ITab[] => {
   const postgresqlIds = [1, 2, 3];
   const mongodbIds = [1, 2];
 
@@ -20,9 +20,9 @@ export const getDetailViewTabsFor = (
   } else if (engineType === undefined) {
     return [];
   } else {
-    const assertNever = (_: never): TabProperties[] => [];
+    const assertNever = (_: never): ITab[] => [];
     return assertNever(engineType);
   }
 };
 
-export const settingsViewTabs: TabProperties[] = [{ id: 1, name: "Profile" }];
+export const settingsViewTabs: ITab[] = [{ id: 1, name: "Profile" }];

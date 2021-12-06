@@ -25,8 +25,8 @@ import InvitationList from "../../components/InvitationList/InvitationList";
 import Notification from "../../components/Notification/Notification";
 import OverviewCard from "../../components/OverviewCard";
 import RoleList from "../../components/RoleList/RoleList";
-import TabList from "../../components/TabList";
 import UserSelector from "../../components/UserSelector/UserSelector";
+import { Tabs } from "../../components/Navigation/Tabs/Tabs";
 
 
 interface DatabaseDetailViewProps { }
@@ -34,8 +34,8 @@ interface DatabaseDetailViewProps { }
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
   const history = useHistory();
-  // Tab Selection
-  const [selectedId, setSelectedId] = useState<number>(1);
+  // Tabs
+  const [activeId, setActiveId] = useState<number>(1);
   // Modals
   const [openDeleteDatabaseModal, setDeleteDatabaseOpenModal] = useState<boolean>(false);
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
@@ -119,14 +119,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   }
 
   const renderTabContent = (): React.ReactNode => {
-    if (selectedId === 1) {
+    if (activeId === 1) {
       return (
         <OverviewCard
           database={database ? new Database(database) : undefined}
           user={user}
         />
       );
-    } else if (selectedId === 2) {
+    } else if (activeId === 2) {
       return (
         <div className="mt-6">
           <div className="flex items-center justify-between flex-wrap sm:flex-nowrap pb-8">
@@ -150,7 +150,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
           <RoleList roles={roles || []} onDelete={(role) => deleteRoleMutation.mutate(role.id)} />
         </div>
       );
-    } else if (selectedId === 3) {
+    } else if (activeId === 3) {
       return <div className="z-50">
         <UserSelector
           users={otherUsers}
@@ -272,10 +272,10 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
           <ActionDropdown onDelete={() => setDeleteDatabaseOpenModal(true)} />
         </div>
       </div>
-      <TabList
+      <Tabs
         tabs={getDetailViewTabsFor(database?.engine)}
-        selectedId={selectedId}
-        onSelect={(value) => setSelectedId(value)}
+        activeId={activeId}
+        onSelect={(value) => setActiveId(value)}
       />
       <div className="mt-4">{renderTabContent()}</div>
       {renderModals()}
