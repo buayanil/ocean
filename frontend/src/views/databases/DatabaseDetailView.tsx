@@ -21,7 +21,7 @@ import ActionDropdown from "../../components/ActionDropdown";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
 import DeleteModal from "../../components/DeleteModal";
 import Headline from "../../components/Headline";
-import InvitationList from "../../components/InvitationList/InvitationList";
+import { InvitationList } from "../../components/Lists/InvitationList/InvitationList";
 import Notification from "../../components/Notification/Notification";
 import OverviewCard from "../../components/OverviewCard";
 import RoleList from "../../components/RoleList/RoleList";
@@ -163,7 +163,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
             Invite other people
           </p>
         </div>
-        <InvitationList users={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
+        <InvitationList invitedUsers={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
       </div>
     }
   };
