@@ -84,10 +84,11 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
   }
 
   private def processCommand(databaseName: String, document: Document): Future[Any] = {
-    // TODO: Type Document
     val database = mongoClient.getDatabase(databaseName)
+    // ignore bson code problem, scala dogshi.
     database
       .runCommand(document)
       .toFuture()
+      .recoverWith(_ => Future.successful(true))
   }
 }
