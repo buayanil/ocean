@@ -1,9 +1,9 @@
-import { EngineOption } from "../components/EngineSelector/EngineSelector";
+import { IEngineOption } from "../components/Form/EngineGroup/EngineOption";
 
 import mongodbLogo from "../img/mongodb-logo.svg";
 import postgresqlLogo from "../img/postgresql-logo.svg";
 
-export const engineOptions: ReadonlyArray<EngineOption> = [
+export const engineOptions: ReadonlyArray<IEngineOption> = [
   {
     id: 1,
     label: "PostgreSQL",

@@ -6,21 +6,21 @@ import { settingsViewTabs } from '../constants/tabs';
 import { UserClient } from '../api/userClient';
 import AppLayout from '../layouts/AppLayout';
 import Headline from '../components/Headline';
-import TabList from '../components/TabList';
 import ProfileCard from '../components/ProfileCard/ProfileCard';
+import { Tabs } from '../components/Navigation/Tabs/Tabs';
 
 interface SettingsViewProps { }
 
 
 const SettingsView: React.FC<SettingsViewProps> = () => {
-  const [selectedTabId, setSelectedTabId] = useState(settingsViewTabs[0].id);
+  const [activeId, setActiveId] = useState(settingsViewTabs[0].id);
   const userQuery = useQuery("user", () => UserClient.getUser())
 
   return (
     <AppLayout selectedNavigation={SettingsNavigation.name}>
       <div>
         <Headline title="Settings" size="large" />
-        <TabList tabs={settingsViewTabs} selectedId={selectedTabId} onSelect={setSelectedTabId} />
+        <Tabs tabs={settingsViewTabs} activeId={activeId} onSelect={setActiveId} />
         <ProfileCard user={userQuery.data} loading={userQuery.isFetching} />
       </div>
     </AppLayout>

@@ -10,9 +10,9 @@ import {
 import { engineOptions } from "../../constants/engines";
 import { EngineType, UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
-import Alert from "../Alert";
+import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
-import EngineSelector from "../EngineSelector/EngineSelector";
+import { EngineGroup } from "../Form/EngineGroup/EngineGroup";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;
@@ -125,14 +125,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         }) => (
           <Form className="space-y-6">
             <>
-              <EngineSelector
-                engineOptions={engineOptions}
-                error={
-                  errors.engine && touched.engine ? errors.engine : undefined
-                }
-                selectedValue={values.engine}
-                onSelect={(value) => setFieldValue("engine", value)}
-              />
+              <EngineGroup engineOptions={engineOptions} selectedValue={values.engine} onSelect={(value) => setFieldValue("engine", value)} />
               <div className="text-xl text-gray-600 sm:text-2xl mt-6 mb-3">
                 Choose a unique database name
               </div>
@@ -165,7 +158,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                   </div>
                 </div>
               </div>
-              <Alert errorMessage={errorMessage} />
+              {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
               <button
                 type="submit"
                 disabled={values.name === "" || !isValid || processing || isValidating}
