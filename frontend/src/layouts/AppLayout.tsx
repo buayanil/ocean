@@ -7,7 +7,7 @@ import { useQuery } from "react-query";
 import { UserProperties } from "../types/user";
 import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/session/sessionSlice";
-import { navigation, SettingsNavigation } from "../constants/menu.";
+import { Navigation, navigation, SettingsNavigation } from "../constants/menu.";
 import { UserClient } from "../api/userClient";
 import CreateDropdown from "../components/CreateDropdown";
 
@@ -24,13 +24,33 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   selectedNavigation,
 }) => {
-  const userQuery = useQuery("user", () => UserClient.getUser(), { staleTime: 1000_1000 })
+  const userQuery = useQuery("user", () => UserClient.getUser(), {
+    staleTime: 1000_1000,
+  });
+  const user = userQuery.data;
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const onLogout = () => {
     dispatch(logout());
   };
+
+  const getNavigationWithPermission = (): Navigation[] => {
+    if (user) {
+      return navigation.filter((item) => {
+        if (item.requiredPermission === undefined) {
+          return true;
+        } else if (item.requiredPermission.includes(user.employeeType)) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    } else {
+      return [];
+    }
+  };
+  const navigationWithPermission = getNavigationWithPermission();
 
   const getAbbreviationFor = (value: UserProperties | undefined): string => {
     const fallbackValue = ":(";
@@ -102,7 +122,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 aria-label="Sidebar"
               >
                 <div className="px-2 space-y-1">
-                  {navigation
+                  {navigationWithPermission
                     .filter((item) => item.section === "primary")
                     .map((item) => (
                       <Link
@@ -128,7 +148,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 </div>
                 <div className="mt-6 pt-6">
                   <div className="px-2 space-y-1">
-                    {navigation
+                    {navigationWithPermission
                       .filter((item) => item.section === "secondary")
                       .map((item) => (
                         <Link
@@ -207,7 +227,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               </div>
               <div className="mt-6 pt-6">
                 <div className="px-2 space-y-1">
-                  {navigation
+                  {navigationWithPermission
                     .filter((item) => item.section === "secondary")
                     .map((item) => (
                       <Link

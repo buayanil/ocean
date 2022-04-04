@@ -18,13 +18,13 @@ const CreateDatabaseView = React.lazy(
 const DatabaseDetailView = React.lazy(
   () => import("./databases/DatabaseDetailView")
 );
+const ReportingView = React.lazy(() => import("./ReportingView"));
 const SettingsView = React.lazy(() => import("./SettingsView"));
 const FAQView = React.lazy(() => import("./FAQView"));
 const PageNotFoundView = React.lazy(() => import("./PageNotFoundView"));
 
 const RootView: React.FC = () => {
   const { isLoggedIn } = useAppSelector((state) => state.session.session);
-
 
   return (
     <Router>
@@ -54,6 +54,10 @@ const RootView: React.FC = () => {
             exact
             path="/databases/:id"
             render={(props: any) => <DatabaseDetailView {...props} />}
+          />
+          <ProtectedRoute
+            path="/reporting"
+            render={(props: any) => <ReportingView {...props} />}
           />
           <ProtectedRoute
             path="/settings"
