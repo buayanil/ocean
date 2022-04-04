@@ -68,4 +68,9 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
     dbConfig.db.run(
       instances.filter(_.id === instanceId).delete
     )
+
+  def countInstances(): Future[Int] =
+    dbConfig.db.run(
+      instances.length.result
+    )
 }

@@ -7,7 +7,6 @@
 POST          /v1/auth/signin                              com.htwhub.ocean.controllers.AuthController.signIn
 POST          /v1/auth/refresh-token                       com.htwhub.ocean.controllers.AuthController.refreshToken
 
-
 # User
 GET           /v1/user                                     com.htwhub.ocean.controllers.UserController.getUser
 GET           /v1/users                                    com.htwhub.ocean.controllers.UserController.getUsers
@@ -29,6 +28,9 @@ DELETE        /v1/roles/:id                                com.htwhub.ocean.cont
 # Invitations
 POST          /v1/invitations                              com.htwhub.ocean.controllers.InvitationController.addInvitation()
 DELETE        /v1/invitations/:id                          com.htwhub.ocean.controllers.InvitationController.deleteInvitation(id: Long)
+
+# Metrics
+GET           /v1/metrics                                com.htwhub.ocean.controllers.MetricController.getMetrics()
 
 # Swagger
 GET           /swagger.json                                controllers.Assets.at(path="/public", file="swagger.json")
