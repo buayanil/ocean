@@ -8,9 +8,20 @@ import { axiosInstance } from "./client";
 
 export class DatabaseClient {
   /**
-   * Get all databases related to this user
+   * Get all databases from all users.
+   * This requires `Staff` permission.
    */
   public static getAllDatabases = async (): Promise<DatabaseProperties[]> => {
+    const { data } = await axiosInstance.get<DatabaseProperties[]>(
+      "/databases/_all_"
+    );
+    return data;
+  };
+
+  /**
+   * Get all databases related to this user
+   */
+  public static getUserDatabases = async (): Promise<DatabaseProperties[]> => {
     const { data } = await axiosInstance.get<DatabaseProperties[]>(
       "/databases"
     );

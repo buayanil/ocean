@@ -37,6 +37,11 @@ class DatabaseManager @Inject() (
 
   val logger: Logger = Logger(this.getClass)
 
+  def getAllInstances(user: User): Future[Seq[Instance]] =
+    instanceService
+      .getAllInstancesWithPermission(user)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
   def getUserInstances(user: User): Future[Seq[Instance]] =
     instanceService
       .getUserInstances(user.id)

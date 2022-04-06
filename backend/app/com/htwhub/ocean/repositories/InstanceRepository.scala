@@ -44,6 +44,9 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
 
   protected val instances = TableQuery[InstanceTable]
 
+  def getAllInstances: Future[Seq[Instance]] =
+    dbConfig.db.run(instances.result)
+
   def getInstancesByUserId(userId: UserId): Future[Seq[Instance]] =
     dbConfig.db.run(
       instances.filter(_.userId === userId).result

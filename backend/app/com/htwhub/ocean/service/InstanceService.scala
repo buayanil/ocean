@@ -1,25 +1,32 @@
 package com.htwhub.ocean.service
 
-import com.htwhub.ocean.models.Instance
+import com.htwhub.ocean.models.{Instance, InstanceId, User, UserId}
 import com.htwhub.ocean.models.Instance.EngineType
-import com.htwhub.ocean.models.InstanceId
-import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.repositories.InstanceRepository
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService.Exceptions.AccessDenied
 import com.htwhub.ocean.service.InstanceService.Exceptions.InternalError
 import com.htwhub.ocean.service.InstanceService.Exceptions.NotFound
+
 import javax.inject.Inject
 import play.api.Logger
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-// TODO: permission check
+
 class InstanceService @Inject() (instanceRepository: InstanceRepository)(implicit
   ec: ExecutionContext
 ) {
 
   val logger: Logger = Logger(this.getClass)
+
+  def getAllInstancesWithPermission(user: User): Future[Seq[Instance]] = {
+    for {
+      _hasPermission <- this.getPermissionOrFail(user)
+      instances <- instanceRepository.getAllInstances
+    } yield instances
+  }
 
   def getUserInstanceById(instanceId: InstanceId, userId: UserId): Future[Instance] =
     instanceRepository
@@ -48,6 +55,13 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
           case None    => Future.successful(true)
         }
       )
+
+  private def getPermissionOrFail(user: User): Future[Boolean] = {
+    user.employeeType match {
+      case string: String if string.contains("Staff") => Future.successful(true)
+      case _               => Future.failed(AccessDenied())
+    }
+  }
 
   private def getForUserOrFail(instances: Seq[Instance], userId: UserId): Future[Instance] =
     instances.find(_.userId == userId) match {

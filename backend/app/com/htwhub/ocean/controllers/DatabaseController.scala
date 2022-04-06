@@ -42,6 +42,24 @@ class DatabaseController @Inject() (cc: ControllerComponents, userAction: UserAc
   implicit val messages: Messages = messagesApi.preferred(Seq(Lang.defaultLang))
 
   @ApiOperation(
+    value = "Get all Databases from all Users",
+    notes = "Get information for multiple databases only with permissio.",
+    httpMethod = "GET",
+    response = classOf[Instance],
+    responseContainer = "List"
+  )
+  @ApiResponses(value = Array(
+    new ApiResponse(code = 400, message = "InternalError", response = classOf[String]),
+    new ApiResponse(code = 403, message = "Forbidden", response = classOf[String]),
+  ))
+  def getAllDatabases: Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    databaseManager
+      .getAllInstances(request.user)
+      .map(instances => Ok(Json.toJson(instances)))
+      .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+  }
+
+  @ApiOperation(
     value = "Get Databases",
     notes = "Get information for multiple databases.",
     httpMethod = "GET",
