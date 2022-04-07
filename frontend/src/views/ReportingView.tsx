@@ -10,6 +10,8 @@ import {
 } from "../hooks/useDatabaseQuery";
 import { IStats, Stats } from "../components/Stats/Stats";
 import { DatabaseAdminList } from "../components/DatabaseAdminList/DatabaseAdminList";
+import { useUsersQuery } from "../hooks/useUserQuery";
+import { UserAdminList } from "../components/UserAdminList/UserAdminList";
 
 interface ReportingViewProps {}
 
@@ -25,6 +27,8 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
         metricsQuery.refetch();
       },
     });
+  const usersQuery = useUsersQuery();
+  const users = usersQuery.data || [];
 
   const getStats = () => {
     const result: IStats[] = [];
@@ -49,6 +53,7 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
           <Headline title="Reporting" size="large" />
           {renderMetrics()}
           {renderDatabases()}
+          {renderUsers()}
         </div>
       </AppLayout>
     );
@@ -72,7 +77,7 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
   const renderDatabases = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-5 text-2xl leading-6 font-medium text-gray-900">
+        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">
           All Databases
         </h2>
         <DatabaseAdminList
@@ -81,6 +86,17 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
             deleteDatabaseWithPermissionMutation.mutate(database.id)
           }
         />
+      </div>
+    );
+  };
+
+  const renderUsers = (): React.ReactElement => {
+    return (
+      <div>
+        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">
+          All Users
+        </h2>
+        <UserAdminList users={users} />
       </div>
     );
   };
