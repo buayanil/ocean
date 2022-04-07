@@ -1,4 +1,9 @@
-import { UseQueryOptions, useQuery } from "react-query";
+import {
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions,
+} from "react-query";
 
 import { DatabaseClient } from "../api/databaseClient";
 import { Database } from "../types/database";
@@ -17,3 +22,13 @@ export const useDatabasesQuery = (
     }
   );
 };
+
+export const useDeleteDatabaseWithPermissionMutation = (
+  options?: Omit<UseMutationOptions<any, Error, number>, "mutationFn">
+) =>
+  useMutation<any, Error, number>(async (variables) => {
+    const { data } = await DatabaseClient.deleteDatabaseWithPermission(
+      variables
+    );
+    return data;
+  }, options);

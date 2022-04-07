@@ -3,9 +3,12 @@ import React from "react";
 import AppLayout from "../layouts/AppLayout";
 import Headline from "../components/Headline";
 import { ReportingNavigation } from "../constants/menu.";
-import { IStats, Stats } from "../components/Stats/Stats";
 import { useMetricsQuery } from "../hooks/useMetricsQuery";
-import { useDatabasesQuery } from "../hooks/useDatabaseQuery";
+import {
+  useDatabasesQuery,
+  useDeleteDatabaseWithPermissionMutation,
+} from "../hooks/useDatabaseQuery";
+import { IStats, Stats } from "../components/Stats/Stats";
 import { DatabaseAdminList } from "../components/DatabaseAdminList/DatabaseAdminList";
 
 interface ReportingViewProps {}
@@ -15,6 +18,13 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
   const metrics = metricsQuery.data;
   const databasesQuery = useDatabasesQuery();
   const databases = databasesQuery.data || [];
+  const deleteDatabaseWithPermissionMutation =
+    useDeleteDatabaseWithPermissionMutation({
+      onSettled: () => {
+        databasesQuery.refetch();
+        metricsQuery.refetch();
+      },
+    });
 
   const getStats = () => {
     const result: IStats[] = [];
@@ -65,7 +75,12 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
         <h2 className="mt-5 text-2xl leading-6 font-medium text-gray-900">
           All Databases
         </h2>
-        <DatabaseAdminList databases={databases} />
+        <DatabaseAdminList
+          databases={databases}
+          onDelete={(database) =>
+            deleteDatabaseWithPermissionMutation.mutate(database.id)
+          }
+        />
       </div>
     );
   };

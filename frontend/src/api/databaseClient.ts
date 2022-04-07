@@ -68,6 +68,16 @@ export class DatabaseClient {
     );
     return data;
   };
+
+  /**
+   * Deletes a database by id from any user. Requires addtional permissions.
+   */
+  public static deleteDatabaseWithPermission = async (id: number) => {
+    const { data } = await axiosInstance.delete<any>(
+      `/databases/${id.toString()}/_permission_`
+    );
+    return data;
+  };
 }
 
 export class DatabaseValidation {

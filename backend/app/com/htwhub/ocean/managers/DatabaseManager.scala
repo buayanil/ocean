@@ -107,6 +107,18 @@ class DatabaseManager @Inject() (
       }
     } yield job1
 
+  def deleteDatabaseWithPermission(instanceId: InstanceId, user: User): Future[List[Int]] =
+    for {
+      instance <- instanceService
+        .getUserInstanceWithPermission(instanceId, user)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+      instanceOwner <- userService.getUserById(instance.userId)
+      job1 <- instance match {
+        case value: Instance if instance.engine == PostgreSQLEngineType => deleteDatabaseForPostgreSQL(value, instanceOwner)
+        case value: Instance if instance.engine == MongoDBSQLEngineType => deleteDatabaseForMongoDB(value, instanceOwner)
+      }
+    } yield job1
+
   def deleteDatabaseForPostgreSQL(instance: Instance, user: User): Future[List[Int]] =
     for {
       job1 <- deleteRolesForPostgreSQL(instance, user)

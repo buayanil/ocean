@@ -12,7 +12,9 @@ import play.api.data.validation.ValidationResult
 object CustomConstraints {
   private val namePattern = "[a-z][a-z0-9_]*$"
   private val illegalWords =
-    List("system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1")
+    List(
+      "system.", "config", "local", "internal", "admin", "root", "postgresql", "template0", "template1", "unique",
+    )
   private val allowedEngineTypes: Seq[EngineType] = Seq(PostgreSQLEngineType, MongoDBSQLEngineType)
 
   val nameCheckConstraint: Constraint[String] = Constraint("constraints.nameCheckConstraint") { plainText =>

@@ -36,6 +36,18 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
       }
       .flatMap(instance => getForUserOrFail(instance.toSeq, userId))
 
+  def getUserInstanceWithPermission(instanceId: InstanceId, user: User): Future[Instance] = {
+    val result = for {
+      _ <- this.getPermissionOrFail(user)
+      instance <- instanceRepository.getInstanceById(instanceId)
+    } yield instance
+
+    result flatMap  {
+      case Some(value) => Future.successful(value)
+      case None => Future.failed(AccessDenied())
+    }
+  }
+
   def getUserInstances(userId: UserId): Future[Seq[Instance]] =
     instanceRepository
       .getInstancesByUserId(userId)
