@@ -15,14 +15,16 @@ interface DatabasesViewProps {}
 const DatabasesView: React.FC<DatabasesViewProps> = () => {
   const history = useHistory();
   // Queries
-  const { data: databases } = useQuery("databases", () => DatabaseClient.getAllDatabases())
+  const { data: databases } = useQuery("databases", () =>
+    DatabaseClient.getUserDatabases()
+  );
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="max-w-6xl mx-auto mt-8 mb-6 px-4  sm:px-6 lg:px-8">
         <Headline title="Databases" size="large" />
       </div>
-      {(databases ||[]).length === 0 ? (
+      {(databases || []).length === 0 ? (
         <EmptyState
           {...emptyDatabaseState}
           onClick={() => history.push("/databases/new")}

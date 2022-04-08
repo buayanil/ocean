@@ -48,4 +48,9 @@ class UserRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
     dbConfig.db.run(
       users.returning(users.map(_.id)) += user
     )
+
+  def countUsers(): Future[Int] =
+    dbConfig.db.run(
+      users.length.result
+    )
 }

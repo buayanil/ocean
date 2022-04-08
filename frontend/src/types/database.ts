@@ -13,6 +13,7 @@ export interface DatabaseProperties {
   name: string;
   engine: EngineType;
   createdAt: Date;
+  userId: number;
 }
 
 export enum EngineType {
@@ -33,6 +34,7 @@ export class Database extends BaseModel {
   public readonly name: string;
   public readonly engine: EngineType;
   public readonly createdAt: Date;
+  public readonly userId: number;
 
   constructor(props: DatabaseProperties) {
     super({ id: props.id });
@@ -41,6 +43,7 @@ export class Database extends BaseModel {
     this.name = props.name;
     this.engine = props.engine;
     this.createdAt = props.createdAt;
+    this.userId = props.userId;
   }
 
   public get hostname(): string {

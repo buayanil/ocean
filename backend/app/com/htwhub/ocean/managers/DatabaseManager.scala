@@ -37,6 +37,11 @@ class DatabaseManager @Inject() (
 
   val logger: Logger = Logger(this.getClass)
 
+  def getAllInstances(user: User): Future[Seq[Instance]] =
+    instanceService
+      .getAllInstancesWithPermission(user)
+      .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
   def getUserInstances(user: User): Future[Seq[Instance]] =
     instanceService
       .getUserInstances(user.id)
@@ -99,6 +104,18 @@ class DatabaseManager @Inject() (
       job1 <- instance match {
         case value: Instance if instance.engine == PostgreSQLEngineType => deleteDatabaseForPostgreSQL(value, user)
         case value: Instance if instance.engine == MongoDBSQLEngineType => deleteDatabaseForMongoDB(value, user)
+      }
+    } yield job1
+
+  def deleteDatabaseWithPermission(instanceId: InstanceId, user: User): Future[List[Int]] =
+    for {
+      instance <- instanceService
+        .getUserInstanceWithPermission(instanceId, user)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+      instanceOwner <- userService.getUserById(instance.userId)
+      job1 <- instance match {
+        case value: Instance if instance.engine == PostgreSQLEngineType => deleteDatabaseForPostgreSQL(value, instanceOwner)
+        case value: Instance if instance.engine == MongoDBSQLEngineType => deleteDatabaseForMongoDB(value, instanceOwner)
       }
     } yield job1
 
