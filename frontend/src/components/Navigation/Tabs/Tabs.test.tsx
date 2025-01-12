@@ -1,17 +1,59 @@
-import React from 'react';
-import { render } from '@testing-library/react';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { Tabs, TabsProps } from "./Tabs";
 
-import { Tabs } from './Tabs';
-import { ITab } from './Tab';
-
-describe('<Tabs />', () => {
-    const fixture: ITab[] = [
-        { id: 1, name: "Overview" },
-        { id: 2, name: "Users" },
-        { id: 3, name: "Invitations" },
+describe("Tabs Component", () => {
+    const defaultTabs = [
+        { id: 1, name: "Tab 1" },
+        { id: 2, name: "Tab 2" },
+        { id: 3, name: "Tab 3" },
     ];
 
-    it('renders without crashing', () => {
-        render(<Tabs tabs={fixture} activeId={NaN} />);
+    const renderTabs = (props: Partial<TabsProps> = {}) => {
+        render(
+            <Tabs
+                tabs={defaultTabs}
+                activeId={1}
+                onSelect={jest.fn()}
+                {...props}
+            />
+        );
+    };
+
+    it("should render the list of tabs", () => {
+        renderTabs();
+        defaultTabs.forEach((tab) => {
+            expect(screen.getByText(tab.name)).toBeInTheDocument();
+        });
+    });
+
+    it("should highlight the active tab", () => {
+        renderTabs({ activeId: 2 });
+        const activeTab = screen.getByText("Tab 2");
+
+        expect(activeTab).toHaveClass("border-cyan-500", "text-cyan-600"); // Active styles
+    });
+
+    it("should call onSelect with the correct id when a tab is clicked", () => {
+        const handleSelect = jest.fn();
+        renderTabs({ onSelect: handleSelect });
+
+        const tabToClick = screen.getByText("Tab 3");
+        fireEvent.click(tabToClick);
+
+        expect(handleSelect).toHaveBeenCalledTimes(1);
+        expect(handleSelect).toHaveBeenCalledWith(3);
+    });
+
+    it("should not throw an error if onSelect is not provided", () => {
+        renderTabs({ onSelect: undefined });
+
+        const tabToClick = screen.getByText("Tab 1");
+        expect(() => fireEvent.click(tabToClick)).not.toThrow();
+    });
+
+    it("should render an empty state when no tabs are provided", () => {
+        renderTabs({ tabs: [] });
+        expect(screen.queryAllByRole("tab")).toHaveLength(0);
     });
 });
