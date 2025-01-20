@@ -18,6 +18,7 @@
     "@types/react-router-dom": "^5.1.7",
     "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
+    "axios-mock-adapter": "^2.1.0",
     "date-fns": "^2.27.0",
     "formik": "^2.2.9",
     "jsonwebtoken": "^8.5.1",
