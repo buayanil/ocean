@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { DatabasesNavigation } from "../../constants/menu.";
 import { emptyDatabaseState } from "../../constants/empty";
@@ -15,7 +15,7 @@ interface DatabasesViewProps {}
 const DatabasesView: React.FC<DatabasesViewProps> = () => {
   const history = useHistory();
   // Queries
-  const { data: databases } = useQuery("databases", () =>
+  const { data: databases } = useQuery(["databases"], () =>
     DatabaseClient.getUserDatabases()
   );
 

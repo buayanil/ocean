@@ -1,4 +1,4 @@
-import { UseQueryOptions, useQuery } from "react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 
 import { MetricClient } from "../api/metricClient";
 import { MetricProperties } from "../types/metrics";

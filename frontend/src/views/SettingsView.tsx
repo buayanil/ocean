@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { SettingsNavigation } from '../constants/menu.';
 import { settingsViewTabs } from '../constants/tabs';
@@ -14,7 +14,7 @@ interface SettingsViewProps { }
 
 const SettingsView: React.FC<SettingsViewProps> = () => {
   const [activeId, setActiveId] = useState(settingsViewTabs[0].id);
-  const userQuery = useQuery("user", () => UserClient.getUser())
+  const userQuery = useQuery(["user"], () => UserClient.getUser())
 
   return (
     <AppLayout selectedNavigation={SettingsNavigation.name}>

@@ -3,7 +3,7 @@ import {
   UseMutationOptions,
   useQuery,
   UseQueryOptions,
-} from "react-query";
+} from "@tanstack/react-query";
 
 import { DatabaseClient } from "../api/databaseClient";
 import { Database } from "../types/database";

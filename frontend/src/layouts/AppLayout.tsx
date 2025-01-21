@@ -2,7 +2,7 @@ import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon, MenuAlt1Icon, XIcon } from "@heroicons/react/solid";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { UserProperties } from "../types/user";
 import { useAppDispatch } from "../redux/hooks";
@@ -24,7 +24,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   selectedNavigation,
 }) => {
-  const userQuery = useQuery("user", () => UserClient.getUser(), {
+  const userQuery = useQuery(["user"], () => UserClient.getUser(), {
     staleTime: 1000_1000,
   });
   const user = userQuery.data;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
 import { Database } from "../../types/database";
@@ -51,57 +51,57 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Queries
   const queryClient = useQueryClient()
   const { data: database } = useQuery(["database", id], () => DatabaseClient.getDatabase(Number.parseInt(id)))
-  const { data: roles } = useQuery("roles", () => RoleClient.getRolesForDatabase(Number.parseInt(id)))
-  const { data: invitations } = useQuery("invitations", () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
-  const { data: users } = useQuery("users", () => UserClient.getUsers())
-  const { data: user } = useQuery("user", () => UserClient.getUser())
+  const { data: roles } = useQuery(["roles"], () => RoleClient.getRolesForDatabase(Number.parseInt(id)));
+  const { data: invitations } = useQuery(["invitations"], () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)));
+  const { data: users } = useQuery(["users"], () => UserClient.getUsers());
+  const { data: user } = useQuery(["user"], () => UserClient.getUser());
   // Mutations
   const createRoleMutation = useMutation<RoleProperties, AxiosError, UpstreamCreateRoleProperties>((role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role), {
     onSuccess: () => {
-      queryClient.invalidateQueries("roles")
+      queryClient.invalidateQueries(["roles"])
       setOpenCreateRoleModal(false);
       setShowUserAddSuccessNotification(true)
     },
     onError: (_value) => {
-      queryClient.invalidateQueries("roles")
+      queryClient.invalidateQueries(["roles"])
       setOpenCreateRoleModal(false);
       setShowUserAddFailedNotification(true)
     }
   })
   const deleteRoleMutation = useMutation((id: number) => RoleClient.deleteRoleForDatabase(id), {
     onSuccess: () => {
-      queryClient.invalidateQueries("roles")
+      queryClient.invalidateQueries(["roles"])
       setShowUserDeleteSuccessNotification(true)
     },
     onError: (_value) => {
-      queryClient.invalidateQueries("roles")
+      queryClient.invalidateQueries(["roles"])
       setShowUserDeleteFailedNotification(true)
     }
   })
   const createInvitationMutation = useMutation((invitation: UpstreamCreateInvitationProperties) => InvitationClient.createInvitationForDatabase(invitation), {
     onSuccess: () => {
-      queryClient.invalidateQueries("invitations")
+      queryClient.invalidateQueries(["invitations"])
       setShowInvitationAddSuccessNotification(true)
     },
     onError: () => {
-      queryClient.invalidateQueries("invitations")
+      queryClient.invalidateQueries(["invitations"])
       setShowInvitationAddFailedNotification(true)
     }
   })
   const deleteInvitationMutation = useMutation((id: number) => InvitationClient.deleteInvitationForDatabase(id), {
     onSuccess: () => {
-      queryClient.invalidateQueries("invitations")
+      queryClient.invalidateQueries(["invitations"])
       setShowInvitationDeleteSuccessNotification(true)
     },
     onError: () => {
-      queryClient.invalidateQueries("invitations")
+      queryClient.invalidateQueries(["invitations"])
       setShowInvitationDeleteFailedNotification(true)
     }
   })
   const deleteDatabaseMutation = useMutation((id: number) => DatabaseClient.deleteDatabase(id), {
     onSuccess: () => {
       setDeleteDatabaseOpenModal(false);
-      queryClient.invalidateQueries("databases")
+      queryClient.invalidateQueries(["databases"])
       history.push("/databases");
     },
 
