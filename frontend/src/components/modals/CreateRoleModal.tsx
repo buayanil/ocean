@@ -4,7 +4,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { DatabaseProperties } from '../../types/database';
 import { UpstreamCreateRoleProperties } from '../../types/role';
 import CreateRoleForm from '../forms/CreateRoleForm';
-;
 
 export interface CreateRoleModalProps {
     database?: DatabaseProperties;

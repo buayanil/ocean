@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient } from "../../api/databaseClient";

@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from "react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 import { UserClient } from "../api/userClient";
 import { UserProperties } from "../types/user";
