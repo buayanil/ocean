@@ -1,12 +1,20 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
-  "baseBranches": ["production"],
+  "extends": [
+    "config:recommended"
+  ],
+  "baseBranches": [
+    "production"
+  ],
   "prConcurrentLimit": 0,
   "branchConcurrentLimit": 0,
   "ignorePaths": [
     "**/build.sbt",
     "**/project/plugins.sbt"
   ],
-  "enabledManagers": ["npm", "docker-compose", "github-actions"]
+  "enabledManagers": [
+    "npm",
+    "docker-compose",
+    "github-actions"
+  ]
 }
