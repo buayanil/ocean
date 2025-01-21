@@ -6,6 +6,7 @@
   "baseBranches": [
     "production"
   ],
+  "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "branchConcurrentLimit": 0,
   "ignorePaths": [
