@@ -4,10 +4,9 @@
   "baseBranches": ["production"],
   "prConcurrentLimit": 0,
   "branchConcurrentLimit": 0,
-  "packageRules": [
-    {
-      "matchPaths": ["frontend/**"],
-      "groupName": "Frontend Dependencies"
-    }
-  ]
+  "ignorePaths": [
+    "**/build.sbt",
+    "**/project/plugins.sbt"
+  ],
+  "enabledManagers": ["npm", "docker-compose", "github-actions"]
 }
