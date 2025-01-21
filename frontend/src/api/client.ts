@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import jwt from "jsonwebtoken";
+import jwt, {JwtPayload} from "jsonwebtoken";
 
 import { loginFailed } from "../redux/slices/session/sessionSlice";
 import { AppDispatch } from "../redux/store";
@@ -19,6 +19,23 @@ export const axiosInstance = axios.create({
   timeout: 20000,
   headers: headers,
 });
+
+/**
+ * Safely decode a JWT and return the payload if it's valid.
+ * @param token - The JWT string to decode.
+ * @returns The decoded JwtPayload or null if invalid.
+ */
+export const decodeJwt = (token: string): JwtPayload | null => {
+  try {
+    const decoded = jwt.decode(token);
+    if (decoded && typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    console.error("Failed to decode JWT:", error);
+  }
+  return null;
+};
 
 export const setBearerToken = (accessToken: string) => {
   if (accessToken === "") {
@@ -68,32 +85,29 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
 const renewAccessToken = async (): Promise<string> => {
   const refreshToken = localStorage.getItem("refreshToken");
 
-  if (refreshToken === null) {
+  if (!refreshToken) {
     throw new Error("No refresh token in storage.");
   }
 
-  const decodedRefreshToken = jwt.decode(refreshToken, { complete: true });
-  if (decodedRefreshToken === null) {
+  const decodedRefreshToken = decodeJwt(refreshToken);
+
+  if (!decodedRefreshToken || !decodedRefreshToken.exp) {
     localStorage.removeItem("refreshToken");
-    throw new Error("Failed to decode refresh token.");
+    throw new Error("Invalid or expired refresh token.");
   }
 
   const now = Math.ceil(Date.now() / 1000);
-  if (
-    decodedRefreshToken.payload.exp &&
-    decodedRefreshToken.payload.exp < now
-  ) {
+  if (decodedRefreshToken.exp < now) {
     localStorage.removeItem("refreshToken");
     throw new Error("Refresh token expired.");
   }
 
   try {
-    const response = await SessionApi.refreshToken({
-      refreshToken: refreshToken,
-    });
+    const response = await SessionApi.refreshToken({ refreshToken });
     return response.accessToken;
   } catch (error) {
     localStorage.removeItem("refreshToken");
     throw error;
   }
 };
+
