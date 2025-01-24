@@ -75,6 +75,7 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
         }
       }
   );
+
   return () => {
     axiosInstance.interceptors.response.eject(responseHandle);
   };
