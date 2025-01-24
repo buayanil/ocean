@@ -47,40 +47,63 @@ export const setBearerToken = (accessToken: string) => {
 
 export const setupRequestInterceptors = (dispatch: AppDispatch) => {
   const responseHandle = axiosInstance.interceptors.response.use(
-    (response) => response,
-    async (error: AxiosError) => {
-      const originalRequest = error.config;
+      (response) => response,
+      async (error: AxiosError) => {
+        const originalRequest = error.config;
 
-      // Prevent loops
-      if (originalRequest.url === baseURL + "/auth/refresh-token") {
-        delete originalRequest.headers.Authorization;
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        dispatch(loginFailed("Refresh token expired."));
-        return Promise.resolve(undefined);
-      }
+        // Ensure originalRequest exists before proceeding
+        if (!originalRequest) {
+          console.error("originalRequest is undefined.");
+          return Promise.reject(error);
+        }
 
-      if (error.response?.status === 401) {
-        try {
-          const accessToken = await renewAccessToken();
-          setBearerToken(accessToken);
-          originalRequest.headers.Authorization = "Bearer " + accessToken;
-          localStorage.setItem("accessToken", accessToken);
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          setBearerToken("");
-          delete originalRequest.headers.Authorization;
+        // Prevent loops for refresh-token requests
+        if (originalRequest.url === baseURL + "/auth/refresh-token") {
+          if (originalRequest.headers) {
+            delete originalRequest.headers.Authorization;
+          }
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-          dispatch(loginFailed("Session expired."));
+          dispatch(loginFailed("Refresh token expired."));
+          return Promise.resolve(undefined);
         }
+
+        // Handle token renewal on 401 errors
+        if (error.response?.status === 401) {
+          try {
+            const accessToken = await renewAccessToken();
+            setBearerToken(accessToken);
+
+            // Ensure headers exist before modifying
+            originalRequest.headers = {
+              ...originalRequest.headers,
+              Authorization: "Bearer " + accessToken,
+            };
+
+            localStorage.setItem("accessToken", accessToken);
+
+            // Retry the original request with the new token
+            return axiosInstance(originalRequest);
+          } catch (refreshError) {
+            setBearerToken("");
+            if (originalRequest.headers) {
+              delete originalRequest.headers.Authorization;
+            }
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            dispatch(loginFailed("Session expired."));
+          }
+        }
+
+        return Promise.reject(error);
       }
-    }
   );
+
   return () => {
     axiosInstance.interceptors.response.eject(responseHandle);
   };
 };
+
 
 const renewAccessToken = async (): Promise<string> => {
   const refreshToken = localStorage.getItem("refreshToken");
