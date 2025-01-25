@@ -12,7 +12,8 @@
     "lint": "eslint new-frontend",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "coverage:report": "nyc report --reporter=text --reporter=html --reporter=lcov"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
@@ -35,6 +36,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.13.10",
     "@eslint/js": "^9.17.0",
     "@storybook/addon-actions": "^6.4.7",
     "@storybook/addon-essentials": "^6.4.7",
@@ -46,21 +48,27 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/cypress": "^0.1.6",
     "@types/jsonwebtoken": "^8.5.6",
     "@types/node": "^18.19.74",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/react-router-dom": "^5.1.7",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-istanbul": "^3.0.4",
     "@vitest/ui": "^3.0.4",
     "axios-mock-adapter": "^2.1.0",
+    "cypress": "^14.0.0",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "globals": "^15.14.0",
+    "istanbul-lib-coverage": "^3.2.2",
     "jsdom": "^26.0.0",
+    "nyc": "^17.1.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
+    "vite-plugin-istanbul": "^6.0.2",
     "vitest": "^3.0.4"
   }
 }

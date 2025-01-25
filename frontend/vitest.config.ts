@@ -8,7 +8,10 @@ export default defineConfig({
         setupFiles: './vitest.setup.ts', // Optional: Setup file for global imports
         globals: true, // Enable Jest-like globals (e.g., describe, it, expect)
         coverage: {
-            provider: 'istanbul', // Optional: Enable code coverage
+            provider: "istanbul",
+            reportsDirectory: "./coverage/vitest", // Save Vitest reports separately
+            reporter: ["text", "html", "json", "json-summary"], // Include JSON reporters for merging
+            all: true, // Collect coverage for all files, even if they're not tested
         },
     },
 });
