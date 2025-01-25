@@ -6,20 +6,22 @@ import { store } from './redux/store';
 import RootView from './views';
 import { restoreSession } from './redux/slices/session/sessionSlice';
 
+// Create a QueryClient instance
+const queryClient = new QueryClient();
 
 const App: React.FC = () => {
-  useEffect(() => {
-    store.dispatch(restoreSession());
-  }, []);
+    // Dispatch session restoration on mount
+    useEffect(() => {
+        store.dispatch(restoreSession());
+    }, []);
 
-  const queryClient = new QueryClient()
-  return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <RootView />
-      </QueryClientProvider>
-    </Provider>
-  );
-}
+    return (
+        <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+                <RootView />
+            </QueryClientProvider>
+        </Provider>
+    );
+};
 
 export default App;
