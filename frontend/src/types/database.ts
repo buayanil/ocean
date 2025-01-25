@@ -6,7 +6,7 @@ const {
   REACT_APP_MONGODB_HOSTNAME,
   REACT_APP_MONGODB_PORT,
   REACT_APP_ADMINER_URL,
-} = process.env;
+} = import.meta.env;
 
 export interface DatabaseProperties {
   id: number;

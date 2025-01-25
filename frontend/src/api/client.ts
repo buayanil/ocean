@@ -1,13 +1,13 @@
 import axios, { AxiosError } from "axios";
-import jwt, {JwtPayload} from "jsonwebtoken";
+import { decodeJwt as joseDecodeJwt } from "jose";
 
 import { loginFailed } from "../redux/slices/session/sessionSlice";
 import { AppDispatch } from "../redux/store";
 import { SessionApi } from "./sessionApi";
 
-const { REACT_APP_API_URL } = process.env;
+const { VITE_API_URL } = import.meta.env;
 
-const baseURL = REACT_APP_API_URL || "";
+const baseURL = VITE_API_URL || "";
 
 const headers = {
   "Content-Type": "application/json",
@@ -25,16 +25,14 @@ export const axiosInstance = axios.create({
  * @param token - The JWT string to decode.
  * @returns The decoded JwtPayload or null if invalid.
  */
-export const decodeJwt = (token: string): JwtPayload | null => {
+export const decodeJwt = (token: string): Record<string, any> | null => {
   try {
-    const decoded = jwt.decode(token);
-    if (decoded && typeof decoded !== "string") {
-      return decoded as JwtPayload;
-    }
+    const decoded = joseDecodeJwt(token); // Decodes the token's payload without verifying the signature
+    return decoded;
   } catch (error) {
     console.error("Failed to decode JWT:", error);
+    return null;
   }
-  return null;
 };
 
 export const setBearerToken = (accessToken: string) => {
@@ -51,51 +49,30 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
       async (error: AxiosError) => {
         const originalRequest = error.config;
 
-        // Ensure originalRequest exists before proceeding
-        if (!originalRequest) {
-          console.error("originalRequest is undefined.");
-          return Promise.reject(error);
-        }
-
-        // Prevent loops for refresh-token requests
+        // Prevent loops
         if (originalRequest.url === baseURL + "/auth/refresh-token") {
-          if (originalRequest.headers) {
-            delete originalRequest.headers.Authorization;
-          }
+          delete originalRequest.headers.Authorization;
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           dispatch(loginFailed("Refresh token expired."));
           return Promise.resolve(undefined);
         }
 
-        // Handle token renewal on 401 errors
         if (error.response?.status === 401) {
           try {
             const accessToken = await renewAccessToken();
             setBearerToken(accessToken);
-
-            // Ensure headers exist before modifying
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: "Bearer " + accessToken,
-            };
-
+            originalRequest.headers.Authorization = "Bearer " + accessToken;
             localStorage.setItem("accessToken", accessToken);
-
-            // Retry the original request with the new token
             return axiosInstance(originalRequest);
           } catch (refreshError) {
             setBearerToken("");
-            if (originalRequest.headers) {
-              delete originalRequest.headers.Authorization;
-            }
+            delete originalRequest.headers.Authorization;
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
             dispatch(loginFailed("Session expired."));
           }
         }
-
-        return Promise.reject(error);
       }
   );
 
@@ -103,7 +80,6 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
     axiosInstance.interceptors.response.eject(responseHandle);
   };
 };
-
 
 const renewAccessToken = async (): Promise<string> => {
   const refreshToken = localStorage.getItem("refreshToken");
@@ -133,4 +109,3 @@ const renewAccessToken = async (): Promise<string> => {
     throw error;
   }
 };
-

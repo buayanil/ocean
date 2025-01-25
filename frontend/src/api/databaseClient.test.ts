@@ -1,12 +1,13 @@
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { DatabaseClient } from './databaseClient';
 import { axiosInstance } from './client';
-import {EngineType, UpstreamDatabaseProperties} from "../types/database";
+import { EngineType, UpstreamDatabaseProperties } from '../types/database';
 
-jest.mock('./client', () => ({
+vi.mock('./client', () => ({
     axiosInstance: {
-        get: jest.fn(),
-        post: jest.fn(),
-        delete: jest.fn(),
+        get: vi.fn(),
+        post: vi.fn(),
+        delete: vi.fn(),
     },
 }));
 
@@ -18,12 +19,12 @@ describe('DatabaseClient', () => {
     ];
 
     afterEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     // Test case 1: Fetch all databases
     it('fetches all databases', async () => {
-        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockDatabases });
+        (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockDatabases });
 
         const result = await DatabaseClient.getAllDatabases();
 
@@ -33,7 +34,7 @@ describe('DatabaseClient', () => {
 
     // Test case 2: Fetch user databases
     it('fetches user databases', async () => {
-        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockDatabases });
+        (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockDatabases });
 
         const result = await DatabaseClient.getUserDatabases();
 
@@ -44,7 +45,7 @@ describe('DatabaseClient', () => {
     // Test case 3: Fetch a single database by ID
     it('fetches a database by ID', async () => {
         const mockDatabase = mockDatabases[0];
-        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockDatabase });
+        (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockDatabase });
 
         const result = await DatabaseClient.getDatabase(1);
 
@@ -56,16 +57,16 @@ describe('DatabaseClient', () => {
     it('creates a database', async () => {
         const newDatabase: UpstreamDatabaseProperties = {
             name: 'Database 3',
-            engine: EngineType.PostgreSQL // Use enum value
+            engine: EngineType.PostgreSQL, // Use enum value
         };
         const createdDatabase = {
             ...newDatabase,
             id: 3,
             createdAt: new Date(),
-            userId: 100
+            userId: 100,
         };
 
-        (axiosInstance.post as jest.Mock).mockResolvedValueOnce({ data: createdDatabase });
+        (axiosInstance.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: createdDatabase });
 
         const result = await DatabaseClient.createDatabase(newDatabase);
 
@@ -73,15 +74,14 @@ describe('DatabaseClient', () => {
         expect(result).toEqual(createdDatabase);
     });
 
-
     // Test case 5: Check database availability
     it('checks database availability', async () => {
         const databaseCheck = {
             name: 'Database 3',
-            engine: EngineType.PostgreSQL // Use EngineType instead of raw string
+            engine: EngineType.PostgreSQL, // Use EngineType instead of raw string
         };
 
-        (axiosInstance.post as jest.Mock).mockResolvedValueOnce({ data: { available: true } });
+        (axiosInstance.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { available: true } });
 
         const result = await DatabaseClient.availabilityDatabase(databaseCheck);
 
@@ -89,10 +89,9 @@ describe('DatabaseClient', () => {
         expect(result).toEqual({ data: { available: true } });
     });
 
-
     // Test case 6: Delete a database
     it('deletes a database by ID', async () => {
-        (axiosInstance.delete as jest.Mock).mockResolvedValueOnce({ data: { success: true } });
+        (axiosInstance.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { success: true } });
 
         const result = await DatabaseClient.deleteDatabase(1);
 
@@ -102,7 +101,7 @@ describe('DatabaseClient', () => {
 
     // Test case 7: Delete a database with permission
     it('deletes a database with additional permissions', async () => {
-        (axiosInstance.delete as jest.Mock).mockResolvedValueOnce({ data: { success: true } });
+        (axiosInstance.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { success: true } });
 
         const result = await DatabaseClient.deleteDatabaseWithPermission(1);
 

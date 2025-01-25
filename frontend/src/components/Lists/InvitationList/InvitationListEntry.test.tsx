@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import InvitationListEntry, { InvitationListEntryProps } from "./InvitationListEntry";
 
 const mockInvitedUser = {
@@ -11,9 +12,10 @@ const mockInvitedUser = {
     invitationId: 123,
 };
 
-jest.mock("../../../types/user", () => ({
+// Mock `User.getDisplayName`
+vi.mock("../../../types/user", () => ({
     User: {
-        getDisplayName: jest.fn(({ firstName, lastName }) => `${firstName} ${lastName}`),
+        getDisplayName: vi.fn(({ firstName, lastName }) => `${firstName} ${lastName}`),
     },
 }));
 
@@ -28,7 +30,7 @@ describe("InvitationListEntry Component", () => {
     });
 
     it("calls onDelete when the Delete action is clicked", () => {
-        const onDeleteMock = jest.fn();
+        const onDeleteMock = vi.fn();
         renderComponent({ invitedUser: mockInvitedUser, onDelete: onDeleteMock });
 
         const deleteButton = screen.getByText("Delete");

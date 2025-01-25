@@ -1,39 +1,39 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import UserSelector from './UserSelector'; // Adjust path as needed
-import { UserProperties } from '../../types/user'; // Adjust path as needed
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import UserSelector from "./UserSelector"; // Adjust path as needed
+import { UserProperties } from "../../types/user"; // Adjust path as needed
 
-describe('UserSelector', () => {
-    const mockOnSelect = jest.fn();
-    const mockOnDeselect = jest.fn();
+describe("UserSelector", () => {
+    const mockOnSelect = vi.fn(); // Replace jest.fn() with vi.fn()
+    const mockOnDeselect = vi.fn();
 
     const users: UserProperties[] = [
         {
             id: 1,
-            username: 'john.doe',
-            firstName: 'John',
-            lastName: 'Doe',
-            mail: 'john.doe@example.com',
-            employeeType: 'full-time',
+            username: "john.doe",
+            firstName: "John",
+            lastName: "Doe",
+            mail: "john.doe@example.com",
+            employeeType: "full-time",
         },
         {
             id: 2,
-            username: 'jane.doe',
-            firstName: 'Jane',
-            lastName: 'Doe',
-            mail: 'jane.doe@example.com',
-            employeeType: 'part-time',
+            username: "jane.doe",
+            firstName: "Jane",
+            lastName: "Doe",
+            mail: "jane.doe@example.com",
+            employeeType: "part-time",
         },
     ];
 
     const selectedUserIds: number[] = [1];
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks(); // Replace jest.clearAllMocks() with vi.clearAllMocks()
     });
 
-    it('renders the UserSelector component with a list of users', () => {
+    it("renders the UserSelector component with a list of users", () => {
         render(
             <UserSelector
                 users={users}
@@ -44,13 +44,13 @@ describe('UserSelector', () => {
         );
 
         // Check if the label is rendered
-        expect(screen.getByText('Select to invite')).toBeInTheDocument();
+        expect(screen.getByText("Select to invite")).toBeInTheDocument();
 
         // Dropdown button should be rendered
-        expect(screen.getByRole('button')).toBeInTheDocument();
+        expect(screen.getByRole("button")).toBeInTheDocument();
     });
 
-    it('calls onSelect when a user is selected', () => {
+    it("calls onSelect when a user is selected", () => {
         render(
             <UserSelector
                 users={users}
@@ -61,10 +61,10 @@ describe('UserSelector', () => {
         );
 
         // Open the dropdown
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByRole("button"));
 
         // Select the first user
-        const userOption = screen.getByText('john.doe');
+        const userOption = screen.getByText("john.doe");
         fireEvent.click(userOption);
 
         // Verify onSelect is called with the correct user
@@ -72,7 +72,7 @@ describe('UserSelector', () => {
         expect(mockOnDeselect).not.toHaveBeenCalled();
     });
 
-    it('calls onDeselect when a selected user is deselected', () => {
+    it("calls onDeselect when a selected user is deselected", () => {
         render(
             <UserSelector
                 users={users}
@@ -83,10 +83,10 @@ describe('UserSelector', () => {
         );
 
         // Open the dropdown
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByRole("button"));
 
         // Deselect the first user
-        const userOption = screen.getByText('john.doe');
+        const userOption = screen.getByText("john.doe");
         fireEvent.click(userOption);
 
         // Verify onDeselect is called with the correct user
@@ -94,7 +94,7 @@ describe('UserSelector', () => {
         expect(mockOnSelect).not.toHaveBeenCalled();
     });
 
-    it('calls onSelect when the correct user is selected', () => {
+    it("calls onSelect when the correct user is selected", () => {
         render(
             <UserSelector
                 users={users}
@@ -105,11 +105,11 @@ describe('UserSelector', () => {
         );
 
         // Open the dropdown
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByRole("button"));
 
         // Find and click the correct option
-        const options = screen.getAllByText('J. Doe');
-        const targetOption = options.find((option) => option.nextSibling?.textContent === 'john.doe');
+        const options = screen.getAllByText("J. Doe");
+        const targetOption = options.find((option) => option.nextSibling?.textContent === "john.doe");
         expect(targetOption).toBeInTheDocument();
         fireEvent.click(targetOption!);
 
@@ -117,7 +117,7 @@ describe('UserSelector', () => {
         expect(mockOnSelect).toHaveBeenCalledWith(users[0]);
     });
 
-    it('calls onDeselect when an already selected user is clicked', () => {
+    it("calls onDeselect when an already selected user is clicked", () => {
         render(
             <UserSelector
                 users={users}
@@ -128,11 +128,11 @@ describe('UserSelector', () => {
         );
 
         // Open the dropdown
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByRole("button"));
 
         // Find the correct option by sibling text
-        const options = screen.getAllByText('J. Doe');
-        const targetOption = options.find((option) => option.nextSibling?.textContent === 'john.doe');
+        const options = screen.getAllByText("J. Doe");
+        const targetOption = options.find((option) => option.nextSibling?.textContent === "john.doe");
         expect(targetOption).toBeInTheDocument();
 
         // Click the option to trigger deselect
@@ -143,7 +143,7 @@ describe('UserSelector', () => {
         expect(mockOnSelect).not.toHaveBeenCalled();
     });
 
-    it('does nothing if onSelect and onDeselect are undefined', () => {
+    it("does nothing if onSelect and onDeselect are undefined", () => {
         render(
             <UserSelector
                 users={users}
@@ -154,11 +154,11 @@ describe('UserSelector', () => {
         );
 
         // Open the dropdown
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(screen.getByRole("button"));
 
         // Find the correct option by sibling text
-        const options = screen.getAllByText('J. Doe');
-        const targetOption = options.find((option) => option.nextSibling?.textContent === 'john.doe');
+        const options = screen.getAllByText("J. Doe");
+        const targetOption = options.find((option) => option.nextSibling?.textContent === "john.doe");
         expect(targetOption).toBeInTheDocument();
 
         // Click the option
