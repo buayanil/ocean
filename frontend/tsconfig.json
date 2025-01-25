@@ -19,9 +19,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["jest", "node"]
+    "types": ["node"]
   },
   "include": [
+    "vite.config.ts",
     "src"
   ]
 }

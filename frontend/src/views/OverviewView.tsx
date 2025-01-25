@@ -8,7 +8,7 @@ import StartingPoints from "../components/StartingPoints";
 
 interface OverviewViewProps {}
 
-const { REACT_APP_ISSUE_LINK } = process.env;
+const { REACT_APP_ISSUE_LINK } = import.meta.env;
 
 const OverviewView: React.FC<OverviewViewProps> = () => {
   return (
