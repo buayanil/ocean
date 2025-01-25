@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { Tabs, TabsProps } from "./Tabs";
 
 describe("Tabs Component", () => {
@@ -14,7 +15,7 @@ describe("Tabs Component", () => {
             <Tabs
                 tabs={defaultTabs}
                 activeId={1}
-                onSelect={jest.fn()}
+                onSelect={vi.fn()} // Replace jest.fn() with vi.fn()
                 {...props}
             />
         );
@@ -35,7 +36,7 @@ describe("Tabs Component", () => {
     });
 
     it("should call onSelect with the correct id when a tab is clicked", () => {
-        const handleSelect = jest.fn();
+        const handleSelect = vi.fn(); // Replace jest.fn() with vi.fn()
         renderTabs({ onSelect: handleSelect });
 
         const tabToClick = screen.getByText("Tab 3");

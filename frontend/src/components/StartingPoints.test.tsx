@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+import { describe, it, expect } from "vitest";
 import StartingPoints, { StartingPointsProps } from "./StartingPoints";
 
 // Mock data
@@ -9,14 +10,22 @@ const mockStartingPoints = [
         title: "Feature A",
         description: "Description for Feature A",
         to: "/feature-a",
-        icon: (props: React.SVGProps<SVGSVGElement>) => <svg {...props}><circle cx="12" cy="12" r="10" /></svg>,
+        icon: (props: React.SVGProps<SVGSVGElement>) => (
+            <svg {...props}>
+                <circle cx="12" cy="12" r="10" />
+            </svg>
+        ),
         background: "bg-blue-500",
     },
     {
         title: "Feature B",
         description: "Description for Feature B",
         to: "/feature-b",
-        icon: (props: React.SVGProps<SVGSVGElement>) => <svg {...props}><rect x="4" y="4" width="16" height="16" /></svg>,
+        icon: (props: React.SVGProps<SVGSVGElement>) => (
+            <svg {...props}>
+                <rect x="4" y="4" width="16" height="16" />
+            </svg>
+        ),
         background: "bg-green-500",
     },
 ];
@@ -41,9 +50,7 @@ describe("StartingPoints Component", () => {
         renderComponent();
         expect(screen.getByText("Getting Started")).toBeInTheDocument();
         expect(
-            screen.getByText(
-                "Explore the starting points to get familiar with the application."
-            )
+            screen.getByText("Explore the starting points to get familiar with the application.")
         ).toBeInTheDocument();
     });
 

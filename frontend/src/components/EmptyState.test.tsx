@@ -1,9 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import EmptyState, { EmptyStateProps } from "./EmptyState";
 
 describe("EmptyState Component", () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn(); // Replace jest.fn() with vi.fn()
     const props: EmptyStateProps = {
         title: "No Data Found",
         description: "It seems like there is no data available. Add new data to get started.",

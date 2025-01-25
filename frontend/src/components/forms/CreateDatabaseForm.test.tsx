@@ -1,40 +1,42 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
-import {AxiosResponse} from "axios";
-import {DatabaseClient, DatabaseValidation} from "../../api/databaseClient";
-import {EngineType} from "../../types/database";
+import { AxiosResponse } from "axios";
+import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
+import { EngineType } from "../../types/database";
 
-jest.mock("../../api/databaseClient", () => ({
+// Mock `DatabaseClient` and `DatabaseValidation`
+vi.mock("../../api/databaseClient", () => ({
     DatabaseClient: {
-        availabilityDatabase: jest.fn(() => Promise.resolve({ data: { availability: true } })),
+        availabilityDatabase: vi.fn(() => Promise.resolve({ data: { availability: true } })),
     },
     DatabaseValidation: {
         availabilityDatabaseSchema: {
-            validateSync: jest.fn(() => ({ availability: true })),
+            validateSync: vi.fn(() => ({ availability: true })),
         },
     },
 }));
 
 describe("CreateDatabaseForm", () => {
-    const onSubmitMock = jest.fn();
+    const onSubmitMock = vi.fn();
     const defaultProps: CreateDatabaseFormProps = {
         processing: false,
         onSubmit: onSubmitMock,
     };
 
     afterEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
-    test("renders the form and input fields", () => {
+    it("renders the form and input fields", () => {
         render(<CreateDatabaseForm {...defaultProps} />);
         expect(screen.getByText("Create a database", { selector: "div" })).toBeInTheDocument();
         expect(screen.getByLabelText("Database Name")).toBeInTheDocument();
         expect(screen.getByRole("button", { name: "Create a database" })).toBeInTheDocument();
     });
 
-    test("validates the name field and shows error messages", async () => {
+    it("validates the name field and shows error messages", async () => {
         render(<CreateDatabaseForm {...defaultProps} />);
 
         const nameInput = screen.getByPlaceholderText("abcd_1234");
@@ -53,17 +55,18 @@ describe("CreateDatabaseForm", () => {
         // Enter valid name
         fireEvent.change(nameInput, { target: { value: "valid_name" } });
         fireEvent.blur(nameInput);
-        await waitFor(() => expect(screen.queryByText(/Name should be of minimum 4 characters length/)).not.toBeInTheDocument());
+        await waitFor(() =>
+            expect(screen.queryByText(/Name should be of minimum 4 characters length/)).not.toBeInTheDocument()
+        );
     });
 
-    test("disables submit button when processing", () => {
+    it("disables submit button when processing", () => {
         render(<CreateDatabaseForm {...defaultProps} processing={true} />);
-
         const submitButton = screen.getByRole("button", { name: "Create a database" });
         expect(submitButton).toBeDisabled();
     });
 
-    test("validateDatabaseValues returns false when name or engine is undefined", async () => {
+    it("validateDatabaseValues returns false when name or engine is undefined", async () => {
         const mockResponse: AxiosResponse = {
             data: { availability: false },
             status: 200,
@@ -72,7 +75,7 @@ describe("CreateDatabaseForm", () => {
             config: {},
         };
 
-        const spy = jest.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
+        const spy = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
 
         render(<CreateDatabaseForm {...defaultProps} />);
 
@@ -100,8 +103,7 @@ describe("CreateDatabaseForm", () => {
         spy.mockRestore();
     });
 
-    test("validateDatabaseValues returns true when availability is true", async () => {
-        // Mock the API response to return availability: true
+    it("validateDatabaseValues returns true when availability is true", async () => {
         const mockResponse: AxiosResponse = {
             data: { availability: true },
             status: 200,
@@ -110,13 +112,13 @@ describe("CreateDatabaseForm", () => {
             config: {},
         };
 
-        // Mock API call
-        const spyApi = jest.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
+        const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
 
-        // Mock validation schema to align with the expected type
-        const spyValidation = jest.spyOn(DatabaseValidation.availabilityDatabaseSchema, "validateSync").mockImplementation((data) => {
-            return { availability: true } as any; // Cast the return type to match the schema
-        });
+        const spyValidation = vi.spyOn(DatabaseValidation.availabilityDatabaseSchema, "validateSync").mockImplementation(
+            (data) => {
+                return { availability: true } as any;
+            }
+        );
 
         render(<CreateDatabaseForm {...defaultProps} />);
 
@@ -125,19 +127,15 @@ describe("CreateDatabaseForm", () => {
         fireEvent.blur(nameInput);
 
         await waitFor(() => {
-            // Verify the API call was made with the correct payload
             expect(spyApi).toHaveBeenCalledWith({
                 name: "valid_name",
                 engine: EngineType.PostgreSQL,
             });
 
-            // Ensure validation passed successfully
             expect(spyValidation).toHaveBeenCalledWith(mockResponse.data);
         });
 
-        // Clean up mocks
         spyApi.mockRestore();
         spyValidation.mockRestore();
     });
-
 });

@@ -1,14 +1,18 @@
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { MetricClient } from "./metricClient";
 import { axiosInstance } from "./client";
 import { MetricProperties } from "../types/metrics";
 
-jest.mock("./client");
+// Mock axiosInstance and cast it to a mocked type
+vi.mock("./client", () => ({
+    axiosInstance: {
+        get: vi.fn(),
+    },
+}));
 
 describe("MetricClient", () => {
-    const mockAxiosInstance = axiosInstance as jest.Mocked<typeof axiosInstance>;
-
     afterEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("should fetch metrics successfully", async () => {
@@ -17,20 +21,22 @@ describe("MetricClient", () => {
             totalUsers: 150,
         };
 
-        mockAxiosInstance.get.mockResolvedValueOnce({ data: mockMetrics });
+        // Cast axiosInstance.get to the correct type
+        (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockMetrics });
 
         const result = await MetricClient.getMetrics();
 
-        expect(mockAxiosInstance.get).toHaveBeenCalledWith("/metrics");
+        expect(axiosInstance.get).toHaveBeenCalledWith("/metrics");
         expect(result).toEqual(mockMetrics);
     });
 
     it("should propagate errors from the API call", async () => {
         const mockError = new Error("Network error");
 
-        mockAxiosInstance.get.mockRejectedValueOnce(mockError);
+        // Cast axiosInstance.get to the correct type
+        (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
         await expect(MetricClient.getMetrics()).rejects.toThrow("Network error");
-        expect(mockAxiosInstance.get).toHaveBeenCalledWith("/metrics");
+        expect(axiosInstance.get).toHaveBeenCalledWith("/metrics");
     });
 });

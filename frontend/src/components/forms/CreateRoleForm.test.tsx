@@ -1,20 +1,20 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { act } from "react-dom/test-utils";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreateRoleForm, { CreateRoleFormProps } from "./CreateRoleForm";
 import { RoleClient } from "../../api/roleClient";
-import {EngineType} from "../../types/database";
+import { EngineType } from "../../types/database";
 
 // Mock the RoleClient
-jest.mock("../../api/roleClient", () => ({
+vi.mock("../../api/roleClient", () => ({
     RoleClient: {
-        availabilityRoleForDatabase: jest.fn(),
+        availabilityRoleForDatabase: vi.fn(),
     },
 }));
 
 describe("CreateRoleForm", () => {
-    const mockOnSubmit = jest.fn();
-    const mockOnClose = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockOnClose = vi.fn();
     const database = {
         name: "testDB",
         id: 1234,
@@ -23,7 +23,6 @@ describe("CreateRoleForm", () => {
         userId: 5678,
     };
 
-
     const defaultProps: CreateRoleFormProps = {
         database,
         onSubmit: mockOnSubmit,
@@ -31,7 +30,7 @@ describe("CreateRoleForm", () => {
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it("renders the form correctly", () => {

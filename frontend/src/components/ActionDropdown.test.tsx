@@ -1,20 +1,21 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import ActionDropdown from './ActionDropdown';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { describe, it, expect, vi } from "vitest";
+import ActionDropdown from "./ActionDropdown";
 
-describe('ActionDropdown', () => {
-    test('renders the Actions button', () => {
+describe("ActionDropdown", () => {
+    it("renders the Actions button", () => {
         render(<ActionDropdown />);
-        const button = screen.getByRole('button', { name: /actions/i });
+        const button = screen.getByRole("button", { name: /actions/i });
         expect(button).toBeInTheDocument();
     });
 
-    test('calls onDelete when Delete is clicked', () => {
-        const onDeleteMock = jest.fn();
+    it("calls onDelete when Delete is clicked", () => {
+        const onDeleteMock = vi.fn(); // Replace jest.fn() with vi.fn()
         render(<ActionDropdown onDelete={onDeleteMock} />);
 
-        const button = screen.getByRole('button', { name: /actions/i });
+        const button = screen.getByRole("button", { name: /actions/i });
         fireEvent.click(button); // Open dropdown
 
         const deleteOption = screen.getByText(/delete/i);

@@ -1,29 +1,31 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import RoleList, { RoleListProps } from './RoleList';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import RoleList, { RoleListProps } from "./RoleList";
 
 // Mock RoleListEntry
-jest.mock('./RoleListEntry', () => ({ role, onDelete }: { role: any; onDelete: () => void }) => (
-    <tr>
-        <td>{role.name}</td>
-        <td>{role.password}</td>
-        <td>
-            <button onClick={onDelete} data-testid={`delete-${role.name}`}>
-                Delete
-            </button>
-        </td>
-    </tr>
-));
+vi.mock("./RoleListEntry", () => ({
+    default: ({ role, onDelete }: { role: any; onDelete: () => void }) => (
+        <tr>
+            <td>{role.name}</td>
+            <td>{role.password}</td>
+            <td>
+                <button onClick={onDelete} data-testid={`delete-${role.name}`}>
+                    Delete
+                </button>
+            </td>
+        </tr>
+    ),
+}));
 
 // Mock data with id and instanceId
 const mockRoles = [
-    { id: 1, instanceId: 123, name: 'Admin', password: 'admin123' },
-    { id: 2, instanceId: 456, name: 'User', password: 'user123' },
+    { id: 1, instanceId: 123, name: "Admin", password: "admin123" },
+    { id: 2, instanceId: 456, name: "User", password: "user123" },
 ];
 
-
 // Mock function
-const mockOnDelete = jest.fn();
+const mockOnDelete = vi.fn();
 
 const renderComponent = (props: Partial<RoleListProps> = {}) => {
     const defaultProps: RoleListProps = {
@@ -35,16 +37,16 @@ const renderComponent = (props: Partial<RoleListProps> = {}) => {
     render(<RoleList {...defaultProps} />);
 };
 
-describe('RoleList Component', () => {
-    it('renders the table headers correctly', () => {
+describe("RoleList Component", () => {
+    it("renders the table headers correctly", () => {
         renderComponent();
 
-        expect(screen.getByText('Name')).toBeInTheDocument();
-        expect(screen.getByText('Password')).toBeInTheDocument();
-        expect(screen.getByText('Action')).toBeInTheDocument();
+        expect(screen.getByText("Name")).toBeInTheDocument();
+        expect(screen.getByText("Password")).toBeInTheDocument();
+        expect(screen.getByText("Action")).toBeInTheDocument();
     });
 
-    it('renders the list of roles', () => {
+    it("renders the list of roles", () => {
         renderComponent();
 
         mockRoles.forEach((role) => {
@@ -53,7 +55,7 @@ describe('RoleList Component', () => {
         });
     });
 
-    it('calls onDelete when delete button is clicked', () => {
+    it("calls onDelete when delete button is clicked", () => {
         renderComponent();
 
         const deleteButtons = mockRoles.map((role) => screen.getByTestId(`delete-${role.name}`));
@@ -67,10 +69,10 @@ describe('RoleList Component', () => {
         expect(mockOnDelete).toHaveBeenCalledTimes(mockRoles.length);
     });
 
-    it('renders no roles when roles array is empty', () => {
+    it("renders no roles when roles array is empty", () => {
         renderComponent({ roles: [] });
 
-        expect(screen.queryByText('Admin')).not.toBeInTheDocument();
-        expect(screen.queryByText('User')).not.toBeInTheDocument();
+        expect(screen.queryByText("Admin")).not.toBeInTheDocument();
+        expect(screen.queryByText("User")).not.toBeInTheDocument();
     });
 });

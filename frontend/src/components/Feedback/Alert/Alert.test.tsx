@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 import { Alert, AlertProps } from "./Alert";
 
 describe("Alert Component", () => {
@@ -16,7 +17,6 @@ describe("Alert Component", () => {
     it("renders the correct icon for the primary variant", () => {
         renderComponent({ variant: "primary" });
 
-        // Use the specific class applied to the primary icon
         const icon = document.querySelector(".text-blue-400");
         expect(icon).toBeInTheDocument();
     });
@@ -43,26 +43,21 @@ describe("Alert Component", () => {
     });
 
     it("renders the alert structure without an icon for an unsupported variant", () => {
-        // Cast an unsupported value to bypass TypeScript checks
         const invalidVariant = "unsupported" as AlertProps["variant"];
 
-        // Render the component with the invalid variant
         const { container } = renderComponent({ variant: invalidVariant });
 
-        // Expect the icon container to be empty
         const iconContainer = container.querySelector(".flex-shrink-0");
         expect(iconContainer).toBeEmptyDOMElement();
 
-        // Validate that the rest of the alert structure is still rendered
         expect(container.querySelector(".rounded-md")).toBeInTheDocument();
         expect(container.querySelector(".text-sm.font-medium")).toHaveTextContent("Alert Title");
         expect(container.querySelector(".mt-2.text-sm")).toHaveTextContent("This is an alert message.");
     });
 
     it("uses the default variant (primary) when no variant is provided", () => {
-        renderComponent({ variant: undefined }); // Explicitly omit the variant prop
+        renderComponent({ variant: undefined });
 
-        // Check that the icon and styles for the primary variant are applied
         const icon = document.querySelector(".text-blue-400");
         expect(icon).toBeInTheDocument();
 
@@ -71,7 +66,7 @@ describe("Alert Component", () => {
     });
 
     it("renders without a title if none is provided", () => {
-        renderComponent({ title: undefined }); // Omit the title prop
+        renderComponent({ title: undefined });
 
         const titleElement = screen.queryByText("Alert Title");
         expect(titleElement).not.toBeInTheDocument();
@@ -81,10 +76,9 @@ describe("Alert Component", () => {
         renderComponent({ message: "Test message" });
 
         const icon = document.querySelector(".text-blue-400");
-        expect(icon).toBeInTheDocument(); // Default icon for primary variant
+        expect(icon).toBeInTheDocument();
 
         const alertContainer = document.querySelector(".bg-blue-50");
-        expect(alertContainer).toBeInTheDocument(); // Default background for primary variant
+        expect(alertContainer).toBeInTheDocument();
     });
-
 });

@@ -1,3 +1,4 @@
+import { describe, it, expect, afterEach } from "vitest";
 import { RoleClient } from "./roleClient";
 import MockAdapter from "axios-mock-adapter";
 import { axiosInstance } from "./client";
@@ -24,7 +25,7 @@ describe("RoleClient Tests", () => {
         const newRole = {
             roleName: "Editor", // Updated property name to `roleName`
             permissions: ["read", "write"],
-            instanceId: 1
+            instanceId: 1,
         };
         const createdRole = { id: 2, ...newRole };
         mockAxios.onPost("/roles").reply(201, createdRole);
@@ -40,7 +41,7 @@ describe("RoleClient Tests", () => {
         const mockRole = {
             roleName: "Viewer",
             permissions: ["read"],
-            instanceId: 1
+            instanceId: 1,
         };
         const mockResponse = { available: true }; // Mocked API response
 
