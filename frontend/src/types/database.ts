@@ -1,11 +1,11 @@
 import { BaseModel } from "./models";
 
 const {
-  REACT_APP_POSTGRESQL_HOSTNAME,
-  REACT_APP_POSTGRESQL_PORT,
-  REACT_APP_MONGODB_HOSTNAME,
-  REACT_APP_MONGODB_PORT,
-  REACT_APP_ADMINER_URL,
+  VITE_POSTGRESQL_HOSTNAME,
+  VITE_POSTGRESQL_PORT,
+  VITE_MONGODB_HOSTNAME,
+  VITE_MONGODB_PORT,
+  VITE_ADMINER_URL,
 } = import.meta.env;
 
 export interface DatabaseProperties {
@@ -48,9 +48,9 @@ export class Database extends BaseModel {
 
   public get hostname(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return REACT_APP_POSTGRESQL_HOSTNAME || "";
+      return VITE_POSTGRESQL_HOSTNAME || "";
     } else if (this.props.engine === EngineType.MongoDB) {
-      return REACT_APP_MONGODB_HOSTNAME || "";
+      return VITE_MONGODB_HOSTNAME || "";
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);
@@ -59,9 +59,9 @@ export class Database extends BaseModel {
 
   public get port(): number {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return Number.parseInt(REACT_APP_POSTGRESQL_PORT || "5432");
+      return Number.parseInt(VITE_POSTGRESQL_PORT || "5432");
     } else if (this.props.engine === EngineType.MongoDB) {
-      return Number.parseInt(REACT_APP_MONGODB_PORT || "27017");
+      return Number.parseInt(VITE_MONGODB_PORT || "27017");
     } else {
       const assertNever = (_: never): number => NaN;
       return assertNever(this.props.engine);
@@ -82,6 +82,6 @@ export class Database extends BaseModel {
   }
 
   public get adminerUrl(): string {
-    return REACT_APP_ADMINER_URL || "";
+    return VITE_ADMINER_URL || "";
   }
 }

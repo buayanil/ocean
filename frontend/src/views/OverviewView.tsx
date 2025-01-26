@@ -8,7 +8,7 @@ import StartingPoints from "../components/StartingPoints";
 
 interface OverviewViewProps {}
 
-const { REACT_APP_ISSUE_LINK } = import.meta.env;
+const { VITE_ISSUE_LINK } = import.meta.env;
 
 const OverviewView: React.FC<OverviewViewProps> = () => {
   return (
@@ -18,7 +18,7 @@ const OverviewView: React.FC<OverviewViewProps> = () => {
         title="Getting started"
         description="Get started by selecting a template."
         startingPoints={startingPoints}
-        moreHref={REACT_APP_ISSUE_LINK || "#"}
+        moreHref={VITE_ISSUE_LINK || "#"}
       />
     </AppLayout>
   );
