@@ -19,7 +19,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["node", "cypress", "@cypress/react"]
+    "types": ["node", "cypress"]
   },
   "include": [
     "vite.config.ts",

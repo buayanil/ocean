@@ -10,10 +10,10 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "eslint new-frontend",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "coverage:report": "nyc report --reporter=text --reporter=html --reporter=lcov"
+    "vitest": "vitest",
+    "vitest:ui": "vitest --ui",
+    "vitest:coverage": "vitest --coverage",
+    "generate-cypress-coverage-report": "npx nyc report --reporter=text --reporter=html --report-dir=coverage/cypress"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
