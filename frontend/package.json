@@ -15,9 +15,8 @@
     "vitest:coverage": "vitest --coverage",
     "generate-coverage-report": "npx nyc report --reporter=text --reporter=html --report-dir=coverage/total",
     "cypress:component": "npx cypress run --component",
-    "cypress:e2e": "npx cypress run",
-    "cypress": "npm run cypress:component && npm run cypress:e2e",
-    "test": "npm run vitest && npm run cypress"
+    "test:e2e": "npx cypress run",
+    "test": "npm run vitest && npm run cypress:component"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
