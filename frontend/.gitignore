@@ -14,7 +14,7 @@ dist
 #Test-Coverage
 coverage
 .nyc_output
-./cypress/screenshots
+cypress/screenshots
 
 dist-ssr
 *.local
