@@ -6,8 +6,9 @@ import istanbul from "vite-plugin-istanbul"
 // https://vite.dev/config/
 export default defineConfig({
     server: {
-        host: "localhost", // Ensure this matches your hostname
-        port: 5173,
+        fs: {
+            allow: ['.']
+        }
     },
     plugins: [
       react(),
