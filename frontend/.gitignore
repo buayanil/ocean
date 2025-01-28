@@ -8,11 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+tsconfig.tsbuildinfo
 dist
 
 #Test-Coverage
 coverage
 .nyc_output
+./cypress/screenshots
 
 dist-ssr
 *.local
