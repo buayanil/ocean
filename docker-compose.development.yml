@@ -38,7 +38,7 @@ services:
   mysql_cluster:
     depends_on:
       - openldap
-    image: mysql:5.7
+    image: mysql:9.2
     restart: always
     ports:
       - 3306:3306
