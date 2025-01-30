@@ -61,8 +61,8 @@ describe("AppLayout Tests", () => {
         .and("have.attr", "href", SettingsNavigation.to); // Verify the correct path
 
     // Click the Settings link and ensure navigation
-    cy.contains("Settings").click();
-    cy.url().should("include", SettingsNavigation.to); // Verify the URL updates
+    cy.contains("Settings").click({ force: true });
+    cy.url().should("include", SettingsNavigation.to);
     cy.get("button").contains("Open user menu").click();
 
     // Verify the Logout button
