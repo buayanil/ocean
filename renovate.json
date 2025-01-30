@@ -16,7 +16,6 @@
   ],
   "enabledManagers": [
     "npm",
-    "docker-compose",
     "github-actions"
   ]
 }
