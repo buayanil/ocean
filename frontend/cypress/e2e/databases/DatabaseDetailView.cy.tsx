@@ -190,7 +190,7 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Users tab
         cy.contains("Invitations").click();
         cy.get('button.relative.w-full[aria-haspopup="listbox"]').click();
-        cy.contains('li', 'O. User1').click();
+        cy.get('[role="option"]').contains('O. User1').click();
         // Verify the invitation creation request
         cy.wait("@createInvitationError").its("response.statusCode").should("eq", 400);
         cy.contains('p', 'Something went wrong :(').should("exist");
@@ -473,7 +473,7 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Users tab
         cy.contains("Invitations").click();
         cy.get('button.relative.w-full[aria-haspopup="listbox"]').click();
-        cy.contains('li', 'O. User1').click();
+        cy.get('[role="option"]').contains('O. User1').click();
         // Verify the invitation creation request
         cy.wait("@createInvitation").its("response.statusCode").should("eq", 200);
         cy.contains('p', 'Successfully created!').should("exist");
