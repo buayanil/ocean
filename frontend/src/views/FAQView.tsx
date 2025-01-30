@@ -2,7 +2,7 @@ import React from 'react';
 
 import AppLayout from '../layouts/AppLayout';
 import { FAQNavigation } from '../constants/menu.';
-import { Disclosure } from '@headlessui/react';
+import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/outline';
 
 interface FAQViewProps {}
@@ -36,7 +36,7 @@ const FAQView: React.FC<FAQViewProps> = () => {
                         {({ open }) => (
                         <>
                             <dt className="text-lg">
-                            <Disclosure.Button className="text-left w-full flex justify-between items-start text-gray-400">
+                            <DisclosureButton className="text-left w-full flex justify-between items-start text-gray-400">
                                 <span className="font-medium text-gray-900">{faq.question}</span>
                                 <span className="ml-6 h-7 flex items-center">
                                 <ChevronDownIcon
@@ -44,11 +44,11 @@ const FAQView: React.FC<FAQViewProps> = () => {
                                     aria-hidden="true"
                                 />
                                 </span>
-                            </Disclosure.Button>
+                            </DisclosureButton>
                             </dt>
-                            <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                            <DisclosurePanel as="dd" className="mt-2 pr-12">
                             <p className="text-base text-gray-500">{faq.answer}</p>
-                            </Disclosure.Panel>
+                            </DisclosurePanel>
                         </>
                         )}
                     </Disclosure>
