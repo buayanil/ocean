@@ -14,17 +14,18 @@ const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
   const history = useHistory();
   // Queries
   const queryClient = useQueryClient()
-  const createDatabaseMutation = useMutation((database: UpstreamDatabaseProperties) => DatabaseClient.createDatabase(database), {
+  const createDatabaseMutation = useMutation({
+    mutationFn: (database: UpstreamDatabaseProperties) => DatabaseClient.createDatabase(database),
     onSuccess: () => {
-      queryClient.invalidateQueries(["databases"])
+      queryClient.invalidateQueries({ queryKey: ["databases"] });
       history.push(DatabasesNavigation.to);
-    }
-  })
+    },
+  });
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <CreateDatabaseForm
-        processing={createDatabaseMutation.isLoading}
+        processing={createDatabaseMutation.isPending}
         errorMessage={createDatabaseMutation.isError ? "Ein Fehler is aufgetreten" : undefined}
         onSubmit={(value) => createDatabaseMutation.mutate(value)}
       />
