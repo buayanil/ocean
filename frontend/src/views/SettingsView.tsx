@@ -14,9 +14,13 @@ interface SettingsViewProps { }
 
 const SettingsView: React.FC<SettingsViewProps> = () => {
   const [activeId, setActiveId] = useState(settingsViewTabs[0].id);
-  const userQuery = useQuery(["user"], () => UserClient.getUser())
+    const userQuery = useQuery({
+        queryKey: ["user"],
+        queryFn: () => UserClient.getUser(),
+    });
 
-  return (
+
+    return (
     <AppLayout selectedNavigation={SettingsNavigation.name}>
       <div>
         <Headline title="Settings" size="large" />

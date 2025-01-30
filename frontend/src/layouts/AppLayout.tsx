@@ -24,9 +24,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   selectedNavigation,
 }) => {
-  const userQuery = useQuery(["user"], () => UserClient.getUser(), {
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: () => UserClient.getUser(),
     staleTime: 1000_1000,
   });
+
   const user = userQuery.data;
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
