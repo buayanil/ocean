@@ -3,7 +3,7 @@ import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 import {Menu, MenuButton, MenuItem, MenuItems, Transition} from '@headlessui/react'
-import { ChevronDownIcon, DatabaseIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon, CircleStackIcon} from '@heroicons/react/20/solid'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -41,7 +41,7 @@ const CreateDropdown: React.FC = () => {
                     <p>
                       <Link to="/databases/new" className={classNames(focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm')}
                       >
-                        <DatabaseIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
+                        <CircleStackIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
                         Databases
                       </Link>
                     </p>

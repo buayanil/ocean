@@ -1,11 +1,11 @@
-import React from "react";
+import React, {JSX} from "react";
 import * as yup from "yup";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import {
   CheckCircleIcon,
-  RefreshIcon,
-  BanIcon,
-} from "@heroicons/react/outline";
+  ArrowPathIcon,
+  NoSymbolIcon,
+} from "@heroicons/react/24/outline";
 
 import { engineOptions } from "../../constants/engines";
 import { EngineType, UpstreamDatabaseProperties } from "../../types/database";
@@ -72,7 +72,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
     valid: boolean
   ): JSX.Element => {
     if (loading) {
-      <RefreshIcon
+      <ArrowPathIcon
         className="animate-spin h-5 w-5 text-blue-400"
         aria-hidden="true"
       />;
@@ -84,9 +84,9 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         />
       );
     } else if (!valid && touched) {
-      return <BanIcon className="h-5 w-5 text-red-400" aria-hidden="true" />;
+      return <NoSymbolIcon className="h-5 w-5 text-red-400" aria-hidden="true" />;
     }
-    return <BanIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />;
+    return <NoSymbolIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />;
   };
 
   return (

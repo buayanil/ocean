@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { DatabaseIcon } from '@heroicons/react/outline';
 
 import { DatabasesNavigation } from '../../constants/menu.';
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
 import { DatabaseProperties } from '../../types/database';
+import {CircleStackIcon} from "@heroicons/react/24/outline";
 
 interface DesktopDatabaseListEntryProps {
     database: DatabaseProperties;
@@ -18,7 +18,7 @@ const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({ dat
             <td className="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div className="flex">
                     <Link to={DatabasesNavigation.to} className="group inline-flex space-x-2 truncate text-sm">
-                        <DatabaseIcon
+                        <CircleStackIcon
                             className="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
                             aria-hidden="true"
                         />

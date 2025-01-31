@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dialog, Menu, Transition, DialogPanel, MenuButton, MenuItems, MenuItem, TransitionChild} from "@headlessui/react";
-import { ChevronDownIcon, MenuAlt1Icon, XIcon } from "@heroicons/react/solid";
+import {Bars3CenterLeftIcon, ChevronDownIcon, XMarkIcon} from "@heroicons/react/20/solid";
 import { useQuery } from "@tanstack/react-query";
 
 import { UserProperties } from "../types/user";
@@ -110,7 +110,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                       onClick={() => setSidebarOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <XIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
                   </button>
                 </div>
               </TransitionChild>
@@ -267,7 +267,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <MenuAlt1Icon className="h-6 w-6" aria-hidden="true" />
+            <Bars3CenterLeftIcon className="h-6 w-6" aria-hidden="true" />
           </button>
           <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8 border-b-2 border-gray-100">
             <div className="flex-1 flex"></div>

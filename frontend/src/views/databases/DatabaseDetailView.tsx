@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { DatabaseIcon } from "@heroicons/react/outline";
+import { CircleStackIcon } from "@heroicons/react/24/outline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Database } from "../../types/database";
@@ -292,7 +292,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="flex space-x-3 mb-4">
         <div className="flex-shrink-0">
-          <DatabaseIcon className="h-10 w-10 rounded-full text-cyan-600" />
+          <CircleStackIcon className="h-10 w-10 rounded-full text-cyan-600" />
         </div>
         <div className="min-w-0 flex-1">
           {database ? (

@@ -1,5 +1,5 @@
 import React from "react";
-import { PlusIcon, DatabaseIcon } from "@heroicons/react/solid";
+import { PlusIcon, CircleStackIcon } from "@heroicons/react/20/solid";
 
 export interface EmptyStateProps {
   title: string;
@@ -16,7 +16,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div className="text-center">
-      <DatabaseIcon
+      <CircleStackIcon
         className="mx-auto h-12 w-12 text-gray-400"
         aria-hidden="true"
       />
