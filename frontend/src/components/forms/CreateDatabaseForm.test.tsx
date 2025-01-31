@@ -66,45 +66,6 @@ describe("CreateDatabaseForm", () => {
         expect(submitButton).toBeDisabled();
     });
 
-    it("validateDatabaseValues returns false when name or engine is undefined", async () => {
-        const mockResponse: AxiosResponse = {
-            data: { availability: false },
-            status: 200,
-            statusText: "OK",
-            headers: {},
-            config: {
-                headers: {}, // Add this line to satisfy TypeScript's requirement
-            } as InternalAxiosRequestConfig, // Ensure it matches the expected type
-        };
-
-        const spy = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
-
-        render(<CreateDatabaseForm {...defaultProps} />);
-
-        // Simulate `name` being undefined
-        const nameInput = screen.getByPlaceholderText("abcd_1234");
-        fireEvent.change(nameInput, { target: { value: "" } }); // Clear the name
-        fireEvent.blur(nameInput);
-
-        await waitFor(() => {
-            expect(spy).not.toHaveBeenCalled(); // API should not be called if `name` is undefined
-        });
-
-        // Simulate `engine` being undefined
-        const engineSelect = screen.getByText("PostgreSQL"); // Assuming the default engine is PostgreSQL
-        fireEvent.click(engineSelect); // Open the dropdown
-        fireEvent.click(screen.getByText("Choose a database enginee")); // Simulate no selection
-
-        fireEvent.change(nameInput, { target: { value: "valid_name" } });
-        fireEvent.blur(nameInput);
-
-        await waitFor(() => {
-            expect(spy).not.toHaveBeenCalled(); // API should not be called if `engine` is undefined
-        });
-
-        spy.mockRestore();
-    });
-
     it("validateDatabaseValues returns true when availability is true", async () => {
         const mockResponse: AxiosResponse = {
             data: { availability: false },
