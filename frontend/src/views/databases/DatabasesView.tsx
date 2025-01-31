@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { DatabasesNavigation } from "../../constants/menu.";
@@ -13,7 +13,7 @@ import Headline from "../../components/Headline";
 interface DatabasesViewProps {}
 
 const DatabasesView: React.FC<DatabasesViewProps> = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   // Queries
     const { data: databases } = useQuery({
         queryKey: ["databases"],
@@ -28,12 +28,12 @@ const DatabasesView: React.FC<DatabasesViewProps> = () => {
       {(databases || []).length === 0 ? (
         <EmptyState
           {...emptyDatabaseState}
-          onClick={() => history.push("/databases/new")}
+          onClick={() => navigate("/databases/new")}
         />
       ) : (
         <DatabaseList
           databases={databases || []}
-          onClick={(id) => history.push(`databases/${id}`)}
+          onClick={(id) => navigate(`/databases/${id}`)}
         />
       )}
     </AppLayout>

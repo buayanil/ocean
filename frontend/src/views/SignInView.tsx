@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { OverviewNavigation } from "../constants/menu.";
 import { CredentialProperties } from "../types/models";
@@ -12,7 +12,7 @@ import SignInForm from "../components/SignInForm";
 interface SignInViewProps { }
 
 const SignInView: React.FC<SignInViewProps> = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { loading, error, isLoggedIn } = useAppSelector(
     (state) => state.session.session
   );
@@ -21,7 +21,7 @@ const SignInView: React.FC<SignInViewProps> = () => {
   useEffect(() => {
     if (isLoggedIn === true) {
       // HINT: Already signed in
-      history.push(OverviewNavigation.to);
+      navigate(OverviewNavigation.to);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn]);

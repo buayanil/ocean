@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { DatabaseIcon } from "@heroicons/react/outline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 
 import { Database } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
-import { RoleProperties, UpstreamCreateRoleProperties } from "../../types/role";
+import { UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
 import { DatabasesNavigation } from "../../constants/menu.";
 import { deleteModalContent } from "../../constants/modals";
@@ -33,7 +32,8 @@ interface DatabaseDetailViewProps { }
 
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
-  const history = useHistory();
+  const parsedId = id ? Number.parseInt(id) : undefined;
+  const navigate = useNavigate();
   // Tabs
   const [activeId, setActiveId] = useState<number>(1);
   // Modals
@@ -51,18 +51,21 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   // Queries
   const queryClient = useQueryClient()
   const { data: database } = useQuery({
-    queryKey: ["database", id],
-    queryFn: () => DatabaseClient.getDatabase(Number.parseInt(id)),
+    queryKey: ["database", parsedId],
+    queryFn: () => parsedId ? DatabaseClient.getDatabase(parsedId) : Promise.resolve(null),
+    enabled: !!parsedId, // Ensures query only runs when parsedId is valid
   });
 
   const { data: roles } = useQuery({
-    queryKey: ["roles"],
-    queryFn: () => RoleClient.getRolesForDatabase(Number.parseInt(id)),
+    queryKey: ["roles", parsedId],
+    queryFn: () => parsedId ? RoleClient.getRolesForDatabase(parsedId) : Promise.resolve([]),
+    enabled: !!parsedId,
   });
 
   const { data: invitations } = useQuery({
-    queryKey: ["invitations"],
-    queryFn: () => InvitationClient.getInvitationsForDatabase(Number.parseInt(id)),
+    queryKey: ["invitations", parsedId],
+    queryFn: () => parsedId ? InvitationClient.getInvitationsForDatabase(parsedId) : Promise.resolve([]),
+    enabled: !!parsedId,
   });
 
   const { data: users } = useQuery({
@@ -130,7 +133,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     onSuccess: () => {
       setDeleteDatabaseOpenModal(false);
       queryClient.invalidateQueries({ queryKey: ["databases"] });
-      history.push("/databases"); // Keeping history.push as requested
+      navigate("/databases"); // Keeping history.push as requested
     }
   });
   // Other users except our user
@@ -182,8 +185,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         <UserSelector
           users={otherUsers}
           selectedUserIds={Invitation.getUserIds(invitations)}
-          onSelect={(value) => createInvitationMutation.mutate({ instanceId: Number.parseInt(id), userId: value.id })}
-          onDeselect={onDeleteInvitation} />
+          onSelect={(value) => {
+            const parsedId = id ? Number.parseInt(id) : undefined;
+            if (parsedId !== undefined) {
+              createInvitationMutation.mutate({ instanceId: parsedId, userId: value.id });
+            }
+          }}
+          onDeselect={onDeleteInvitation}
+        />
         <div className="my-5">
           <Headline title="Invitations" size="medium" />
           <p className="mt-1 text-sm text-gray-500">
@@ -201,15 +210,21 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
         <DeleteModal
           open={openDeleteDatabaseModal}
           modalContent={deleteModalContent}
-          onSubmit={() => deleteDatabaseMutation.mutate(Number.parseInt(id))}
+          onSubmit={() => {
+            const parsedId = id ? Number.parseInt(id) : undefined;
+            if (parsedId !== undefined) {
+              deleteDatabaseMutation.mutate(parsedId);
+            }
+          }}
           onClose={() => setDeleteDatabaseOpenModal(false)}
         />
         <CreateRoleModal
-          database={database}
+          database={database ?? undefined}  // Ensures 'null' is converted to 'undefined'
           open={openCreateRoleModal}
           onSubmit={(value) => createRoleMutation.mutate(value)}
           onClose={() => setOpenCreateRoleModal(false)}
         />
+
       </div>
     )
   }

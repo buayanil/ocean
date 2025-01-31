@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { UpstreamDatabaseProperties } from "../../types/database";
@@ -11,14 +11,14 @@ import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 interface CreateDatabaseViewProps { }
 
 const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   // Queries
   const queryClient = useQueryClient()
   const createDatabaseMutation = useMutation({
     mutationFn: (database: UpstreamDatabaseProperties) => DatabaseClient.createDatabase(database),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["databases"] });
-      history.push(DatabasesNavigation.to);
+      navigate(DatabasesNavigation.to);
     },
   });
 
