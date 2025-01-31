@@ -26,7 +26,7 @@
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/react-query": "^5.0.0",
     "axios": "^1.0.0",
-    "date-fns": "^2.27.0",
+    "date-fns": "^4.0.0",
     "formik": "^2.2.9",
     "jose": "^5.9.6",
     "react": "^19.0.0",
