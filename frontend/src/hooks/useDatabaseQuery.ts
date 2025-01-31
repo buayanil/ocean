@@ -12,12 +12,12 @@ export const useDatabasesQuery = (
     options?: UseQueryOptions<ReadonlyArray<Database>>
 ) => {
     return useQuery({
-        queryKey: ["databases", "_all_"], // ✅ Correct: key is inside an object
+        queryKey: ["databases", "_all_"], //
         queryFn: async () => {
             const data = await DatabaseClient.getAllDatabases();
             return data.map((database) => new Database(database));
         },
-        ...options, // ✅ Spread additional options inside the object
+        ...options, //
     });
 };
 
