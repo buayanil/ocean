@@ -1,11 +1,11 @@
-import React, {JSX} from "react";
+import React from "react";
 import {
   HomeIcon,
-  DatabaseIcon,
-  CogIcon,
+  CircleStackIcon,
+  Cog8ToothIcon,
   QuestionMarkCircleIcon,
   ChartBarIcon,
-} from "@heroicons/react/outline";
+} from "@heroicons/react/24/outline";
 
 // TODO: create a map for all routes
 export type LinkProps = {
@@ -16,7 +16,7 @@ export type LinkProps = {
 export type Navigation = LinkProps & {
   section: "primary" | "secondary";
   requiredPermission?: string;
-  icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  icon: React.ElementType;
 };
 
 export const OverviewNavigation: Navigation = {
@@ -30,14 +30,14 @@ export const DatabasesNavigation: Navigation = {
   name: "Databases",
   to: "/databases",
   section: "primary",
-  icon: DatabaseIcon,
+  icon: CircleStackIcon,
 };
 
 export const SettingsNavigation: Navigation = {
   name: "Settings",
   to: "/settings",
   section: "secondary",
-  icon: CogIcon,
+  icon: Cog8ToothIcon,
 };
 
 export const FAQNavigation: Navigation = {

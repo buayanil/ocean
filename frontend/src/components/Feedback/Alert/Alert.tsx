@@ -1,6 +1,6 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React from 'react'
-import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/solid';
+import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/20/solid';
 
 export type AlertVariant = "primary" | "success" | "danger" | "warning";
 
@@ -32,7 +32,7 @@ export const Alert: React.FC<AlertProps> = ({ message, title = "", variant = "pr
     } else if (variant === "danger") {
       return <XCircleIcon className={common} aria-hidden="true" />;
     } else if (variant === "warning") {
-      return <ExclamationIcon className={common} aria-hidden="true" />;
+      return <ExclamationTriangleIcon className={common} aria-hidden="true" />;
     } else {
       const assertNever = (_: never): React.ReactElement => <></>;
       return assertNever(variant);

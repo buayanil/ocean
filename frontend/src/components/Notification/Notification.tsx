@@ -1,8 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment } from 'react'
 import { Transition } from '@headlessui/react'
-import { CheckCircleIcon, ExclamationIcon } from '@heroicons/react/outline'
-import { XIcon } from '@heroicons/react/solid'
+import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon } from '@heroicons/react/20/solid'
 
 
 export interface NotificationProps {
@@ -19,7 +19,7 @@ const Notification: React.FC<NotificationProps> = ({ show, title, description, v
         if (variant === "success") {
             return <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
         } else {
-            return <ExclamationIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
+            return <ExclamationTriangleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
         }
     }
 
@@ -56,7 +56,7 @@ const Notification: React.FC<NotificationProps> = ({ show, title, description, v
                                         onClick={onClose}
                                     >
                                         <span className="sr-only">Close</span>
-                                        <XIcon className="h-5 w-5" aria-hidden="true" />
+                                        <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                                     </button>
                                 </div>
                             </div>

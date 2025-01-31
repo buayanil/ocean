@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react'
 
 import {Menu, MenuButton, MenuItem, MenuItems, Transition} from '@headlessui/react'
-import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/20/solid'
 
 
 export interface ActionDropdownProps {

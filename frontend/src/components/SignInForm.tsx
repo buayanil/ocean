@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form, Field, FormikHelpers } from "formik";
-import { LockClosedIcon } from "@heroicons/react/solid";
+import { LockClosedIcon } from "@heroicons/react/20/solid";
 
 import { Alert } from "./Feedback/Alert/Alert";
 import { CredentialProperties } from "../types/models";
