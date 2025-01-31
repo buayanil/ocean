@@ -95,7 +95,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         <Headline title="Create a database" size="large" />
       </div>
       <div className="mb-3">
-        <Headline title="Choose a database enginee" size="medium" />
+        <Headline title="Choose a database engine" size="medium" />
       </div>
       <div className="text-sm font-light mb-3">
         A database runs a single database engine that powers one or more
