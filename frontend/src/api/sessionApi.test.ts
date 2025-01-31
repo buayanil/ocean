@@ -5,12 +5,12 @@ import { SessionApi } from "./sessionApi";
 // Mock the axiosInstance
 vi.mock("./client", () => ({
     axiosInstance: {
-        post: vi.fn(),
+        post: vi.fn(),  // Ensure 'post' exists and is mockable
     },
 }));
 
-// Explicitly type the mocked axiosInstance
-const mockedAxiosInstance = axiosInstance as jest.Mocked<typeof axiosInstance>;
+// Cast axiosInstance explicitly
+const mockedAxiosInstance = axiosInstance as unknown as { post: ReturnType<typeof vi.fn> };
 
 describe("SessionApi", () => {
     // Test case 1: Successful login

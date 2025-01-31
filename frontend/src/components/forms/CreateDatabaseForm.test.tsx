@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
-import { AxiosResponse } from "axios";
+import {AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import { EngineType } from "../../types/database";
 
@@ -72,7 +72,9 @@ describe("CreateDatabaseForm", () => {
             status: 200,
             statusText: "OK",
             headers: {},
-            config: {},
+            config: {
+                headers: {}, // Add this line to satisfy TypeScript's requirement
+            } as InternalAxiosRequestConfig, // Ensure it matches the expected type
         };
 
         const spy = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
@@ -105,11 +107,13 @@ describe("CreateDatabaseForm", () => {
 
     it("validateDatabaseValues returns true when availability is true", async () => {
         const mockResponse: AxiosResponse = {
-            data: { availability: true },
+            data: { availability: false },
             status: 200,
             statusText: "OK",
             headers: {},
-            config: {},
+            config: {
+                headers: {}, // Add this line to satisfy TypeScript's requirement
+            } as InternalAxiosRequestConfig, // Ensure it matches the expected type
         };
 
         const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);

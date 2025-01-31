@@ -49,6 +49,10 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
       async (error: AxiosError) => {
         const originalRequest = error.config;
 
+        if (!originalRequest) {
+          return Promise.reject(error); // Prevents further execution if undefined
+        }
+
         // Prevent loops
         if (originalRequest.url === baseURL + "/auth/refresh-token") {
           delete originalRequest.headers.Authorization;

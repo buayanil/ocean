@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { Alert } from './Alert';
@@ -37,4 +37,4 @@ Danger.args = {
     message: "This is a danger message",
     title: "Danger",
     variant: "danger"
-};
+};*/

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { InvitationList } from './InvitationList';
@@ -35,4 +35,4 @@ const Template: ComponentStory<typeof InvitationList> = (args) => {
 }
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = {};*/

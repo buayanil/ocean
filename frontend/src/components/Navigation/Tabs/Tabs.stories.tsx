@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { Tabs } from './Tabs';
@@ -22,4 +22,4 @@ const Template: ComponentStory<typeof Tabs> = (args) => {
 
 export const Default = Template.bind({});
 Default.args = {
-};
+};*/

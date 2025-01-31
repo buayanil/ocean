@@ -3,6 +3,7 @@ import React from "react";
 import AppLayout from "../layouts/AppLayout";
 import Headline from "../components/Headline";
 import { ReportingNavigation } from "../constants/menu.";
+import {Database, DatabaseProperties} from "../types/database";
 import { useMetricsQuery } from "../hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
@@ -17,9 +18,15 @@ interface ReportingViewProps {}
 
 const ReportingView: React.FC<ReportingViewProps> = () => {
   const metricsQuery = useMetricsQuery();
-  const metrics = metricsQuery.data;
+  interface MetricsData {
+      totalInstances: number;
+      totalUsers: number;
+  }
+  const metrics = metricsQuery.data as MetricsData | undefined;
   const databasesQuery = useDatabasesQuery();
-  const databases = databasesQuery.data || [];
+  const databases = Array.isArray(databasesQuery.data)
+      ? (databasesQuery.data as DatabaseProperties[]).map((db) => new Database(db))
+      : [];
   const deleteDatabaseWithPermissionMutation =
     useDeleteDatabaseWithPermissionMutation({
       onSettled: () => {
@@ -28,8 +35,15 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
       },
     });
   const usersQuery = useUsersQuery();
-  const users = usersQuery.data || [];
-
+  interface UserProperties {
+      id: number;
+      username: string;
+      firstName: string;
+      lastName: string;
+      mail: string;
+      employeeType: string;
+  }
+  const users = (usersQuery.data as UserProperties[]) || [];
   const getStats = () => {
     const result: IStats[] = [];
     if (metrics) {
