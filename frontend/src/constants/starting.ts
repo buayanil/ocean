@@ -1,4 +1,5 @@
 import { CogIcon, DatabaseIcon } from "@heroicons/react/outline";
+import {JSX} from "react";
 
 export interface StartingPoint {
   title: string;
@@ -13,21 +14,21 @@ export const startingPoints: StartingPoint[] = [
     title: "Create a Database",
     description: "Add a new database now.",
     icon: DatabaseIcon,
-    to: "databases/new",
+    to: "/databases/new",
     background: "bg-pink-500",
   },
   {
     title: "Manage Databases",
     description: "Manage databases in one place.",
     icon: DatabaseIcon,
-    to: "databases/",
+    to: "/databases/",
     background: "bg-pink-500",
   },
   {
     title: "Manage your profile",
     description: "All your user-specific settings are located here.",
     icon: CogIcon,
-    to: "settings/",
+    to: "/settings/",
     background: "bg-yellow-500",
   },
 ];

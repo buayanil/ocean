@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
 import {
   BrowserRouter as Router,
-  Redirect,
   Route,
-  Switch,
+  Navigate,
+  Routes, Outlet,
 } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 
@@ -29,66 +29,41 @@ const RootView: React.FC = () => {
   return (
     <Router>
       <Suspense fallback={<LoadingView />}>
-        <Switch>
-          <Redirect exact from="/" to={isLoggedIn ? "/overview" : "/login"} />
-          <Route
-            exact
-            path="/login"
-            render={(props) => <SignInView {...props} />}
-          />
-          <ProtectedRoute
-            exact
-            path="/overview"
-            render={(props: any) => <OverviewView {...props} />}
-          />
-          <ProtectedRoute
-            exact
-            path="/databases"
-            render={(props: any) => <DatabasesView {...props} />}
-          />
-          <ProtectedRoute
-            path="/databases/new"
-            render={(props: any) => <CreateDatabaseView {...props} />}
-          />
-          <ProtectedRoute
-            exact
-            path="/databases/:id"
-            render={(props: any) => <DatabaseDetailView {...props} />}
-          />
-          <ProtectedRoute
-            path="/reporting"
-            render={(props: any) => <ReportingView {...props} />}
-          />
-          <ProtectedRoute
-            path="/settings"
-            render={(props: any) => <SettingsView {...props} />}
-          />
-          <ProtectedRoute
-            path="/faq"
-            render={(props: any) => <FAQView {...props} />}
-          />
-          <Route
-            path="/error"
-            render={(props: any) => <PageNotFoundView {...props} />}
-          />
-          <Redirect to="/error" />
-        </Switch>
+        <Routes>
+          {/* Redirect root to login or overview */}
+          <Route path="/" element={<Navigate to={isLoggedIn ? "/overview" : "/login"} />} />
+
+          {/* Public route */}
+          <Route path="/login" element={<SignInView />} />
+
+          {/* Protected routes wrapped in one `ProtectedRoute` */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/overview" element={<OverviewView />} />
+            <Route path="/databases" element={<DatabasesView />} />
+            <Route path="/overview/databases" element={<DatabasesView />} />
+            <Route path="/databases/new" element={<CreateDatabaseView />} />
+            <Route path="/overview/databases/new" element={<CreateDatabaseView />} />
+            <Route path="/databases/:id" element={<DatabaseDetailView />} />
+            <Route path="/reporting" element={<ReportingView />} />
+            <Route path="/settings" element={<SettingsView />} />
+            <Route path="/overview/settings" element={<SettingsView />} />
+            <Route path="/faq" element={<FAQView />} />
+          </Route>
+
+          {/* Move `/error` outside of `ProtectedRoute` */}
+          <Route path="/error" element={<PageNotFoundView />} />
+
+          {/* Catch-all redirect to error page */}
+          <Route path="*" element={<Navigate to="/error" />} />
+        </Routes>
       </Suspense>
     </Router>
   );
 };
 
-const ProtectedRoute = (props: any) => {
+const ProtectedRoute = () => {
   const { isLoggedIn } = useAppSelector((state) => state.session.session);
-  return isLoggedIn ? (
-    <Route {...props} />
-  ) : (
-    <Redirect
-      to={{
-        pathname: "/login",
-      }}
-    />
-  );
+  return isLoggedIn ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default RootView;
