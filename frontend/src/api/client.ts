@@ -47,7 +47,6 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
   const responseHandle = axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-      console.error("Interceptor caught an error:", error); // Debug log
 
       const originalRequest = error.config;
 
@@ -65,14 +64,12 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
       }
 
       if (error.response?.status === 401) {
-        console.warn("401 detected! Token might be expired.");
         try {
           const newAccessToken = await renewAccessToken();
           setBearerToken(newAccessToken);
           originalRequest.headers.Authorization = "Bearer " + newAccessToken;
           localStorage.setItem("accessToken", newAccessToken);
 
-          console.log("Retrying original request with new token...");
           return axiosInstance(originalRequest); // Retry the request
         } catch (refreshError) {
           console.error("Token refresh failed!", refreshError);

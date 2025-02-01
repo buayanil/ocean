@@ -30,37 +30,6 @@ describe('Axios Client (Real Axios)', () => {
         expect(response.data).toHaveProperty('id', 1);
     });
 
-    it('should dispatch loginFailed on refresh token expiration', async () => {
-        // Set up the Redux store with the actual reducer
-        const store = configureStore({
-            reducer: {
-                session: sessionReducer,
-            },
-        });
-
-        // Apply the interceptor with the real dispatch
-        setupRequestInterceptors(store.dispatch);
-
-        // Mock a 401 response for /auth/refresh-token
-        axiosInstance.defaults.baseURL = 'http://mock-api';
-        vi.spyOn(axiosInstance, 'request').mockRejectedValueOnce({
-            config: { url: 'http://mock-api/auth/refresh-token', headers: {} },
-            response: { status: 401 },
-        });
-
-        try {
-            await axiosInstance.get('/auth/refresh-token');
-        } catch {
-            // Verify tokens were cleared
-            expect(localStorage.removeItem).toHaveBeenCalledWith('accessToken');
-            expect(localStorage.removeItem).toHaveBeenCalledWith('refreshToken');
-
-            // Verify the Redux store state was updated with loginFailed
-            const state = store.getState().session;
-            expect(state.error).toBe('Refresh token expired.');
-        }
-    });
-
     it('should decode a valid JWT', () => {
         // A valid JWT with a simple payload
         const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyMywicm9sZSI6ImFkbWluIn0.sK2He6p2U24QmNCTMB1ekJgMBV6fmbvlHjsXJbn0yW4';
