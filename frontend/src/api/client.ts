@@ -45,39 +45,44 @@ export const setBearerToken = (accessToken: string) => {
 
 export const setupRequestInterceptors = (dispatch: AppDispatch) => {
   const responseHandle = axiosInstance.interceptors.response.use(
-      (response) => response,
-      async (error: AxiosError) => {
-        const originalRequest = error.config;
+    (response) => response,
+    async (error: AxiosError) => {
+      console.error("Interceptor caught an error:", error); // Debug log
 
-        if (!originalRequest) {
-          return Promise.reject(error); // Prevents further execution if undefined
-        }
+      const originalRequest = error.config;
 
-        // Prevent loops
-        if (originalRequest.url === baseURL + "/auth/refresh-token") {
-          delete originalRequest.headers.Authorization;
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          dispatch(loginFailed("Refresh token expired."));
-          return Promise.resolve(undefined);
-        }
+      if (!originalRequest) {
+        console.warn("Original request is undefined!");
+        return Promise.reject(error);
+      }
 
-        if (error.response?.status === 401) {
-          try {
-            const accessToken = await renewAccessToken();
-            setBearerToken(accessToken);
-            originalRequest.headers.Authorization = "Bearer " + accessToken;
-            localStorage.setItem("accessToken", accessToken);
-            return axiosInstance(originalRequest);
-          } catch (refreshError) {
-            setBearerToken("");
-            delete originalRequest.headers.Authorization;
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            dispatch(loginFailed("Session expired."));
-          }
+      if (originalRequest.url === baseURL + "/auth/refresh-token") {
+        delete originalRequest.headers.Authorization;
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        dispatch(loginFailed("Refresh token expired."));
+        return Promise.resolve(undefined); // Gracefully stops execution
+      }
+
+      if (error.response?.status === 401) {
+        console.warn("401 detected! Token might be expired.");
+        try {
+          const newAccessToken = await renewAccessToken();
+          setBearerToken(newAccessToken);
+          originalRequest.headers.Authorization = "Bearer " + newAccessToken;
+          localStorage.setItem("accessToken", newAccessToken);
+
+          console.log("Retrying original request with new token...");
+          return axiosInstance(originalRequest); // Retry the request
+        } catch (refreshError) {
+          console.error("Token refresh failed!", refreshError);
+          setBearerToken("");
+          dispatch(loginFailed("Session expired."));
+          return Promise.reject(refreshError);
         }
       }
+      return Promise.reject(error);
+    }
   );
 
   return () => {
