@@ -3,6 +3,7 @@ import { DatabaseClient } from './databaseClient';
 import { axiosInstance } from './client';
 import { EngineType, UpstreamDatabaseProperties } from '../types/database';
 
+// Mock axiosInstance to prevent real API calls and control responses
 vi.mock('./client', () => ({
     axiosInstance: {
         get: vi.fn(),
@@ -11,6 +12,7 @@ vi.mock('./client', () => ({
     },
 }));
 
+// Tests for DatabaseClient methods that interact with the API
 describe('DatabaseClient', () => {
     // Mock data
     const mockDatabases = [
