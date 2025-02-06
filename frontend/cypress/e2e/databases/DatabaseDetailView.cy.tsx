@@ -10,6 +10,7 @@ describe("DatabaseDetailView Test", () => {
     const rolesApiUrl ="http://databases.f4.htw-berlin.de:9000/v1/roles"
     const invitationsApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/invitations";
 
+    // Intercept API calls to simulate backend behavior for database details
     beforeEach(() => {
         // Intercept login API call
         // @ts-ignore
@@ -21,7 +22,7 @@ describe("DatabaseDetailView Test", () => {
             },
         }).as("signinRequest");
 
-        // Intercept user API call
+        // Mock user API response to ensure correct user details
         // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
@@ -35,6 +36,7 @@ describe("DatabaseDetailView Test", () => {
             },
         }).as("getUser");
 
+        // Mock API response for fetching the list of databases
         // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
@@ -44,6 +46,7 @@ describe("DatabaseDetailView Test", () => {
             ],
         }).as("getDatabases");
 
+        // Mock get database number 1
         // @ts-ignore
         cy.intercept("GET", database1ApiUrl, {
             statusCode: 200,
@@ -56,7 +59,7 @@ describe("DatabaseDetailView Test", () => {
             },
         }).as("getDatabase1");
 
-        // Mock roles
+        // Mock get roles
         // @ts-ignore
         cy.intercept("GET", databasesRolesApiUrl, {
             statusCode: 200,
@@ -70,7 +73,7 @@ describe("DatabaseDetailView Test", () => {
             ],
         }).as("getRoles");
 
-        // Mock database invitations
+        // Mock get database invitations
         // @ts-ignore
         cy.intercept("GET", databaseInvitationsApiUrl, {
             statusCode: 200,
@@ -89,7 +92,7 @@ describe("DatabaseDetailView Test", () => {
             ],
         }).as("getDatabaseInvitations");
 
-        // Mock users
+        // Mock get users
         // @ts-ignore
         cy.intercept("GET", usersApiUrl, {
             statusCode: 200,
@@ -122,6 +125,7 @@ describe("DatabaseDetailView Test", () => {
         }).as("getUsers");
 
         // @ts-ignore
+        // Mock successful deletion of a database
         cy.intercept("DELETE", database1ApiUrl, {
             statusCode: 200,
         }).as("deleteDatabase1");
@@ -163,6 +167,7 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Fails to create a new invitation", () => {
+        // Simulate a failed invitation creation request
         // @ts-ignore
         cy.intercept("POST", invitationsApiUrl, {
             statusCode: 400, // Simulate good request
@@ -193,6 +198,8 @@ describe("DatabaseDetailView Test", () => {
         cy.get('[role="option"]').contains('O. User1').click();
         // Verify the invitation creation request
         cy.wait("@createInvitationError").its("response.statusCode").should("eq", 400);
+
+        // Verify that an error message is displayed when the request fails
         cy.contains('p', 'Something went wrong :(').should("exist");
         cy.contains('button', 'Close').click();
     });
@@ -226,8 +233,9 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Invitations tab
         cy.contains("Invitations").click();
 
+        // Click the delete button
         cy.contains('div', 'Delete').click();
-        // Verify the delete role request
+        // Ensure the deletion request was successful
         cy.wait("@deleteInvitation2").its("response.statusCode").should("eq", 200);
         cy.contains('p', 'Successfully delete!').should("exist");
         cy.contains('button', 'Close').click();
@@ -262,9 +270,12 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Invitations tab
         cy.contains("Invitations").click();
 
+        // Click the delete button
         cy.contains('div', 'Delete').click();
         // Verify the delete role request
         cy.wait("@deleteInvitation2").its("response.statusCode").should("eq", 400);
+
+        // Verify that an error message is displayed when the request fails
         cy.contains('p', 'Something went wrong :(').should("exist");
         cy.contains('button', 'Close').click();
     });
@@ -298,6 +309,7 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Users tab
         cy.contains("Users").click();
 
+        // Click the delete button
         cy.contains('div', 'Delete').click();
         // Verify the delete role request
         cy.wait("@deleteRole").its("response.statusCode").should("eq", 200);
@@ -334,9 +346,12 @@ describe("DatabaseDetailView Test", () => {
         // Switch to Users tab
         cy.contains("Users").click();
 
+        // Click the delete button
         cy.contains('div', 'Delete').click();
         // Verify the delete role request
         cy.wait("@deleteRole").its("response.statusCode").should("eq", 400);
+
+        // Verify that an error message is displayed when the request fails
         cy.contains('p', 'Something went wrong').should("exist");
         cy.contains('button', 'Close').click();
     });
@@ -380,6 +395,8 @@ describe("DatabaseDetailView Test", () => {
 
         // Verify the role creation request
         cy.wait("@createRoleError").its("response.statusCode").should("eq", 400);
+
+        // Verify that an error message is displayed when the request fails
         cy.contains('p', 'Something went wrong :(').should("exist");
         cy.contains('button', 'Close').click();
     });

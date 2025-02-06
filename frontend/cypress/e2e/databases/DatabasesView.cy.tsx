@@ -3,8 +3,9 @@ describe("DatabasesView Test", () => {
     const userApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/user"; // User data endpoint
     const databasesApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases"; // Get databases endpoint
 
+    // Mock API responses for user authentication and database retrieval
     beforeEach(() => {
-        // Intercept login API call
+        // Simulate login process by intercepting authentication request
         // @ts-ignore
         cy.intercept("POST", loginApiUrl, {
             statusCode: 200,
@@ -28,6 +29,7 @@ describe("DatabasesView Test", () => {
             },
         }).as("getUser");
 
+        // Mock API response to return a list of test databases
         // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
@@ -49,6 +51,7 @@ describe("DatabasesView Test", () => {
         // Intercept the GET databases API with an empty response
         cy.get('a[href="/databases/"]').click();
 
+        // Simulate scenario where no databases exist, expecting an empty state UI
         // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
@@ -62,6 +65,7 @@ describe("DatabasesView Test", () => {
         cy.contains("Databases").should("exist");
 
         // Verify EmptyState is displayed
+        // Ensure the UI correctly displays an empty state message
         cy.contains("No databases").should("exist"); // Adjust based on EmptyState text
         cy.contains('button', 'New database').click();
 
@@ -85,9 +89,11 @@ describe("DatabasesView Test", () => {
         cy.contains("Databases").should("exist");
 
         // Verify DatabaseList is displayed
+        // Verify that existing databases are listed on the page
         cy.contains("Test Database 1").should("exist");
         cy.contains("Test Database 2").should("exist");
         // Click on the first database
+        // Select a database and verify navigation to its details page
         cy.contains('p', 'Test Database 1').click();
 
         // Verify navigation to the database details page

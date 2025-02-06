@@ -5,8 +5,10 @@ describe("Login and Create a Database", () => {
     const checkAvailabilityApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases/_availability_"; // Check availability endpoint
     const getDatabasesUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases"
     let wasPostRequestBodyRight = false; // Global boolean flag
+
+    // Set up API intercepts to mock backend responses and control test scenarios
     beforeEach(() => {
-        // Intercept login API call
+        // Mock login API to simulate authentication responses
         // @ts-ignore
         cy.intercept("POST", loginApiUrl, (req) => {
             if (req.body.username === "testuser" && req.body.password === "password123") {
@@ -25,7 +27,7 @@ describe("Login and Create a Database", () => {
             }
         }).as("signinRequest");
 
-        // Intercept user API call for settings
+        // Mock user data retrieval after successful login
         // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
@@ -39,7 +41,7 @@ describe("Login and Create a Database", () => {
             },
         }).as("getUser");
 
-        // Intercept create database API call
+        // Mock API response when creating a new database
         // @ts-ignore
         cy.intercept("POST", createDatabaseApiUrl, (req) => {
             console.log("POST Request Body:", req.body);
@@ -87,6 +89,7 @@ describe("Login and Create a Database", () => {
         cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
         cy.wait("@getUser");
 
+        // Navigate to database creation page
         cy.contains('a', 'Create a Database').click();
 
         // Fill out the form and submit
