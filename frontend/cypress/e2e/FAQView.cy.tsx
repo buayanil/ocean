@@ -38,15 +38,15 @@ describe("Login and Navigate to FAQ", () => {
     });
 
     it("logs in and navigates to the settings page using the Open sidebar button", () => {
-        // Step 1: Visit the login page
+        // Visit the login page
         cy.visit("http://localhost:5173/login");
 
-        // Step 2: Log in with valid credentials
+        // Log in with valid credentials
         cy.get('input[name="username"]').type("testuser");
         cy.get('input[name="password"]').type("password123");
         cy.get('button[type="submit"]').click();
 
-        // Step 3: Wait for the login API call and verify success
+        // Wait for the login API call and verify success
         cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
         cy.wait(1000)
         // Click the "Open sidebar" button
@@ -56,7 +56,7 @@ describe("Login and Navigate to FAQ", () => {
         cy.wait(1000);
         cy.contains("Frequently asked questions").should("exist");
 
-        // Verify that FAQ questions are displayed
+        // Expand the first FAQ question to check its content
         cy.contains("Wo finde ich die Datenschutzerklärung?").should("exist");
         cy.contains("Wo finde ich das Impressum?").should("exist");
         cy.contains("Wo finde ich die Datenschutzerklärung?").click();

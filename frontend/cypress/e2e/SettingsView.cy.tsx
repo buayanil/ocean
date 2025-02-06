@@ -38,24 +38,25 @@ describe("Login and Navigate to Settings", () => {
     });
 
     it("logs in and navigates to the settings page", () => {
-        // Step 1: Visit the login page
+        // Visit the login page
         cy.visit("http://localhost:5173/login");
 
-        // Step 2: Log in with valid credentials
+        // Log in with valid credentials
         cy.get('input[name="username"]').type("testuser");
         cy.get('input[name="password"]').type("password123");
         cy.get('button[type="submit"]').click();
 
-        // Step 3: Wait for the login API call and verify success
+        // Wait for the login API call and verify success
         cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
 
         cy.wait(5000)
 
+        // Open user menu to access settings
         cy.contains('button', 'Open user menu for').click();
 
         cy.get('a[role="menuitem"][href="/settings"]').click();
 
-        // Step 5: Wait for the user API call and verify user data is loaded
+        // Wait for the user API call and verify user data is loaded
         cy.wait("@getUser").its("response.body").should("deep.equal", {
             id: 1,
             username: "TestUser",
@@ -65,7 +66,7 @@ describe("Login and Navigate to Settings", () => {
             employeeType: "Admin",
         });
 
-        // Step 6: Verify SettingsView components
+        // Verify SettingsView components
         // Check for the headline
         cy.contains("Settings").should("exist");
         cy.wait(5000)

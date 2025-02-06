@@ -28,7 +28,7 @@ describe("Access token management tests", () => {
         // Use cy.wrap() to properly handle async token generation
         cy.wrap(generateValidJWT(1)).then((validAccessToken) => {
             cy.wrap(generateValidJWT(1)).then((validRefreshToken) => {
-
+                // Mock login API to return valid access and refresh tokens
                 cy.intercept("POST", "http://databases.f4.htw-berlin.de:9000/v1/auth/signin", (req) => {
                     if (req.body.username === "testuser" && req.body.password === "password123") {
                         req.reply({
@@ -46,15 +46,15 @@ describe("Access token management tests", () => {
                     }
                 }).as("signinRequest");
 
-                // Step 1: Visit the login page
+                // Visit the login page
                 cy.visit("http://localhost:5173/login");
 
-                // Step 2: Log in with valid credentials
+                // Log in with valid credentials
                 cy.get('input[name="username"]').type("testuser");
                 cy.get('input[name="password"]').type("password123");
                 cy.get('button[type="submit"]').click();
 
-                // Step 3: Wait for the login API call and verify success
+                // Wait for the login API call and verify success
                 cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
                 cy.wait(1000);
 
@@ -70,6 +70,7 @@ describe("Access token management tests", () => {
         });
     });
 
+    // Test scenario where access token expires and is refreshed using a valid refresh token
     it("should refresh the token when access token expires", () => {
         // Generate tokens before running Cypress commands
         cy.wrap(generateExpiredJWT(1)).then((expiredAccessToken) => {
@@ -165,6 +166,8 @@ describe("Access token management tests", () => {
             });
         });
     });
+
+    // Simulate network failure to test error handling in authentication
     it("should handle network errors in axiosInstance", () => {
         cy.intercept("POST", "http://databases.f4.htw-berlin.de:9000/v1/auth/signin", {
             forceNetworkError: true // Simulate network failure
