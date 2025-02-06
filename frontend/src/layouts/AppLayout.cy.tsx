@@ -7,19 +7,24 @@ import { Provider } from "react-redux";
 import { store } from "../redux/store";
 import {navigation, SettingsNavigation} from "../constants/menu.";
 
+// Initialize a new QueryClient instance for React Query
 const queryClient = new QueryClient();
+// Mock user data to simulate API response for user permissions
 const mockUser = { firstName: "John", lastName: "Doe", employeeType: "Staff" }; // Mock user with "Staff" permission
 
+// Tests for AppLayout component, verifying navigation, layout, and user interactions
 describe("AppLayout Tests", () => {
+  // Default properties for rendering the AppLayout component
   const defaultProps: AppLayoutProps = {
     children: <div>Test Content</div>,
     selectedNavigation: "Overview",
   };
-
+  // Mock API response for fetching user details and mount the component
   beforeEach(() => {
     cy.intercept("GET", "/v1/user", { body: mockUser }).as("getUser");
 
     mount(
+        // Wrap the component with necessary providers: Redux store, QueryClient, and Router
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <Router>
@@ -29,9 +34,10 @@ describe("AppLayout Tests", () => {
         </Provider>
     );
   });
-
+  // Verify that navigation items appear based on user permissions
   it("renders all navigation items for users with permissions", () => {
     cy.wait("@getUser");
+    // Loop through navigation items and check visibility based on permissions
     navigation.forEach((item) => {
       if (item.requiredPermission === undefined || item.requiredPermission === mockUser.employeeType) {
         cy.contains(item.name).should("exist");
@@ -40,19 +46,20 @@ describe("AppLayout Tests", () => {
       }
     });
   });
-
+  // Ensure sidebar is always visible on large screen sizes
   it("renders static sidebar on larger screens", () => {
+    // Simulate desktop resolution to verify sidebar rendering
     cy.viewport(1280, 800); // Desktop resolution
     cy.get("nav[aria-label='Sidebar']").should("exist");
     cy.get("button[aria-label='Open sidebar']").should("not.exist");
   });
-
+  // Ensure AppLayout correctly renders its child content
   it("renders children content", () => {
     cy.contains("Test Content").should("exist");
   });
-
+  // Verify profile dropdown interactions, including Settings navigation and Logout
   it("handles profile dropdown actions", () => {
-    // Open the profile dropdown
+    // Open the user menu dropdown
     cy.get("button").contains("Open user menu").click(); // Adjust the button text or accessibility label if needed
 
     // Verify the Settings link
