@@ -43,6 +43,12 @@ npm run storybook
 ```
 Starts Storybook for component development.
 
+### Generate Documentation
+```sh
+npm run docs
+```
+Generates TypeScript documentation using TypeDoc. The documentation will be output to docs/typedoc/.
+
 ### Run Tests
 #### Unit & Component Tests (Vitest)
 ```sh

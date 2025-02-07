@@ -16,7 +16,8 @@
     "generate-coverage-report": "npx nyc report --reporter=text --reporter=html --report-dir=coverage/total",
     "cypress:component": "npx cypress run --component",
     "test:e2e": "npx cypress run",
-    "test": "npm run vitest && npm run cypress:component"
+    "test": "npm run vitest && npm run cypress:component",
+    "docs": "typedoc --out docs/typedoc src/ --entryPointStrategy expand"
   },
   "dependencies": {
     "@headlessui/react": "^2.0.0",
