@@ -11,15 +11,30 @@ import { Navigation, navigation, SettingsNavigation } from "../constants/menu.";
 import { UserClient } from "../api/userClient";
 import CreateDropdown from "../components/CreateDropdown";
 
+/**
+ * Utility function to merge Tailwind CSS classes.
+ * @param classes - Array of class names.
+ * @returns A string containing all valid class names.
+ */
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
-
+/**
+ * Props for the `AppLayout` component.
+ */
 export interface AppLayoutProps {
+  /** React children elements (main content). */
   children: React.ReactNode;
+  /** The currently selected navigation item. */
   selectedNavigation: string;
 }
-
+/**
+ * The main application layout component.
+ * Manages sidebar, navigation, user menu, and page content.
+ *
+ * @param children - The main content of the page.
+ * @param selectedNavigation - The currently selected navigation item.
+ */
 const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   selectedNavigation,
@@ -33,11 +48,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const user = userQuery.data;
   const dispatch = useAppDispatch();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  /**
+   * Logs out the current user by dispatching the `logout` action.
+   */
   const onLogout = () => {
     dispatch(logout());
   };
-
+  /**
+   * Filters navigation items based on user permissions.
+   * @returns An array of permitted navigation items.
+   */
   const getNavigationWithPermission = (): Navigation[] => {
     if (user) {
       return navigation.filter((item) => {
@@ -54,7 +74,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     }
   };
   const navigationWithPermission = getNavigationWithPermission();
-
+  /**
+   * Retrieves the initials of a user's first and last name.
+   * If either name is missing, returns a fallback value.
+   *
+   * @param value - The user object or `undefined`.
+   * @returns A string containing the user's initials or a fallback `":("` if names are unavailable.
+   */
   const getAbbreviationFor = (value: UserProperties | undefined): string => {
     const fallbackValue = ":(";
     if (value && value.firstName.length > 0 && value.lastName.length > 0) {
@@ -65,6 +91,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
   return (
     <div className="h-screen flex overflow-hidden bg-white">
+      {/* Mobile Sidebar */}
       <Transition show={sidebarOpen} as={Fragment}>
         <Dialog
             as="div"
@@ -73,6 +100,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             open={sidebarOpen}
             onClose={setSidebarOpen}
         >
+          {/* Sidebar Panel */}
           <TransitionChild
               as={Fragment}
               enter="transition-opacity ease-linear duration-300"
@@ -122,7 +150,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     alt="HTW logo"
                 />
               </div>
-
+              {/* Sidebar Navigation */}
               <nav
                   className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
                   aria-label="Sidebar"
@@ -259,7 +287,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
         </div>
       </div>
-
+      {/* Main Content */}
       <div className="flex-1 overflow-auto focus:outline-none">
         <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
           <button

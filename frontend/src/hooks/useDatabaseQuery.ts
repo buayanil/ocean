@@ -8,6 +8,13 @@ import {
 import { DatabaseClient } from "../api/databaseClient";
 import { Database } from "../types/database";
 
+/**
+ * Custom hook to fetch all databases.
+ * Uses `react-query` to cache and manage API requests efficiently.
+ *
+ * @param options - Optional query configuration.
+ * @returns A `useQuery` result containing the databases.
+ */
 export const useDatabasesQuery = (
     options?: UseQueryOptions<ReadonlyArray<Database>>
 ) => {
@@ -21,7 +28,13 @@ export const useDatabasesQuery = (
     });
 };
 
-
+/**
+ * Custom hook to delete a database with permission.
+ * Uses `react-query` mutation to trigger a delete request.
+ *
+ * @param options - Optional mutation configuration.
+ * @returns A `useMutation` result to handle the deletion process.
+ */
 export const useDeleteDatabaseWithPermissionMutation = (
     options?: Omit<UseMutationOptions<any, Error, number>, "mutationFn">
 ) => {
@@ -30,6 +43,6 @@ export const useDeleteDatabaseWithPermissionMutation = (
             const { data } = await DatabaseClient.deleteDatabaseWithPermission(variables);
             return data;
         },
-        ...options, // ✅ Spread options inside the object
+        ...options,
     });
 };
