@@ -11,7 +11,7 @@ This is a frontend project built using **React 19**, **Vite**, and **TailwindCSS
 ### Setup
 Clone the repository and install dependencies:
 ```sh
-git clone <repository-url>
+git clone https://github.com/buayanil/ocean.git
 cd frontend
 npm install
 ```

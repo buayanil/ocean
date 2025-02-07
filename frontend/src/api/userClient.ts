@@ -5,7 +5,8 @@ import { UserProperties } from "../types/user";
 
 export class UserClient {
   /**
-   * Get user data
+   * Fetches the authenticated user's data.
+   * @returns A promise that resolves to the user properties.
    */
   public static getUser = async (): Promise<UserProperties> => {
     const { data } = await axiosInstance.get<UserProperties>("/user");
@@ -13,7 +14,8 @@ export class UserClient {
   };
 
   /**
-   * Search for users
+   * Fetches a list of all users.
+   * @returns A promise that resolves to an array of user properties.
    */
   public static getUsers = async (): Promise<UserProperties[]> => {
     const { data } = await axiosInstance.get<UserProperties[]>("/users");
@@ -22,6 +24,10 @@ export class UserClient {
 }
 
 export class UserValidation {
+  /**
+   * Schema for user login validation.
+   * Ensures that both `username` and `password` meet the required constraints.
+   */
   public static loginSchema = yup.object().shape({
     username: yup
       .string()
