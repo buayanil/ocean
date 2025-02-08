@@ -4,7 +4,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
 import {AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
-import { EngineType } from "../../types/database";
+import { EngineType } from "../../types/engine";
 
 // Mock DatabaseClient and DatabaseValidation to prevent actual API calls
 vi.mock("../../api/databaseClient", () => ({

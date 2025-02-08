@@ -1,6 +1,6 @@
 import {mount} from "cypress/react";
 import CreateRoleForm from "./CreateRoleForm";
-import {EngineType} from "../../types/database";
+import {EngineType} from "../../types/engine";
 
 describe("CreateRoleForm Component", () => {
   // Mock database object to simulate a real database instance for testing

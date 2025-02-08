@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { Database, EngineType } from '../types/database';
+import { Database } from '../types/database';
 import { UserProperties } from '../types/user';
 import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
+import {EngineType} from "../types/engine";
 
 /**
  * Props for the `OverviewCard` component.

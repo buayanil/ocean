@@ -2,7 +2,8 @@ import React from "react";
 import { mount } from "cypress/react";
 import OverviewCard from "./OverviewCard";
 import { UserProperties } from "../types/user";
-import { Database, EngineType } from "../types/database";
+import { Database } from "../types/database";
+import { EngineType } from "../types/engine";
 
 // Tests for OverviewCard component to verify correct rendering, database engine handling, clipboard interactions, and Adminer link validation
 describe("OverviewCard Component", () => {

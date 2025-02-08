@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { DatabaseAdminList } from "./DatabaseAdminList";
 import { Database } from "../../types/database";
-import { EngineType } from "../../types/database";
+import { EngineType } from "../../types/engine";
 // Mock database data used for testing component rendering and interactions
 const mockData: ReadonlyArray<Database> = [
     new Database({

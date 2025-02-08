@@ -1,4 +1,5 @@
 import { BaseModel } from "./models";
+import {EngineType, EngineTypeValues} from "./engine";
 
 const {
   VITE_POSTGRESQL_HOSTNAME,
@@ -13,18 +14,9 @@ const {
 export interface DatabaseProperties {
   id: number;
   name: string;
-  engine: EngineType;
+  engine: EngineTypeValues;
   createdAt: Date;
   userId: number;
-}
-/**
- * Represents the supported database engine types.
- */
-export enum EngineType {
-  /** PostgreSQL Cluster */
-  PostgreSQL = "P",
-  /** MongoDB Cluster */
-  MongoDB = "M",
 }
 /**
  * Defines the required properties for creating a new database.
@@ -40,7 +32,7 @@ export class Database extends BaseModel {
   public readonly props: DatabaseProperties;
 
   public readonly name: string;
-  public readonly engine: EngineType;
+  public readonly engine: EngineTypeValues;
   public readonly createdAt: Date;
   public readonly userId: number;
   /**

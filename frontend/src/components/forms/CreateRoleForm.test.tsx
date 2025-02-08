@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreateRoleForm, { CreateRoleFormProps } from "./CreateRoleForm";
 import { RoleClient } from "../../api/roleClient";
-import { EngineType } from "../../types/database";
+import { EngineType } from "../../types/engine";
 
 // Mock RoleClient to prevent real API calls and allow controlled responses
 vi.mock("../../api/roleClient", () => ({

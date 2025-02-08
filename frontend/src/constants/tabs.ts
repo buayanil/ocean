@@ -1,5 +1,5 @@
 import { ITab } from "../components/Navigation/Tabs/Tab";
-import { EngineType } from "../types/database";
+import {EngineType, EngineTypeValues} from "../types/engine";
 
 /**
  * Default tab configuration for the database detail view.
@@ -19,7 +19,7 @@ const databaseDetailTabs: ITab[] = [
  * @returns An array of `ITab` objects specific to the given engine.
  */
 export const getDetailViewTabsFor = (
-  engineType: EngineType | undefined
+  engineType: EngineTypeValues | undefined
 ): ITab[] => {
   const postgresqlIds = [1, 2, 3]; // Tabs available for PostgreSQL
   const mongodbIds = [1, 2]; // Tabs available for MongoDB
