@@ -4,13 +4,29 @@ import { Database, EngineType } from '../types/database';
 import { UserProperties } from '../types/user';
 import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
 
+/**
+ * Props for the `OverviewCard` component.
+ */
 export interface OverviewCardProps {
+  /** The database object containing its details (optional). */
   database?: Database;
+  /** The user object associated with the database (optional). */
   user?: UserProperties;
 }
-
+/**
+ * Renders an overview card displaying database details.
+ * - Displays database name, hostname, port, engine type, and connection string.
+ * - Provides an option to copy the connection string and open Adminer.
+ *
+ * @param database - The database object containing details.
+ * @param user - The user object to personalize the connection string.
+ */
 const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
-
+  /**
+   * Retrieves the appropriate connection string based on the database engine.
+   *
+   * @returns A formatted connection string.
+   */
   const getEngineConnectionString = (): string => {
     if (database?.engine === EngineType.PostgreSQL) {
       return database.connectionString(user?.username || "")

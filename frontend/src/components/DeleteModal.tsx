@@ -2,21 +2,42 @@ import React, { Fragment } from 'react'
 import {Dialog, DialogPanel, DialogTitle, Transition, TransitionChild} from '@headlessui/react';
 import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
-
+/**
+ * Defines the content structure for the delete confirmation modal.
+ */
 export interface ModalContent {
+    /** The title displayed in the modal. */
     title: string;
+    /** The description providing details about the action. */
     description: string;
+    /** The text for the submit (confirm) button. */
     submitText: string;
+    /** The text for the cancel button. */
     cancelText: string;
 }
-
+/**
+ * Props for the `DeleteModal` component.
+ */
 export interface DeleteModalProps {
+    /** The content to display in the modal. */
     modalContent: ModalContent;
+    /** Boolean flag indicating whether the modal is open. */
     open: boolean;
+    /** Callback function triggered when the confirm button is clicked. */
     onSubmit: () => void;
+    /** Callback function triggered when the modal is closed. */
     onClose: () => void;
 }
-
+/**
+ * A modal component for confirming deletion actions.
+ * - Displays a warning message with a confirmation and cancel button.
+ * - Uses `headlessui` for accessibility and smooth transitions.
+ *
+ * @param modalContent - The content for the modal (title, description, button texts).
+ * @param open - Controls whether the modal is displayed.
+ * @param onSubmit - Function triggered when the user confirms the deletion.
+ * @param onClose - Function triggered when the modal is closed.
+ */
 const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit, onClose }) => {
     return (
         <Transition show={open} as={Fragment}>

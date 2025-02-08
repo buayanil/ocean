@@ -4,9 +4,14 @@ import AppLayout from '../layouts/AppLayout';
 import { FAQNavigation } from '../constants/menu.';
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react';
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
-
+/**
+ * Props for the `FAQView` component.
+ * Currently, this component does not accept any props.
+ */
 interface FAQViewProps {}
-
+/**
+ * List of frequently asked questions (FAQs) and their corresponding answers.
+ */
 const faqs = [
     {
         question: "Wo finde ich die Datenschutzerklärung?",
@@ -19,11 +24,21 @@ const faqs = [
         <div>Aufrufbar unter <a href="https://www.htw-berlin.de/impressum/">https://www.htw-berlin.de/impressum/</a></div>,
     }
   ]
-  
+  /**
+   * Utility function to merge class names dynamically.
+   * Removes falsy values and joins the remaining class names into a single string.
+   *
+   * @param classes - An array of class names.
+   * @returns A string containing the filtered class names.
+   */
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
   }
-
+/**
+ * View component for displaying frequently asked questions (FAQs).
+ * - Uses `headlessui` for collapsible FAQ sections.
+ * - Wrapped in `AppLayout` for consistent navigation.
+ */
 const FAQView: React.FC<FAQViewProps> = () => {
   return (
     <AppLayout selectedNavigation={FAQNavigation.name}>

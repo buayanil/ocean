@@ -9,15 +9,27 @@ import { loginStart } from "../redux/slices/session/sessionSlice";
 import UserLayout from "../layouts/UserLayout";
 import SignInForm from "../components/SignInForm";
 
+/**
+ * Props for the `SignInView` component.
+ * Currently, this component does not accept any props.
+ */
 interface SignInViewProps { }
-
+/**
+ * The sign-in page where users can log into their HTW account.
+ * - Uses `react-redux` for authentication state management.
+ * - Redirects users to the overview page if they are already logged in.
+ * - Handles authentication by dispatching login credentials to Redux.
+ */
 const SignInView: React.FC<SignInViewProps> = () => {
   const navigate = useNavigate();
   const { loading, error, isLoggedIn } = useAppSelector(
     (state) => state.session.session
   );
   const dispatch = useAppDispatch();
-
+  /**
+   * Redirects the user to the overview page if already logged in.
+   * Runs on component mount and whenever `isLoggedIn` changes.
+   */
   useEffect(() => {
     if (isLoggedIn === true) {
       // HINT: Already signed in
@@ -25,7 +37,11 @@ const SignInView: React.FC<SignInViewProps> = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn]);
-
+  /**
+   * Handles form submission by dispatching login credentials.
+   *
+   * @param credentials - The user credentials (username and password).
+   */
   const onSubmit = (credentials: CredentialProperties) => {
     dispatch(loginStart(credentials));
   };

@@ -5,13 +5,30 @@ import { DatabaseProperties } from '../../types/database';
 import { UpstreamCreateRoleProperties } from '../../types/role';
 import CreateRoleForm from '../forms/CreateRoleForm';
 
+/**
+ * Props for the `CreateRoleModal` component.
+ */
 export interface CreateRoleModalProps {
+    /** The database where the new role will be created (optional). */
     database?: DatabaseProperties;
+    /** Boolean flag indicating whether the modal is open. */
     open: boolean;
+    /** Callback function triggered when the form is submitted. */
     onSubmit: (value: UpstreamCreateRoleProperties) => void;
+    /** Callback function triggered when the modal is closed. */
     onClose: () => void;
 }
 
+/**
+ * Modal component for creating a new user role within a database.
+ * - Displays a form to enter role details.
+ * - Uses `headlessui` transitions for smooth modal animations.
+ *
+ * @param database - The target database for the new role.
+ * @param open - Controls modal visibility.
+ * @param onSubmit - Function to handle role creation.
+ * @param onClose - Function to handle modal closure.
+ */
 const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ database, open, onSubmit, onClose }) => {
     return (
         <Transition show={open} as={Fragment}>

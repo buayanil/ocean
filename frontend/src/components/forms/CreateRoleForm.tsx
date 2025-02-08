@@ -6,15 +6,24 @@ import { DatabaseProperties } from "../../types/database";
 import { UpstreamCreateRoleProperties } from "../../types/role";
 import { RoleClient, RoleValidation } from "../../api/roleClient";
 
-
+/**
+ * Props for the `CreateRoleForm` component.
+ */
 export interface CreateRoleFormProps {
     database?: DatabaseProperties;
     onSubmit: (value: UpstreamCreateRoleProperties) => void;
     onClose?: () => void;
 }
-
+/**
+ * A form component for creating a new role within a database.
+ * - Requires a database context.
+ * - Ensures role names are unique within the database.
+ * - Handles validation before submitting the role.
+ */
 const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onClose }) => {
-
+    /**
+     * Validation schema for creating a new role.
+     */
     const schema = yup.object().shape({
         roleName: yup
             .string()
@@ -25,7 +34,14 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
                 validateDatabaseValues(value, ctx)
             )
     });
-
+    /**
+     * Checks if the role name is available in the given database.
+     * - Calls an API endpoint to verify role name uniqueness.
+     *
+     * @param roleName - The role name to validate.
+     * @param context - Formik test context for retrieving sibling fields.
+     * @returns `true` if the role name is available, otherwise `false`.
+     */
     const validateDatabaseValues = async (
         roleName: string | undefined,
         context: yup.TestContext<Record<string, any>>

@@ -7,15 +7,27 @@ import RootView from './views';
 import { restoreSession } from './redux/slices/session/sessionSlice';
 import {setupRequestInterceptors} from "./api/client";
 
-// Create a QueryClient instance
+/**
+ * Initializes a QueryClient instance for handling API requests with `react-query`.
+ */
 const queryClient = new QueryClient();
-
+/**
+ * The main application component.
+ * - Provides Redux and React Query contexts.
+ * - Restores session and sets up Axios interceptors on mount.
+ */
 const App: React.FC = () => {
-    // Dispatch session restoration on mount
+    /**
+     * Dispatches `restoreSession()` when the app mounts.
+     * This restores the user's authentication session from local storage.
+     */
     useEffect(() => {
         store.dispatch(restoreSession());
     }, []);
-
+    /**
+     * Dispatches `restoreSession()` again (potential redundancy?).
+     * Also sets up Axios interceptors for request handling.
+     */
     useEffect(() => {
         store.dispatch(restoreSession());
 

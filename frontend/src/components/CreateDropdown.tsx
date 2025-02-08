@@ -5,10 +5,20 @@ import { Link } from 'react-router-dom'
 import {Menu, MenuButton, MenuItem, MenuItems, Transition} from '@headlessui/react'
 import { ChevronDownIcon, CircleStackIcon} from '@heroicons/react/20/solid'
 
+/**
+ * Utility function to join class names dynamically.
+ *
+ * @param classes - An array of class names.
+ * @returns A string containing the filtered class names.
+ */
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
-
+/**
+ * Renders a dropdown menu for creating new entities.
+ * - Currently supports database creation.
+ * - Uses `headlessui` for accessibility and animations.
+ */
 const CreateDropdown: React.FC = () => {
   return (
     <Menu as="div" className="relative inline-block text-left">

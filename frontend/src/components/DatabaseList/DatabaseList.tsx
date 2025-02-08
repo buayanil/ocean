@@ -5,14 +5,23 @@ import MobileDatabaseListEntry from './MobileDatabaseListEntry';
 import DesktopDatabaseListEntry from './DesktopDatabaseListEntry';
 import { DatabaseProperties } from '../../types/database';
 
-
+/**
+ * Props for the `DatabaseList` component.
+ */
 export interface DatabaseListProps {
+    /** The list of databases to display. */
     databases: ReadonlyArray<DatabaseProperties>;
+    /** Optional callback function triggered when a database entry is clicked. */
     onClick?: (id: number) => void;
 }
 
-
+/**
+ * Renders a list of databases in a responsive layout.
+ * - Displays databases differently for mobile and desktop views.
+ * - Sorts databases by creation date (newest first).
+ */
 const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
+    /** Sorted list of databases, ordered by creation date (newest first). */
     const sortedDatabases = databases.slice(0).sort((left, right) => compareDesc(left.createdAt, right.createdAt))
     return (
         <>
@@ -59,7 +68,12 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
         </>
     );
 }
-
+/**
+ * Returns the database engine title based on its identifier.
+ *
+ * @param value - The engine identifier (`'P'` for PostgreSQL, `'M'` for MongoDB).
+ * @returns The full name of the database engine.
+ */
 export const getDatabaseEngineTitle = (value: string): string => {
     if (value === 'P') {
         return 'PostgreSQL';
@@ -69,7 +83,12 @@ export const getDatabaseEngineTitle = (value: string): string => {
         return 'Unknown';
     }
 }
-
+/**
+ * Formats the database creation date into a human-readable format.
+ *
+ * @param value - The date the database was created.
+ * @returns A formatted string representing the relative time (e.g., "3 days ago").
+ */
 export const getDatabaseCreatedAt = (value: Date): string => {
     return formatDistance(value, new Date(), { addSuffix: true })
 }

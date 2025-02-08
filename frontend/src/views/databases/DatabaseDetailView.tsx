@@ -27,9 +27,16 @@ import RoleList from "../../components/RoleList/RoleList";
 import UserSelector from "../../components/UserSelector/UserSelector";
 import { Tabs } from "../../components/Navigation/Tabs/Tabs";
 
-
+/**
+ * Props for the `DatabaseDetailView` component.
+ * Currently, this component does not accept any props.
+ */
 interface DatabaseDetailViewProps { }
-
+/**
+ * View component for displaying the details of a database.
+ * - Fetches database information, roles, invitations, and users.
+ * - Supports role creation, invitation management, and database deletion.
+ */
 const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   let { id } = useParams<{ id: string }>();
   const parsedId = id ? Number.parseInt(id) : undefined;
@@ -50,24 +57,33 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   const [showInvitationDeleteFailedNotification, setShowInvitationDeleteFailedNotification] = useState<boolean>(false);
   // Queries
   const queryClient = useQueryClient()
+  /**
+   * Fetches the database details by ID.
+   */
   const { data: database } = useQuery({
     queryKey: ["database", parsedId],
     queryFn: () => parsedId ? DatabaseClient.getDatabase(parsedId) : Promise.resolve(null),
     enabled: !!parsedId, // Ensures query only runs when parsedId is valid
   });
-
+  /**
+   * Fetches the list of roles associated with the database.
+   */
   const { data: roles } = useQuery({
     queryKey: ["roles", parsedId],
     queryFn: () => parsedId ? RoleClient.getRolesForDatabase(parsedId) : Promise.resolve([]),
     enabled: !!parsedId,
   });
-
+  /**
+   * Fetches invitations for the database.
+   */
   const { data: invitations } = useQuery({
     queryKey: ["invitations", parsedId],
     queryFn: () => parsedId ? InvitationClient.getInvitationsForDatabase(parsedId) : Promise.resolve([]),
     enabled: !!parsedId,
   });
-
+  /**
+   * Fetches the currently authenticated user.
+   */
   const { data: users } = useQuery({
     queryKey: ["users"],
     queryFn: () => UserClient.getUsers(),
@@ -78,6 +94,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
     queryFn: () => UserClient.getUser(),
   });
   // Mutations
+  /**
+   * Mutation for creating a new role in the database.
+   */
   const createRoleMutation = useMutation({
     mutationFn: (role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role),
     onSuccess: () => {
@@ -91,6 +110,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       setShowUserAddFailedNotification(true);
     }
   });
+  /**
+   * Mutation for deleting a role from the database.
+   */
   const deleteRoleMutation = useMutation({
     mutationFn: (id: number) => RoleClient.deleteRoleForDatabase(id),
     onSuccess: () => {
@@ -102,7 +124,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       setShowUserDeleteFailedNotification(true);
     }
   });
-
+  /**
+   * Mutation for creating an invitation for a user.
+   */
   const createInvitationMutation = useMutation({
     mutationFn: (invitation: UpstreamCreateInvitationProperties) =>
         InvitationClient.createInvitationForDatabase(invitation),
@@ -115,7 +139,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       setShowInvitationAddFailedNotification(true);
     }
   });
-
+  /**
+   * Mutation for deleting an invitation.
+   */
   const deleteInvitationMutation = useMutation({
     mutationFn: (id: number) => InvitationClient.deleteInvitationForDatabase(id),
     onSuccess: () => {
@@ -127,7 +153,9 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       setShowInvitationDeleteFailedNotification(true);
     }
   });
-
+  /**
+   * Mutation for deleting the entire database.
+   */
   const deleteDatabaseMutation = useMutation({
     mutationFn: (id: number) => DatabaseClient.deleteDatabase(id),
     onSuccess: () => {
@@ -138,7 +166,13 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
   });
   // Other users except our user
   const otherUsers = (users || []).filter(_ => _.id !== user?.id)
-
+  /**
+   * Handles the deletion of an invitation for a user.
+   * - Finds the invitation matching the user ID.
+   * - Calls the mutation function to delete the invitation.
+   *
+   * @param value - The user whose invitation needs to be deleted.
+   */
   const onDeleteInvitation = (value: UserProperties) => {
     if (invitations) {
       const invitation = invitations.find(invitation => invitation.userId === value.id);
@@ -147,7 +181,14 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       }
     }
   }
-
+  /**
+   * Renders the content for the selected tab.
+   * - Overview tab: Displays database details.
+   * - Users tab: Displays a list of users with role management.
+   * - Invitations tab: Displays a list of invitations with user selection.
+   *
+   * @returns The React node containing the tab content.
+   */
   const renderTabContent = (): React.ReactNode => {
     if (activeId === 1) {
       return (
@@ -203,7 +244,11 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       </div>
     }
   };
-
+  /**
+   * Renders the modals used for database deletion and role creation.
+   *
+   * @returns The React element containing the modals.
+   */
   const renderModals = (): React.ReactElement => {
     return (
       <div>
@@ -228,7 +273,11 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       </div>
     )
   }
-
+  /**
+   * Renders notification messages for success and failure events.
+   *
+   * @returns The React element containing notification messages.
+   */
   const renderNotifications = (): React.ReactElement => {
     return (
       <div>
