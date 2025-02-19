@@ -19,9 +19,6 @@ cypress/screenshots
 #Typedoc
 docs/typedoc
 
-dist-ssr
-*.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
