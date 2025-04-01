@@ -90,6 +90,40 @@ Generates a comprehensive coverage report using NYC, providing both text and HTM
 
 If you want to unify the vitest and cypress test coverage, copy the coverage-final.json from coverage/vitest to .nyc_output and then run the command
 
+## Deployment
+
+After running the build command:
+
+```sh
+npm run build
+```
+The production-ready static files will be generated in the dist/ directory.
+
+These files can be deployed using any static file server, such as Nginx, Apache, or tools like serve.
+
+### Example using `serve` (for local testing)
+
+```sh
+npm install -g serve
+serve -s dist
+```
+
+### Deployment on oceandev.f4.htw-berlin.de
+
+To deploy the application on `oceandev.f4.htw-berlin.de`, follow these steps:
+
+1. Build the application:
+
+   ```sh
+   npm run build
+   ```
+2. Copy the contents of the `dist/` folder to the appropriate directory on the server. For example:
+
+    ```sh
+    scp -r dist/* username@oceandev.f4.htw-berlin.de:/var/www/html/
+    ```
+3. Ensure the server is configured to serve files from that location.
+
 ## Linting
 ```sh
 npm run lint
